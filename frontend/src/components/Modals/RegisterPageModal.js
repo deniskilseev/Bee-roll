@@ -1,5 +1,7 @@
+// RegisterPageModal.js
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import LoginPageModal from './LoginPageModal';
 
 const RegisterPageModal = ({ showModal, onClose }) => {
   const [formData, setFormData] = useState({
@@ -8,11 +10,20 @@ const RegisterPageModal = ({ showModal, onClose }) => {
     password: '',
   });
 
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleLoginClick = () => {
+    onClose(); // Close the registration modal first
+    console.log("Before set: ", showLoginModal);
+    setShowLoginModal(true); // Close the registration modal when opening the login modal
+    console.log("After set: ", showLoginModal);
   };
 
   const handleSubmit = (e) => {
@@ -67,12 +78,25 @@ const RegisterPageModal = ({ showModal, onClose }) => {
           </div>
 
           <div className="modal-footer d-flex justify-content-center">
-            <button type="submit" className="btn btn-primary">
-              Register
-            </button>
-          </div>
+              <button type="submit" className="btn btn-primary">
+                Register
+              </button>
+            </div>
+            <div className="text-center">
+              <p>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  className="btn btn-link text-dark-blue p-0 m-0 pb-1"
+                  onClick={handleLoginClick}
+                >
+                  Login Here
+                </button>
+              </p>
+            </div>
         </form>
       </Modal.Body>
+      {showLoginModal && <LoginPageModal showModal={showLoginModal} onClose={() => setShowLoginModal(false)} />}
     </Modal>
   );
 };

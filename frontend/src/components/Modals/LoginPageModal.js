@@ -1,3 +1,4 @@
+// LoginPageModal.js
 import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
 
@@ -21,9 +22,16 @@ const LoginPageModal = ({ showModal, onClose }) => {
 
   const handleClose = () => {
     const modalElement = document.getElementById('loginModal');
+
     if (modalElement) {
       modalElement.classList.remove('show');
       modalElement.style.display = 'none';
+
+      setFormData({
+        username: '',
+        password: '',
+      });
+
       onClose();
     }
   };
@@ -103,7 +111,7 @@ const LoginPageModal = ({ showModal, onClose }) => {
                 Don't have an account?{' '}
                 <button
                   type="button"
-                  className="btn btn-link text-info"
+                  className="btn btn-link text-dark-blue p-0 m-0 pb-1"
                   onClick={handleRegisterClick}
                 >
                   Register Here
