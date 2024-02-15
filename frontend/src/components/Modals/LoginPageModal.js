@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import RegisterPageModal from './RegisterPageModal';
 
 const LoginPageModal = ({ showModal, onClose }) => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
   });
+
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
   useEffect(() => {
     if (showModal) {
@@ -32,6 +35,12 @@ const LoginPageModal = ({ showModal, onClose }) => {
     });
   };
 
+  const handleRegisterClick = () => {
+    handleClose();
+
+    setShowRegisterModal(true);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form data:', formData);
@@ -40,6 +49,7 @@ const LoginPageModal = ({ showModal, onClose }) => {
   };
 
   return (
+    <>
     <div
       className={`modal fade ${showModal ? 'show' : ''}`}
       id="loginModal"
@@ -67,6 +77,7 @@ const LoginPageModal = ({ showModal, onClose }) => {
                   name="username"
                   value={formData.username}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
               <div className="form-group">
@@ -78,6 +89,7 @@ const LoginPageModal = ({ showModal, onClose }) => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
@@ -87,12 +99,28 @@ const LoginPageModal = ({ showModal, onClose }) => {
               </button>
             </div>
             <div className="text-center">
-              <p>Don't have an account? <a href="/register" className="text-info">Register Here</a></p>
+              <p>
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  className="btn btn-link text-info"
+                  onClick={handleRegisterClick}
+                >
+                  Register Here
+                </button>
+              </p>
             </div>
           </div>
         </div>
       </form>
     </div>
+    {showRegisterModal && (
+      <RegisterPageModal
+        showModal={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+      />
+    )}
+    </>
   );
 };
 
