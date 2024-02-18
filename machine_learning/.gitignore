@@ -3,3 +3,7 @@
 env/
 # Data for Machine Learning
 data/
+# Temporary Files
+tmp/
+# Trained Models:
+models/
