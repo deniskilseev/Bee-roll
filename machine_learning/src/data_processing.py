@@ -48,13 +48,15 @@ class UserHistory():
     def user_id(self):
         return self.data["user_id"]
 
-def process_input(path_to_films, path_to_reviews, output_dir):
+def process_input(path_to_films, path_to_reviews, output_dir, n_parts=10):
     films = pd.read_csv(path_to_films)
     reviews = pd.read_csv(path_to_reviews)
     movie_reviews = reviews.merge(films, on="movieId").sort_values(by="timestamp")
     movie_reviews["timestamp"] = movie_reviews["timestamp"].apply(datetime.fromtimestamp)
     movie_reviews["genres"] = movie_reviews["genres"].apply(parse_genres)
     users_history = []
+    n_users = movie_reviews["userId"].nunique()
+    part = 0
     for user_id in tqdm(movie_reviews["userId"].unique()):
         user_reviews = movie_reviews[movie_reviews["userId"] == user_id]
         history = UserHistory(user_id)
@@ -63,7 +65,19 @@ def process_input(path_to_films, path_to_reviews, output_dir):
             review = Review(movie, row.timestamp, row.rating)
             history.add_review(review)
         users_history.append(history)
-    pickle.dump(users_history, os.path.join(output_dir, "processed.data"))
+        if len(users_history) >= n_users / n_parts:
+            with open(os.path.join(output_dir, f"processed_{part}.data"), "ab") as file:
+                pickle.dump(users_history, file)
+            print (f"Processed {part + 1}/{n_parts} of data")
+            users_history = []
+            part += 1
+    if n_parts > part:
+        with open(os.path.join(output_dir, f"processed_{part}.data"), "ab") as file:
+            pickle.dump(users_history, file)
+        print (f"Processed {part + 1}/{n_parts} of data")
+        users_history = []
+        part += 1
+
 
 
 def parse_genres(genres_list):
