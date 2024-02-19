@@ -7,3 +7,7 @@ data/
 tmp/
 # Trained Models:
 models/
+# Pycache stuff
+__pycache__/
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
