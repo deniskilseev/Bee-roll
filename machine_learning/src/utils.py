@@ -8,7 +8,7 @@ class MovieEncoder():
     def __init__(self, movie_csv_path):
         self.movie_idx = dict() # Translate movieId to index
         self.movie_mid = dict() # Translate index to movieId
-        for idx, mid in enumerate(pd.read_csv(movie_csv_path).movieId.values)
+        for idx, mid in enumerate(pd.read_csv(movie_csv_path).movieId.values):
             self.movie_idx[mid] = idx
             self.movie_mid[idx] = mid
 

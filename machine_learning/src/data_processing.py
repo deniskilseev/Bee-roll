@@ -39,8 +39,9 @@ class UserHistory():
 class RowProcessor:
     def __init__(self, output_path, n_parts=10):
         self.n_parts = n_parts
+
         os.makedirs(
-            output_path, exist_ok=True,
+            output_path, exist_ok=True
         )
 
         self.files = []
@@ -58,9 +59,9 @@ class RowProcessor:
     def flush(self):
         if self._user != None:
             # All reviews of 1 user go into 1 part
-            part_index = user_hash(self._user.user_id()) % n_parts
+            part_index = user_hash(str(self._user.user_id())) % self.n_parts
             # Writing gathered data about the user
-            self.files[part_index].write(json.dumps(self._client.as_dict()) + "\n")
+            self.files[part_index].write(json.dumps(self._user.as_dict()) + "\n")
 
             self._user = None
 
@@ -73,11 +74,32 @@ class RowProcessor:
         
         review = Review(row.movieId, row.timestamp, row.rating)
 
-        self._user.add_review(review)
+        self._user.add_review(review.as_dict())
+
+
+def count_input_users(input_path):
+    uids = set()
+    
+    for files in tqdm(pd.read_csv(input_path, chunksize=250000)):
+        for row in files.itertuples():
+            uids.add(row.userId)
+
+    return len(uids)
+
+
+def count_output_users(output_path):
+    n_uids = 0
+    
+    for file in tqdm(os.listdir(output_path)):
+        if ".json.splitted" in file:
+            for _ in open(os.path.join(output_path, file)):
+                n_uids += 1
+
+    return n_uids
 
 
 def process_input(input_path, output_path, n_parts=10):
-    processor = RowProcessor(input_path, output_path, n_parts=n_parts)
+    processor = RowProcessor(output_path, n_parts=n_parts)
 
     for files in tqdm(pd.read_csv(input_path, chunksize=250000)):
         for row in files.itertuples():
@@ -88,5 +110,10 @@ def process_input(input_path, output_path, n_parts=10):
 
 if __name__ == "__main__":
     random.seed(42) # Ah, yes, the number
-    process_input(cfg.MOVIES_CSV_PATH, cfg.REVIEWS_CSV_PATH, "../tmp/")
+    print("Processing input")
+    process_input(cfg.REVIEWS_CSV_PATH, cfg.TEMPORATY_FILES_PATH, n_parts=10)
+    print("Checking if the output is correct")
+    input_users = count_input_users(cfg.REVIEWS_CSV_PATH)
+    output_users = count_output_users(cfg.TEMPORATY_FILES_PATH)
+    assert input_users == output_users
 
