@@ -1,35 +1,23 @@
-from datetime import datetime
-import numpy as np
-import pandas as pd
-import pickle
+import json
 import os
 import random
-from tqdm import tqdm
-
+import pandas as pd
 import config as cfg
-
-
-class Movie:
-    def __init__(self, movie_id, title, genres):
-        self.data = {
-            "mid": movie_id,
-            "title": title,
-            "genres": genres
-        }
-
+from tqdm import tqdm
+from utils import user_hash
 
 class Review:
-    def __init__(self, movie, review_datetime, review_rating, **kwargs):
+    def __init__(self, movie_id, review_timestamp, review_rating, **kwargs):
         self.data = {
-            **{"movie": movie, "datetime": review_datetime, "rating": review_rating},
+            **{"movie_id": movie_id, "timestamp": review_timestamp, "rating": review_rating},
             **kwargs,
         }
     
     def as_dict(self):
         return self.data
 
-    def movie(self):
-        return self.data["movie"]
+    def movie_id(self):
+        return self.data["movie_id"]
 
 
 class UserHistory():
@@ -48,42 +36,54 @@ class UserHistory():
     def user_id(self):
         return self.data["user_id"]
 
-def process_input(path_to_films, path_to_reviews, output_dir, n_parts=10):
-    films = pd.read_csv(path_to_films)
-    reviews = pd.read_csv(path_to_reviews)
-    movie_reviews = reviews.merge(films, on="movieId").sort_values(by="timestamp")
-    movie_reviews["timestamp"] = movie_reviews["timestamp"].apply(datetime.fromtimestamp)
-    movie_reviews["genres"] = movie_reviews["genres"].apply(parse_genres)
-    users_history = []
-    n_users = movie_reviews["userId"].nunique()
-    part = 0
-    for user_id in tqdm(movie_reviews["userId"].unique()):
-        user_reviews = movie_reviews[movie_reviews["userId"] == user_id]
-        history = UserHistory(user_id)
-        for rid, row in user_reviews.iterrows():
-            movie = Movie(row.movieId, row.title, row.genres)
-            review = Review(movie, row.timestamp, row.rating)
-            history.add_review(review)
-        users_history.append(history)
-        if len(users_history) >= n_users / n_parts:
-            with open(os.path.join(output_dir, f"processed_{part}.data"), "ab") as file:
-                pickle.dump(users_history, file)
-            print (f"Processed {part + 1}/{n_parts} of data")
-            users_history = []
-            part += 1
-    if n_parts > part:
-        with open(os.path.join(output_dir, f"processed_{part}.data"), "ab") as file:
-            pickle.dump(users_history, file)
-        print (f"Processed {part + 1}/{n_parts} of data")
-        users_history = []
-        part += 1
+class RowProcessor:
+    def __init__(self, output_path, n_parts=10):
+        self.n_parts = n_parts
+        os.makedirs(
+            output_path, exist_ok=True,
+        )
+
+        self.files = []
+        for i in range(self.n_parts):
+            self.files.append(
+                open(os.path.join(output_path, "{:02d}.json.splitted".format(i)), "w")
+            )
+        self._user = None
+    
+    def finish(self):
+        self.flush()
+        for file in self.files:
+            file.close()
+
+    def flush(self):
+        if self._user != None:
+            # All reviews of 1 user go into 1 part
+            part_index = user_hash(self._user.user_id()) % n_parts
+            # Writing gathered data about the user
+            self.files[part_index].write(json.dumps(self._client.as_dict()) + "\n")
+
+            self._user = None
+
+    def consume_row(self, row):
+        if self._user != None and self._user.user_id() != row.userId:
+            self.flush()
+        
+        if self._user == None:
+            self._user = UserHistory(row.userId)
+        
+        review = Review(row.movieId, row.timestamp, row.rating)
+
+        self._user.add_review(review)
 
 
+def process_input(input_path, output_path, n_parts=10):
+    processor = RowProcessor(input_path, output_path, n_parts=n_parts)
 
-def parse_genres(genres_list):
-    if genres_list == "(no genres listed)":
-        return []
-    return genres_list.split("|")
+    for files in tqdm(pd.read_csv(input_path, chunksize=250000)):
+        for row in files.itertuples():
+            processor.consume_row(row)
+
+    processor.finish()
     
 
 if __name__ == "__main__":
