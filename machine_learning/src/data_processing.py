@@ -47,7 +47,7 @@ class RowProcessor:
         self.files = []
         for i in range(self.n_parts):
             self.files.append(
-                open(os.path.join(output_path, "{:02d}.json.splitted".format(i)), "w")
+                open(os.path.join(output_path, "{:02d}.json".format(i)), "w")
             )
         self._user = None
     
@@ -91,7 +91,7 @@ def count_output_users(output_path):
     n_uids = 0
     
     for file in tqdm(os.listdir(output_path)):
-        if ".json.splitted" in file:
+        if file.endswith(".json"):
             for _ in open(os.path.join(output_path, file)):
                 n_uids += 1
 
