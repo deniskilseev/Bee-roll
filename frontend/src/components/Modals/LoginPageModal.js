@@ -1,4 +1,3 @@
-// LoginPageModal.js
 import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
 
@@ -49,10 +48,29 @@ const LoginPageModal = ({ showModal, onClose }) => {
     setShowRegisterModal(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form data:', formData);
-    // Add authentication Logic
+
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        console.log('Login successful');
+      } else {
+        console.error('Login failed');
+        // Handle failed login scenarios
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network or other errors
+    }
+
     handleClose();
   };
 

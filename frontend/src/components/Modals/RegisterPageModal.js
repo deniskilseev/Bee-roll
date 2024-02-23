@@ -1,4 +1,3 @@
-// RegisterPageModal.js
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import LoginPageModal from './LoginPageModal';
@@ -14,7 +13,7 @@ const RegisterPageModal = ({ showModal, onClose }) => {
 
   const handleInputChange = (e) => {
     setFormData({
-      ...formData,
+      formData,
       [e.target.name]: e.target.value,
     });
   };
@@ -26,10 +25,29 @@ const RegisterPageModal = ({ showModal, onClose }) => {
     console.log("After set: ", showLoginModal);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form data:', formData);
-    // Add registration logic
+
+    try {
+      const response = await fetch('/createuser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        console.log('User created successfully');
+      } else {
+        console.error('Failed to create user');
+        // Handle error scenarios
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle network or other errors
+    }
+
     onClose();
   };
 

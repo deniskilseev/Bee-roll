@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,11 +15,12 @@ const App = () => {
     profilePicture: 'blank profile pic.jpg',
     followers: [1, 2, 3, 4],
     following: [1, 2, 3],
-    posts: [
-      { id: 1, title: 'First Post', content: 'First post.' },
-      { id: 2, title: 'Second Post', content: 'Second post.' },
-    ],
   };
+
+  dummyUser.posts = [
+    { id: 1, title: 'First Post', content: 'First post.', author: dummyUser},
+    { id: 2, title: 'Second Post', content: 'Second post.', author: dummyUser},
+  ];
 
   return (
     <Router>

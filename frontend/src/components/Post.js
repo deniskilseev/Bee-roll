@@ -6,7 +6,19 @@ const Post = ({ title, content, author }) => {
       <div className="card-body">
         <h5 className="card-title">{title}</h5>
         <p className="card-text">{content}</p>
-        <p className="card-text"><small className="text-muted">Posted by {author}</small></p>
+        <div className="d-flex align-items-center">
+          <img
+            src={author.profilePicture}
+            alt={`${author.username}'s profile`}
+            className="rounded-circle mr-2"
+            style={{ width: '30px', height: '30px', marginRight: '8px' }}
+          />
+          <p className="card-text">
+            <small className="text-muted">
+              Posted by {author.username}
+            </small>
+          </p>
+        </div>
       </div>
     </div>
   );
