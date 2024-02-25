@@ -41,7 +41,30 @@ const userConroller = {
             console.error("Error in createUser:", error);
             res.status(500).json({ error: "Internal server error" });
         }
+    },
+
+    async loginUser(req, res) {
+        try {
+            const {username, password} = req.body;
+
+            data_by_username = await User.findOne({login: username});
+            const verified_password = data_by_username.password == password;
+
+            if (!data_by_username || !verified_password) {
+                console.log("Access denied for" + username);
+                return res.status(401).json({error: "Access denied."});
+            }
+
+            data_by_username.password = undefined; // delete password from data.
+
+            res.status(200).json({data_by_username});
+
+        } catch (error) {
+            console.error("Error in loginUser:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     }
+
 }
 
 module.exports = userConroller;
