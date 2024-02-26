@@ -1,0 +1,11 @@
+# Python
+# Enviornments
+env/
+# Data for Machine Learning
+data/
+# Temporary Files
+tmp/
+# Pycache stuff
+__pycache__/
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
