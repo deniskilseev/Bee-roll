@@ -5,8 +5,6 @@ env/
 data/
 # Temporary Files
 tmp/
-# Trained Models:
-models/
 # Pycache stuff
 __pycache__/
 # Jupyter Notebook checkpoints
