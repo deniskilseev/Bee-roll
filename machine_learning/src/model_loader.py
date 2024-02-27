@@ -7,7 +7,7 @@ class ModelLoader():
         assert os.path.isfile(model_pickled_path), "Provide a valid model path"
 
         with open(model_pickled_path, "rb") as modelFile:
-            self.model = picke.load(modelFile)
+            self.model = pickle.load(modelFile)
         self.model_type = model_type
 
     def predict(self, x):

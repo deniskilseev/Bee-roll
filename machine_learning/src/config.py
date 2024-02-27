@@ -8,3 +8,7 @@ TEMPORATY_FILES_PATH = "../tmp/"
 # Train/Validation Ratio:
 
 TRAIN_RATIO = 0.8
+
+# Path to Models
+
+PATH_TO_MOVIE_MODEL ="../models/dummy.model"
