@@ -1,3 +1,5 @@
+import pandas as pd
+
 class DummyModel():
     def __init__(self, dataframe):
         self.sortedMovies = dataframe
