@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from config import PATH_TO_MOVIE_MODEL
-from typing import List
+from typing import List, Union
 import joblib
 from dummy_model import DummyModel
 
@@ -23,11 +23,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+class History(BaseModel):
+    user_id: int
+    movie_ids: List[int] | None = None
 
 @app.post("/movies")
-async def predict(q: List[int] = Query(None)):
-    movie_ids = q["movie_ids"]
-    predict_movie(movie_ids)
+async def predict(history: History):
+    if history.movie_ids == None:
+        return HTTPException(status_code=412, detail="Provide movie IDs")
+
+    output = ml_models["movies"].predict(history.movie_ids)
     return {
         "movie_ids": list(output)
     }
