@@ -25,13 +25,12 @@ app = FastAPI(lifespan=lifespan)
 
 class History(BaseModel):
     user_id: int
-    movie_ids: List[int] | None = None
+    movie_ids: List[int] = []
 
 @app.post("/movies")
 async def predict(history: History):
-    if history.movie_ids == None:
-        return HTTPException(status_code=412, detail="Provide movie IDs")
-
+    if len(history.movie_ids) < 10:
+        return HTTPException(status_code=412, detail="Provide more movie IDs")
     output = ml_models["movies"].predict(history.movie_ids)
     return {
         "movie_ids": list(output)
