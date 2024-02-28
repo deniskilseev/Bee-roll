@@ -40,6 +40,34 @@ const forumController = {
             console.error("Error in createForum:", error);
             res.status(500).json({ error: "Internal server error" });
         }
+    },
+
+    async joinForum(req, res) {
+        try {
+            const {forumId, memberId} = req.body;
+
+            const forum = await Forum.findOne({forumId: forumId});
+            if (!forum) {
+                return res.status(400).json({error: "Forum with such name does not exists"})
+            }
+
+            const member = await User.findOne({uid: memberId})
+            if (!member) {
+                return res.status(400).json({error: "User with such id does not exists"})
+            }
+
+            member.forumIds.push(forumId)
+            forum.userIds.push(memberId)
+
+            await member.save()
+            await forum.save()
+
+            console.log("Forum joined successfully: ", forumId, " user being ", memberId)
+            return res.status(201).json({message: "Forum joined successfully"})
+        } catch (error) {
+            console.error("Error in createForum:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     }
 }
 
