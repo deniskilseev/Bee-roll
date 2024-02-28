@@ -124,4 +124,4 @@ const watchListController = {
     }
 }
 
-module.exports(watchListController);
+module.exports = watchListController;

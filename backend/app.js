@@ -2,7 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 // Import controllers
-const userRoute = require('./routes/user'); 
+const userRoute = require('./routes/user');
+const watchlistRoute = require('./routes/watchlist');
 
 // Add more controllers as needed
 
@@ -31,5 +32,6 @@ mongoose.connect(uri, {
 
 // Routes.
 app.use('/users', userRoute);
+app.use('/watchlists', watchlistRoute)
 
 module.exports = app;
