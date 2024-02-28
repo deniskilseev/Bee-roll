@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
-const messageGroupSchema = new Schema({
+const chatSchema = new Schema({
     groupId: {
         type: Number,
         required: true
@@ -17,7 +17,7 @@ const messageGroupSchema = new Schema({
     },
     userIds: {
         type: [Number],
-        required: false
+        required: true
     },
     messageIds: {
         type: [Number],
@@ -25,5 +25,5 @@ const messageGroupSchema = new Schema({
     }
 });
 
-const MessageGroup = model('MessageGroup', messageGroupSchema);
-module.exports = MessageGroup;
+const Chat = model('Chat', chatSchema);
+module.exports = Chat;

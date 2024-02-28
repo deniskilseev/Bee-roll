@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
 const movieSchema = new Schema({
-    mid: Number,
+    movieId: Number,
     title: String,
-    imdbid: Number,
+    imdbId: Number,
     genres: [String]
 });
 

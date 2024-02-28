@@ -19,7 +19,7 @@ const watchListSchema = new Schema({
         type: [String],
         require: false
     },
-    reviews: {
+    ratings: {
         type: [Number],
         require: false
     }
