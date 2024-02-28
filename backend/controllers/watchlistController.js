@@ -11,7 +11,7 @@ const watchListController = {
         try {
             const {username, is_public, watch_list_title} = req.body();
 
-            const data_by_username = await User.findOne({login: username});
+            const data_by_username = await User.findOne( {login: username} );
 
             if (!data_by_username) {
                 return res.status(400).json( {error: "Username does not exist"} );
@@ -31,7 +31,7 @@ const watchListController = {
             // New watchlist entry
 
             const newWatchList = new WatchList({
-                watchListsId: counter_value + 1,
+                watchListId: counter_value + 1,
                 watchListTitle: watch_list_title,
                 isPublic: is_public,
                 userId: user_id
@@ -45,7 +45,38 @@ const watchListController = {
             return res.status(200).json( {message: "Created WatchList successfully"} );
         } catch (error) {
             console.error("Error in createWatchList:", error);
-            res.status(500).json( {error: "Internal server error" } );
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    }
+
+    async getWatchList(req, res) {
+        try {
+            const {watch_list_id} = req.body();
+
+            const data_by_id = await WatchList.findOne( {watchListId: watch_list_id} );
+
+            if (!data_by_id) {
+                return res.status(400).json( {error: "watchListId does not exits"} );
+            }
+
+            return res.status(200).json({data_by_id});
+
+        } catch (error) {
+            console.error("Error in getWatchList:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    }
+
+    async editWatchList(req, res) {
+        try {
+            const {watch_list_id, add_movies, ratings, delete_movies} = req.body;
+
+
+        } catch (error) {
+            console.error("Error in editWatchList:". error);
+            return res.status(500).json( {error: "Internal server error"} );
         }
     }
 }
+
+module.exports(watchListController);
