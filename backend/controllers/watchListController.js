@@ -24,6 +24,12 @@ const watchListController = {
             // Get user id from the request.
             const user_id = data_by_username.uid;
 
+            const watchlist_data = WatchList.findOne( {watchListTitle: watch_list_title, userId: user_id} );
+
+            if (watchlist_data) { // If there's already a watchlist with the same name and user, we don't create it.
+                return res.status(400).json( {error: "Watchlist already exists"} );
+            }
+
             // Get the value for watchlist id through autoincrement.
             const data_request = await Counter.findOne( {_id: "WatchList"} );
             const counter_value = data_request.collectionCounter;
@@ -40,7 +46,7 @@ const watchListController = {
             await newWatchList.save(); // Save the new watchlist
             await Counter.findOneAndUpdate( {_id: "WatchList"}, {collectionCounter: counter_value + 1}); // Update the autoincrement
 
-            console.log("WatchList created successfully: ", watch_list_title);
+            console.log("WatchList created successfully:", watch_list_title);
 
             return res.status(201).json( {message: "Created WatchList successfully"} );
         } catch (error) {
