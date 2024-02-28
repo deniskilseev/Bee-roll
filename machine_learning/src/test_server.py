@@ -22,6 +22,6 @@ def test_invalid_input():
         "user_id": "Quentin Tarantino",
         "movie_ids": ["The Hateful Eight", "Django Unchained"]
     }
-    with TestClient(app = app) as client:
+    with TestClient(app=app) as client:
         response = client.post("/movies", json=json)
         assert response.status_code == 422
