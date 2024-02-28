@@ -9,7 +9,7 @@ const User = require('../model/User.js')
 const watchListController = {
     async createWatchList(req, res) {
         try {
-            const {username, is_public, watch_list_title} = req.body();
+            const {username, is_public, watch_list_title} = req.body;
 
             const data_by_username = await User.findOne( {login: username} );
 
@@ -51,7 +51,7 @@ const watchListController = {
 
     async getWatchList(req, res) {
         try {
-            const {watch_list_id} = req.body();
+            const {watch_list_id} = req.body;
 
             const data_by_id = await WatchList.findOne( {watchListId: watch_list_id} );
 
