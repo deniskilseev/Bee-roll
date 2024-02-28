@@ -47,7 +47,7 @@ const watchListController = {
             console.error("Error in createWatchList:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
-    }
+    },
 
     async getWatchList(req, res) {
         try {
@@ -65,7 +65,7 @@ const watchListController = {
             console.error("Error in getWatchList:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
-    }
+    },
 
     async editWatchList(req, res) {
         try {
@@ -82,7 +82,7 @@ const watchListController = {
             }
 
             // check whether movie ids are valid.
-            const movie_data = await Movie.find( {movieId: $in add_movie_ids} );
+            const movie_data = await Movie.find( {movieId: {$in: add_movie_ids}} );
 
             if (movie_data.length != add_movie_ids.length) {
                 return res.status(400).json( {error: "Some movieId do not exist"} );
