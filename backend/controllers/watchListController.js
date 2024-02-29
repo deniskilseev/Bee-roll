@@ -42,8 +42,13 @@ const watchListController = {
                 isPublic: is_public,
                 userId: user_id
             });
+            
+            const newWatchListIds = data_by_username.watchListsIds;
+
+            newWatchListIds.push(counter_value + 1);
 
             await newWatchList.save(); // Save the new watchlist
+            await User.findOneAndUpdate({uid: user_id}, {watchListsIds: newWatchListIds}); // Update the user entry
             await Counter.findOneAndUpdate( {_id: "WatchList"}, {collectionCounter: counter_value + 1}); // Update the autoincrement
 
             console.log("WatchList created successfully:", watchlist_title);
@@ -170,13 +175,35 @@ const watchListController = {
     async deleteWatchList(req, res) {
         try {
             const {watchlist_id} = req.body;
-            // TODO: Delete the watchlist entry.
-            res.status(404).json( {message: "Not Found"} );
+
+            const watchlist_data = await WatchList.findOne( {watchListId: watchlist_id} );
+
+            if (!watchlist_data) {
+                return res.status(400).json( {error: "watchlist_id does not exist"} );
+            }
+            const user_id = watchlist_data.userId;
+
+            const user_data = await User.findOne( {uid: user_id} );
+
+            if (!user_data) {
+                return res.status(400).json( {error: "the owner has been deleted"} );
+            }
+            
+            const watchlist_ids = user_data.watchListsIds;
+            const index = watchlist_ids.indexOf(watchlist_id);
+
+            if (index != -1) {
+                watchlist_ids.splice(index, 1);
+            }
+        
+            await WatchList.deleteOne( {watchListId: watchlist_id} ); // Delete watchlist
+            await User.findOneAndUpdate( {uid: user_id}, {watchListsIds: watchlist_ids} ); // Update User entry
+
+            res.status(200).json( {message: "Deleted the watchlist successfully"} );
         } catch (error) {
             console.error("Error in predictMovies:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
-
     }
 }
 
