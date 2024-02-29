@@ -6,6 +6,7 @@ import Taskbar from './components/Taskbar';
 import ProfilePage from './Profile';
 import WatchlistPage from './WatchlistPage';
 import User from './components/User';
+import { UserProvider } from './UserContext';
 
 const App = () => {
   const dummyUser = {
@@ -25,15 +26,16 @@ const App = () => {
 
   return (
     <Router>
-      <div className="app">
-        <Taskbar />
-        <User user={dummyUser} />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/profile" element={<ProfilePage user={dummyUser} />} />
-          <Route path="/watchlists" element={<WatchlistPage />} />
-        </Routes>
-      </div>
+      <UserProvider>
+        <div className="app">
+          <Taskbar />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/profile" element={<ProfilePage user={dummyUser} />} />
+            <Route path="/watchlists" element={<WatchlistPage />} />
+          </Routes>
+        </div>
+      </UserProvider>
     </Router>
   );
 };

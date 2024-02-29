@@ -51,7 +51,7 @@ const Profile = ({ user }) => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    // const file = e.target.files[0];
     // Add logic to handle image change and update editedUser.profilePicture
   };
   const handleWatchlistsClick = () => {
