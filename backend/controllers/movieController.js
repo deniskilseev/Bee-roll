@@ -11,7 +11,7 @@ const movieController = {
 
     async getMovieInfo(req, res) {
         try {
-            const {movie_id} = req.body;
+            const {movie_id} = req.params;
             
             const movie_data = await Movie.findOne( {movieId: movie_id} );
 
@@ -28,7 +28,7 @@ const movieController = {
 
     async findMoviesWithPattern(req, res) {
         try {
-            const {pattern} = req.body;
+            const {pattern} = req.params;
 
             const regex = new RegExp(escapeRegExp(pattern), "gi");
 
