@@ -31,17 +31,14 @@ const WatchlistsPage = ({ user }) => {
     }
   };
 
-  
   const fetchWatchlist = async (watchListId) => {
     try {
-      const response = await fetch(`http://localhost:3000/watchlists/getWatchlist`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          watchlist_id: watchListId,
-        }),
+      if (watchlists.some((watchlist) => watchlist.data_by_id.watchListId === watchListId)) {
+        return;
+      }
+
+      const response = await fetch(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
+        method: 'GET',
       });
 
       if (response.ok) {
@@ -66,7 +63,7 @@ const WatchlistsPage = ({ user }) => {
     <div className="container mt-5">
       {watchlists.length > 0 ? (
         watchlists.map((watchlist) => (
-          <Watchlist key={watchlist.data_by_id._id} watchlist={watchlist} />
+          <Watchlist key={watchlist.data_by_id.watchListId} watchlist={watchlist} />
         ))
       ) : (
         <button className="btn btn-primary mt-3" onClick={createWatchlist}>
