@@ -62,7 +62,7 @@ const watchListController = {
 
     async getWatchList(req, res) {
         try {
-            const {watchlist_id} = req.body;
+            const {watchlist_id} = req.params;
 
             const data_by_id = await WatchList.findOne( {watchListId: watchlist_id} );
 
@@ -163,7 +163,7 @@ const watchListController = {
 
     async predictMovies(req, res) {
         try {
-            const {watchlist_id} = req.body;
+            const {watchlist_id} = req.params;
             // TODO: Add the Machine Learning server. And send http request.
             res.status(404).json( {message: "Not Found"} );
         } catch (error) {
