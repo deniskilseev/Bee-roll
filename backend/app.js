@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 // Import controllers
 const userRoute = require('./routes/user');
@@ -10,6 +11,7 @@ const movieRoute = require('./routes/movie');
 
 // Create Express application
 const app = express();
+app.use(cors());
 
 // Middleware
 app.use(express.json()); // Parse JSON bodies

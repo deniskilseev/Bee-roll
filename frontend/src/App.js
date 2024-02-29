@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import HomePage from './components/Homepage';
+import HomePage from './Homepage';
 import Taskbar from './components/Taskbar';
-import ProfilePage from './components/Profile';
+import ProfilePage from './Profile';
+import WatchlistPage from './WatchlistPage';
 import User from './components/User';
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage user={dummyUser} />} />
+          <Route path="/watchlists" element={<WatchlistPage />} />
         </Routes>
       </div>
     </Router>

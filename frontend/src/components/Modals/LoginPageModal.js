@@ -52,7 +52,7 @@ const LoginPageModal = ({ showModal, onClose }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/login', {
+      const response = await fetch('http://localhost:3000/users/loginUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

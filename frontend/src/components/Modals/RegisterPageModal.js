@@ -13,7 +13,7 @@ const RegisterPageModal = ({ showModal, onClose }) => {
 
   const handleInputChange = (e) => {
     setFormData({
-      formData,
+      ...formData,
       [e.target.name]: e.target.value,
     });
   };
@@ -29,7 +29,7 @@ const RegisterPageModal = ({ showModal, onClose }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/createuser', {
+      const response = await fetch('http://localhost:3000/users/createUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
