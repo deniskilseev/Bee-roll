@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
-
-//dummy commit
+import { useUser } from '../../UserContext';
 
 const LoginPageModal = ({ showModal, onClose }) => {
+  const { updateUser } = useUser();
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -63,7 +64,11 @@ const LoginPageModal = ({ showModal, onClose }) => {
       });
 
       if (response.ok) {
+        const userData = await response.json();
         console.log('Login successful');
+        console.log('Current user:', userData);
+
+        updateUser(userData);
       } else {
         console.error('Login failed');
         // Handle failed login scenarios
