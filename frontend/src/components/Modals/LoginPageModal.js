@@ -66,7 +66,6 @@ const LoginPageModal = ({ showModal, onClose }) => {
       if (response.ok) {
         const userData = await response.json();
         console.log('Login successful');
-        console.log('Current user:', userData);
 
         updateUser(userData);
       } else {

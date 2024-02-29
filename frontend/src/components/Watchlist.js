@@ -13,7 +13,7 @@ const Watchlist = ({ watchlist }) => {
     <div className="card mt-3">
       <div className="card-body">
         <h5 className="card-title" onClick={toggleExpand}>
-          {watchlist.name}
+          {watchlist.data_by_id.watchListTitle}
         </h5>
         {isExpanded && (
           <div className="bg-light p-3 mt-2">
