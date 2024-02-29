@@ -14,6 +14,10 @@ const postSchema = new Schema({
     forumId: {
         type: Number,
         required: true
+    },
+    postText: {
+        type: String,
+        required: true
     }
 });
 
