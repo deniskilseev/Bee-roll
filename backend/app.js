@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 // Import controllers
 const userRoute = require('./routes/user'); 
 const forumRoute = require('./routes/forum'); 
+const postRoute = require('./routes/post'); 
 
 // Add more controllers as needed
 
@@ -33,5 +34,6 @@ mongoose.connect(uri, {
 // Routes.
 app.use('/users', userRoute);
 app.use('/forums', forumRoute);
+app.use('/posts', postRoute);
 
 module.exports = app;
