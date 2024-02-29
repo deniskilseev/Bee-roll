@@ -5,8 +5,7 @@ import HomePage from './Homepage';
 import Taskbar from './components/Taskbar';
 import ProfilePage from './Profile';
 import WatchlistPage from './WatchlistPage';
-import User from './components/User';
-import { UserProvider, useUser } from './UserContext';
+import { useUser } from './UserContext';
 
 const App = () => {
   const { user } = useUser();
