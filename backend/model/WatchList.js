@@ -20,7 +20,7 @@ const watchListSchema = new Schema({
         require: true
     },
     movieIds: {
-        type: [String],
+        type: [Number],
         require: false
     },
     ratings: {
