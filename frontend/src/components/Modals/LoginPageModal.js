@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
 
+//dummy commit
+
 const LoginPageModal = ({ showModal, onClose }) => {
   const [formData, setFormData] = useState({
     username: '',
