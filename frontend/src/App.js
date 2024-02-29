@@ -23,6 +23,7 @@ const App = () => {
         { id: 1, title: 'First Post', content: 'First post.', author: user.data_by_username },
         { id: 2, title: 'Second Post', content: 'Second post.', author: user.data_by_username },
       ],
+      watchlists: user.data_by_username.watchListsIds,
     }
   : 
   {
@@ -33,6 +34,7 @@ const App = () => {
     profilePicture: 'blank profile pic.jpg',
     followers: [1, 2, 3, 4],
     following: [1, 2, 3],
+    watchlists: [1]
   };
 
   dummyUser.posts = [
@@ -47,7 +49,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage user={dummyUser} />} />
           <Route path="/profile" element={<ProfilePage user={dummyUser} />} />
-          <Route path="/watchlists" element={<WatchlistPage />} />
+          <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
         </Routes>
       </div>
     </Router>
