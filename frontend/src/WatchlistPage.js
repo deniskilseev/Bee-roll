@@ -19,23 +19,15 @@ const WatchlistsPage = ({ user }) => {
         body: JSON.stringify({
           username: user.username,
           is_public: false,
-          watchlist_title: 'baruvs gonna kms',
+          watchlist_title: 'New Watchlist',
         }),
       });
 
       if (response.ok) {
         const watchlistData = await response.json();
         
-        updateWatchlists(watchlistData.newId);
         const createdWatchlist = await fetchWatchlist(watchlistData.newId);
-
-        setWatchlists((prevWatchlists) => {
-          const newWatchlist = { data_by_id: { watchListId: createdWatchlist.data_by_id.watchListId, watchListTitle: createdWatchlist.watchListTitle } };
-          console.log('New Watchlist:', newWatchlist);
-          console.log('Current Watchlists:', prevWatchlists);
-        
-          return [...prevWatchlists, newWatchlist];
-        });
+        updateWatchlists(createdWatchlist);
       } else {
         console.error('Failed to create watchlist.');
       }

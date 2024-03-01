@@ -9,13 +9,13 @@ export const UserProvider = ({ children }) => {
     setUser((prevUser) => ({ ...prevUser, ...userData }));
   };
 
-  const updateWatchlists = (newWatchlistId) => {
+  const updateWatchlists = (newWatchlist) => {
     setUser((prevUser) => {
       return {
         ...prevUser,
         watchlists: Array.isArray(prevUser?.watchlists)
-          ? [...prevUser?.watchlists, newWatchlistId]
-          : [newWatchlistId],
+          ? [...prevUser?.watchlists, newWatchlist]
+          : [newWatchlist],
       };
     });
   };
