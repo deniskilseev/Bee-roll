@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PostList from './components/PostList';
+//import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import plusIcon from './assets/edit.png';
+//import plusIcon from './assets/edit.png';
 
 const GetProfile = () => {
   const [user, setUser] = useState({});

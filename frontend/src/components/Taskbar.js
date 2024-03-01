@@ -37,7 +37,10 @@ const Taskbar = () => {
         <Link className="navbar-brand" to="/">Bee-Roll</Link>
 
         <div>
-          {user ? (  // If user is logged in, show "Profile" button with "Logout" text
+          <Link to="/forum" className="btn btn-outline-light mr-2">
+            <span className="d-inline-block text-center">Forum</span>
+          </Link>
+          {user ? (  
             <div>
               <Link to="/profile" className="btn btn-outline-light mr-2">
                 <span className="d-inline-block text-center">Profile</span>
@@ -52,7 +55,6 @@ const Taskbar = () => {
             </button>
           )}
         </div>
-        
 
         <LoginPageModal showModal={showLoginModal} onClose={handleCloseModal} />
         <RegisterPageModal showModal={showRegisterModal} onClose={handleRegisterModal} />

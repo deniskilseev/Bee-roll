@@ -6,6 +6,9 @@ import Taskbar from './components/Taskbar';
 import ProfilePage from './Profile';
 import WatchlistPage from './WatchlistPage';
 import { useUser } from './UserContext';
+import ForumPage from './components/Modals/ForumPage';
+import WritePost from './components/WritePost';
+
 
 const App = () => {
   const { user } = useUser();
@@ -50,6 +53,8 @@ const App = () => {
           <Route path="/" element={<HomePage user={dummyUser} />} />
           <Route path="/profile" element={<ProfilePage user={dummyUser} />} />
           <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
+          <Route path="/forum" element={<ForumPage />} />
+          <Route path="/forum/write-post" element={<WritePost />} />
         </Routes>
       </div>
     </Router>

@@ -19,7 +19,7 @@ const Profile = ({ user }) => {
 
       console.log(editedUser) //print edits to console
   
-      const response = await fetch('http://localhost:3000/users/updateUserProfile', {
+      const response = await fetch('/profile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
