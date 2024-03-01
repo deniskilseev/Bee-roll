@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
 import { useUser } from '../../UserContext';
+import { useNavigate } from 'react-router-dom'; // Ensure this import is correct
 
 const LoginPageModal = ({ showModal, onClose }) => {
   const { updateUser } = useUser();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: '',
@@ -68,6 +70,8 @@ const LoginPageModal = ({ showModal, onClose }) => {
         console.log('Login successful');
 
         updateUser(userData);
+        navigate('/users/profile/${formData.username}'); // Redirect to the profile page
+        
       } else {
         console.error('Login failed');
         // Handle failed login scenarios
