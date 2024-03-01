@@ -1,13 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
+
 const { Schema, model } = mongoose;
 
 const movieSchema = new Schema({
     movieId: Number,
     title: String,
-    imdbId: Number,
-    genres: [String]
+    genres: [String],
+    imdbId: Number
 });
 
-const Movie = model('movie', movieSchema);
+const Movie = model('Movie', movieSchema);
 module.exports = Movie;

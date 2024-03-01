@@ -43,19 +43,6 @@ const postController = {
             res.status(500).json({ error: "Internal server error" });
         }
     },
-    async getPost(req, res) {
-
-        const postId = req.params.postId
-        const post = await Post.findOne({postId: postId});
-
-        if (!post) {
-            return res.status(400).json({error: "Post does not exists"})
-        }
-
-        post.forumId = undefined;
-
-        return res.status(200).json(post);
-    },
 
     async pinPost(req, res) {
         try {
@@ -79,8 +66,60 @@ const postController = {
         } catch (error) {
             console.error("Error in pinPost:", error);
             res.status(500).json({ error: "Internal server error" });
-        }
+        },
 
+    async getPostInfo(req, res) {
+        try {
+            const {post_id} = req.params;
+
+            const post_info = await Post.findOne( {postId: post_id} );
+
+            if (!post_info) {
+                return res.status(400).json( {error: "post_id does not exist"} );
+            }
+
+            return res.status(200).json( {post_info} );
+
+        } catch (error) {
+            console.error("Error in getPostInfo:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
+    async deletePost(req, res) {
+        try {
+            const {post_id} = req.params;
+
+            const post_info = await Post.findOne( {postId: post_id} );
+
+            if (!post_info) {
+                return res.status(400).json( {error: "post_id does not exist"} );
+            }
+
+            const user_id = post_info.userId;
+
+            const user_info = await User.findOne( {uid: user_id} );
+
+            if (!user_info) {
+                return res.status(400).json( {error: "The owner of the post does not exist"} );
+            }
+
+            const post_ids = user_info.postIds;
+            const index = post_ids.indexOf(post_id);
+
+            if (index != -1) {
+                post_ids.splice(index, 1);
+            }
+
+            await User.findOneAndUpdate( {uid: user_id}, {postIds: post_ids}); // Remove the post entry from User
+            await Post.deleteOne( {postId: post_id} ); // Remove the post entry from database.
+
+            return res.status(200).json( {message: "Deleted a post successfuly"});
+
+        } catch (error) {
+            console.error("Error in deletePost:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
     }
 }
 
