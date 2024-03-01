@@ -1,5 +1,5 @@
 // WatchlistsPage.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Watchlist from './components/Watchlist';
 // import watchlists from './dummyWatchlistData';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,7 +17,7 @@ const WatchlistsPage = ({ user }) => {
         body: JSON.stringify({
           username: user.username,
           is_public: false,
-          watchlist_title: 'nonde',
+          watchlist_title: 'New Watchlist',
         }),
       });
 
@@ -31,7 +31,7 @@ const WatchlistsPage = ({ user }) => {
     }
   };
 
-  const fetchWatchlist = async (watchListId) => {
+  const fetchWatchlist = useCallback(async (watchListId) => {
     try {
       if (watchlists.some((watchlist) => watchlist.data_by_id.watchListId === watchListId)) {
         return;
@@ -43,21 +43,27 @@ const WatchlistsPage = ({ user }) => {
 
       if (response.ok) {
         const watchlistData = await response.json();
-        setWatchlists((prevWatchlists) => [...prevWatchlists, watchlistData]);
+        setWatchlists((prevWatchlists) => {
+          if (!prevWatchlists.some((watchlist) => watchlist.data_by_id.watchListId === watchListId)) {
+            return [...prevWatchlists, watchlistData];
+          } else {
+            return prevWatchlists;
+          }
+        });
       } else {
         console.error(`Failed to fetch watchlist: ${watchListId}`);
       }
     } catch (error) {
       console.error(`Error fetching watchlist: ${watchListId}`, error);
     }
-  };
+  }, [watchlists]);
 
   useEffect(() => {
     // Fetch individual watchlists when the component mounts
     user.watchlists.forEach((watchListId) => {
       fetchWatchlist(watchListId);
     });
-  }, [user.watchlists]);
+  }, [user.watchlists, fetchWatchlist]);
 
   return (
     <div className="container mt-5">
@@ -66,10 +72,11 @@ const WatchlistsPage = ({ user }) => {
           <Watchlist key={watchlist.data_by_id.watchListId} watchlist={watchlist} />
         ))
       ) : (
-        <button className="btn btn-primary mt-3" onClick={createWatchlist}>
+        <p>No watchlists found.</p>
+      )}
+      <button className="btn btn-primary mt-3" onClick={createWatchlist}>
           Create Watchlist
         </button>
-      )}
     </div>
   );
 };
