@@ -25,9 +25,7 @@ const Movie = ({ title }) => {
         data-parent="#movieAccordion"
       >
         <div className="card-body">
-          {/* You can add more details about the movie here */}
-          {/* For example: Release date, genre, etc. */}
-          {/* Example: <p>Release Date: January 1, 2022</p> */}
+          {/* add more details about the movie here */}
         </div>
       </div>
     </div>
