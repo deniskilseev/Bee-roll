@@ -42,6 +42,19 @@ const postController = {
             console.error("Error in createPost:", error);
             res.status(500).json({ error: "Internal server error" });
         }
+    },
+    async getPost(req, res) {
+        console.log("123")
+        const postId = req.params.postId
+        const post = await Post.findOne({postId: postId});
+
+        if (!post) {
+            return res.status(400).json({error: "Post does not exists"})
+        }
+
+        post.forumId = undefined;
+
+        return res.status(200).json(post);
     }
 }
 
