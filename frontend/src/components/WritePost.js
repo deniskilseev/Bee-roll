@@ -5,7 +5,8 @@ const WritePost = ({ onPost }) => {
   const [newPostText, setNewPostText] = useState('');
 
   const handlePostChange = (e) => {
-    setNewPostText(e.target.value);
+    const text = e.target.value;
+    setNewPostText(text);
   };
 
   const handlePostClick = () => {
@@ -13,9 +14,12 @@ const WritePost = ({ onPost }) => {
     setNewPostText('');
   };
 
+  const characterCount = newPostText.length;
+
   return (
     <div>
       <textarea value={newPostText} onChange={handlePostChange} />
+      <p>Character Count: {characterCount}</p>
       <button onClick={handlePostClick}>Post</button>
     </div>
   );

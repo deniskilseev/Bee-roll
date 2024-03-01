@@ -37,7 +37,7 @@ const App = () => {
     profilePicture: 'blank profile pic.jpg',
     followers: [1, 2, 3, 4],
     following: [1, 2, 3],
-    watchlists: [1]
+    watchlists: []
   };
 
   dummyUser.posts = [

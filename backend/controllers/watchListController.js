@@ -52,8 +52,9 @@ const watchListController = {
             await Counter.findOneAndUpdate( {_id: "WatchList"}, {collectionCounter: counter_value + 1}); // Update the autoincrement
 
             console.log("WatchList created successfully:", watchlist_title);
+            const newId =  newWatchListIds[newWatchListIds.length - 1]
 
-            return res.status(201).json( {message: "Created WatchList successfully"} );
+            return res.status(201).json( {message: "Created WatchList successfully", newId} );
         } catch (error) {
             console.error("Error in createWatchList:", error);
             return res.status(500).json( {error: "Internal server error"} );
@@ -174,7 +175,7 @@ const watchListController = {
 
     async deleteWatchList(req, res) {
         try {
-            const {watchlist_id} = req.body;
+            const {watchlist_id} = req.params;
 
             const watchlist_data = await WatchList.findOne( {watchListId: watchlist_id} );
 
