@@ -6,10 +6,19 @@ const WritePost = ({ onPost }) => {
 
   const handlePostChange = (e) => {
     const text = e.target.value;
-    setNewPostText(text);
+    // Limit the input to 5000 characters
+    setNewPostText(text.slice(0, 5000));
   };
 
   const handlePostClick = () => {
+    // Check if the character count is within the limit (not exceeding 5000)
+    if (newPostText.length > 5000) {
+      // Alert or handle the case where the character limit is exceeded
+      alert('Character limit exceeded. Please limit your post to 5000 characters.');
+      return;
+    }
+
+    // Proceed with posting if the character count is within the limit
     onPost({ id: Date.now(), content: newPostText }); // Example data, adjust as needed
     setNewPostText('');
   };
@@ -19,7 +28,7 @@ const WritePost = ({ onPost }) => {
   return (
     <div>
       <textarea value={newPostText} onChange={handlePostChange} />
-      <p>Character Count: {characterCount}</p>
+      <p>Character Count: {characterCount} / 5000</p>
       <button onClick={handlePostClick}>Post</button>
     </div>
   );
