@@ -174,7 +174,7 @@ const watchListController = {
 
     async deleteWatchList(req, res) {
         try {
-            const {watchlist_id} = req.body;
+            const {watchlist_id} = req.params;
 
             const watchlist_data = await WatchList.findOne( {watchListId: watchlist_id} );
 

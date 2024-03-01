@@ -6,7 +6,7 @@ router.post('/createWatchlist', watchListController.createWatchList);
 router.post('/addMovie', watchListController.addMovie);
 router.post('/removeMovie', watchListController.removeMovie)
 router.get('/getWatchlist/:watchlist_id', watchListController.getWatchList);
-router.delete('/deleteWatchlist', watchListController.deleteWatchList);
+router.delete('/deleteWatchlist/:watchlist_id', watchListController.deleteWatchList);
 router.get('/predictmovies/:watchlist_id', watchListController.predictMovies);
 
 // Export the router
