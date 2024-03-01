@@ -6,7 +6,18 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const updateUser = (userData) => {
-    setUser(userData);
+    setUser((prevUser) => ({ ...prevUser, ...userData }));
+  };
+
+  const updateWatchlists = (newWatchlistId) => {
+    setUser((prevUser) => {
+      return {
+        ...prevUser,
+        watchlists: Array.isArray(prevUser?.watchlists)
+          ? [...prevUser?.watchlists, newWatchlistId]
+          : [newWatchlistId],
+      };
+    });
   };
 
   const logout = () => {
@@ -14,7 +25,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser, logout }}>
+    <UserContext.Provider value={{ user, updateUser, updateWatchlists, logout }}>
       {children}
     </UserContext.Provider>
   );

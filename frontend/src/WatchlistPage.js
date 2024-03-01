@@ -1,11 +1,13 @@
 // WatchlistsPage.js
 import React, { useState, useEffect, useCallback } from 'react';
 import Watchlist from './components/Watchlist';
+import { useUser } from './UserContext';
 // import watchlists from './dummyWatchlistData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const WatchlistsPage = ({ user }) => {
   const [watchlists, setWatchlists] = useState([]);
+  const { updateWatchlists } = useUser();
 
   const createWatchlist = async () => {
     try {
@@ -17,12 +19,23 @@ const WatchlistsPage = ({ user }) => {
         body: JSON.stringify({
           username: user.username,
           is_public: false,
-          watchlist_title: 'New Watchlist',
+          watchlist_title: 'baruvs gonna kms',
         }),
       });
 
       if (response.ok) {
-        console.log('Watchlist created successfully!');
+        const watchlistData = await response.json();
+        
+        updateWatchlists(watchlistData.newId);
+        const createdWatchlist = await fetchWatchlist(watchlistData.newId);
+
+        setWatchlists((prevWatchlists) => {
+          const newWatchlist = { data_by_id: { watchListId: createdWatchlist.data_by_id.watchListId, watchListTitle: createdWatchlist.watchListTitle } };
+          console.log('New Watchlist:', newWatchlist);
+          console.log('Current Watchlists:', prevWatchlists);
+        
+          return [...prevWatchlists, newWatchlist];
+        });
       } else {
         console.error('Failed to create watchlist.');
       }
@@ -50,6 +63,7 @@ const WatchlistsPage = ({ user }) => {
             return prevWatchlists;
           }
         });
+        return watchlistData;
       } else {
         console.error(`Failed to fetch watchlist: ${watchListId}`);
       }
@@ -59,11 +73,16 @@ const WatchlistsPage = ({ user }) => {
   }, [watchlists]);
 
   useEffect(() => {
-    // Fetch individual watchlists when the component mounts
-    user.watchlists.forEach((watchListId) => {
-      fetchWatchlist(watchListId);
-    });
+    // Fetch initial watchlists when the component mounts
+    const fetchInitialWatchlists = async () => {
+      for (const watchListId of user.watchlists) {
+        await fetchWatchlist(watchListId);
+      }
+    };
+
+    fetchInitialWatchlists();
   }, [user.watchlists, fetchWatchlist]);
+  
 
   return (
     <div className="container mt-5">

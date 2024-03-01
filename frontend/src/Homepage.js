@@ -1,7 +1,9 @@
 import React from 'react';
 import PostList from './components/PostList';
+import { useUser } from './UserContext';
 
-const HomePage = ({ user }) => {
+const HomePage = ({ user:propUser }) => {
+    const { user } = useUser();
     const dummyUser2 = {
     id: 1,
     username: 'janedoe',
@@ -17,8 +19,8 @@ const HomePage = ({ user }) => {
   ];
 
   const examplePosts = [
-    user.posts[0],
-    user.posts[1],
+    propUser.posts[0],
+    propUser.posts[1],
     dummyUser2.posts[0],
   ];
 
