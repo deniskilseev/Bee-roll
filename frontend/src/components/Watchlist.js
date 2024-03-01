@@ -1,13 +1,23 @@
 // Watchlist.js
 import React, { useState, useEffect } from 'react';
+import AddMovieModal from './Modals/AddMovieModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Watchlist = ({ watchlist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [moviesInfo, setMoviesInfo] = useState([]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const addMovieToWatchlist = () => {
+    setIsPopupOpen(true);
+  };
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
   };
 
   useEffect(() => {
@@ -49,14 +59,20 @@ const Watchlist = ({ watchlist }) => {
           {watchlist.data_by_id.watchListTitle}
         </h5>
         {isExpanded && (
-          <div className="bg-light p-3 mt-2">
-            <ul className="list-group">
-              {moviesInfo.map((movieInfo) => (
-                <li key={movieInfo.movie_data.movieId} className="list-group-item">
-                  {movieInfo.movie_data.title}
-                </li>
-              ))}
-            </ul>
+          <div>
+            <div className="bg-light p-3 mt-2">
+              <ul className="list-group">
+                {moviesInfo.map((movieInfo) => (
+                  <li key={movieInfo.movie_data.movieId} className="list-group-item">
+                    {movieInfo.movie_data.title}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button className="btn btn-primary mt-2" onClick={addMovieToWatchlist}>
+              Add Movie
+            </button>
+            {isPopupOpen && <AddMovieModal onClose={closePopup} />}
           </div>
         )}
       </div>

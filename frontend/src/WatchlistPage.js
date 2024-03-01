@@ -19,7 +19,7 @@ const WatchlistsPage = ({ user }) => {
         body: JSON.stringify({
           username: user.username,
           is_public: false,
-          watchlist_title: 'New Watchlist 3',
+          watchlist_title: 'New Watchlist',
         }),
       });
 
