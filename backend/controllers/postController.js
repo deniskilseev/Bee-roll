@@ -66,7 +66,8 @@ const postController = {
         } catch (error) {
             console.error("Error in pinPost:", error);
             res.status(500).json({ error: "Internal server error" });
-        },
+        }
+    },
 
     async getPostInfo(req, res) {
         try {
