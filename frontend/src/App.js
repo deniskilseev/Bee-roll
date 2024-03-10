@@ -7,6 +7,10 @@ import ProfilePage from './Profile';
 import WatchlistPage from './WatchlistPage';
 import CreateForumPage from './CreateForum';
 import ForumPage from './ForumPage';
+import FollowersPage from './FollowersPage';
+import FollowingPage from './FollowingPage';
+
+
 import { useUser } from './UserContext';
 
 const App = () => {
@@ -59,6 +63,8 @@ const App = () => {
           <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} />}/>
           <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
           <Route path="/f/:forumName" element={<ForumPage forums={forums} />}/>
+          <Route path="/followers" element={<FollowersPage />} />
+          <Route path="/following" element={<FollowingPage />} />
         </Routes>
       </div>
     </Router>
