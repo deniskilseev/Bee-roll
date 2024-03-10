@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import plusIcon from './assets/edit.png';
@@ -54,6 +54,7 @@ const Profile = ({ user }) => {
     // const file = e.target.files[0];
     // Add logic to handle image change and update editedUser.profilePicture
   };
+
   const handleWatchlistsClick = () => {
     navigate('/watchlists');
   };
@@ -141,12 +142,26 @@ const Profile = ({ user }) => {
             <div className="card-body">
               <div className="row">
                 <div className="col-md-6 text-center">
-                  <h3 className='bio-follow-header'>Followers</h3>
-                  <p className='bio-follows'>{editedUser.followers.length}</p>
+                  <Link
+                      to="/followers"
+                      style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
+                    >
+                      <div className='bio-follow-header'>
+                        <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
+                        <p className='bio-follows'>{editedUser.followers.length}</p>
+                      </div>
+                  </Link>
                 </div>
                 <div className="col-md-6 text-center">
-                  <h3 className='bio-follow-header'>Following</h3>
-                  <p className='bio-follows'>{editedUser.following.length}</p>
+                    <Link
+                        to="/following"
+                        style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
+                      >
+                        <div className='bio-follow-header'>
+                          <h3 style={{ fontSize: 'inherit' }}>Following</h3>
+                          <p className='bio-follows'>{editedUser.following.length}</p>
+                        </div>
+                    </Link>
                 </div>
               </div>
             </div>
