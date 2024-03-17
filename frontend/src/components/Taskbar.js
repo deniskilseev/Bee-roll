@@ -18,7 +18,6 @@ const Taskbar = () => {
     logout();
   };
 
-  // useEffect to log user information after logout
   useEffect(() => {
     console.log('Logged out: ', user);
   }, [user]);
@@ -37,10 +36,7 @@ const Taskbar = () => {
         <Link className="navbar-brand" to="/">Bee-Roll</Link>
 
         <div>
-          <Link to="/forum" className="btn btn-outline-light mr-2">
-            <span className="d-inline-block text-center">Forum</span>
-          </Link>
-          {user ? (  
+          {user ? (
             <div>
               <Link to="/profile" className="btn btn-outline-light mr-2">
                 <span className="d-inline-block text-center">Profile</span>
@@ -50,9 +46,14 @@ const Taskbar = () => {
               </button>
             </div>
           ) : (
+            <div>
+            <Link to="/createforum" className="btn btn-outline-light mr-2">
+                <span className="d-inline-block text-center">Create Forum</span>
+            </Link>
             <button className="btn btn-outline-light" onClick={handleLoginClick}>
               <span className="d-inline-block text-center">Login</span>
             </button>
+            </div>
           )}
         </div>
 

@@ -44,6 +44,31 @@ const postController = {
         }
     },
 
+    async pinPost(req, res) {
+        try {
+            const {postId, forumId} = req.body;
+
+            const post = await Post.findOne({postId: postId});
+    
+            if (!post) {
+                return res.status(400).json({error: "Post does not exists"})
+            }
+    
+            const forum = await Forum.findOne({forumId: forumId});
+    
+            if (!forum) {
+                return res.status(400).json({error: "Forum does not exists"})
+            }
+
+            forum.pinnedPost = postId;
+            await forum.save()
+            return res.status(200).json("Post pinned");
+        } catch (error) {
+            console.error("Error in pinPost:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
     async getPostInfo(req, res) {
         try {
             const {post_id} = req.params;

@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import HomePage from './Homepage';
 import Taskbar from './components/Taskbar';
 import ProfilePage from './Profile';
 import WatchlistPage from './WatchlistPage';
+import CreateForumPage from './CreateForum';
+import ForumPage from './ForumPage';
+import FollowersPage from './FollowersPage';
+import FollowingPage from './FollowingPage';
+
+
 import { useUser } from './UserContext';
 import ForumPage from './components/Modals/ForumPage';
 import WritePost from './components/WritePost';
@@ -12,6 +18,7 @@ import WritePost from './components/WritePost';
 
 const App = () => {
   const { user } = useUser();
+  const [forums, setForums] = useState([]);
 
   const dummyUser = user
   ? {
@@ -45,6 +52,10 @@ const App = () => {
     { id: 2, title: 'Second Post', content: 'Second post.', author: dummyUser},
   ];
 
+  const addForum = (forum) => {
+    setForums([...forums, forum]);
+  };
+
   return (
     <Router>
       <div className="app">
@@ -52,9 +63,11 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage user={dummyUser} />} />
           <Route path="/profile" element={<ProfilePage user={dummyUser} />} />
+          <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} />}/>
           <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
-          <Route path="/forum" element={<ForumPage />} />
-          <Route path="/forum/write-post" element={<WritePost />} />
+          <Route path="/f/:forumName" element={<ForumPage forums={forums} />}/>
+          <Route path="/followers" element={<FollowersPage />} />
+          <Route path="/following" element={<FollowingPage />} />
         </Routes>
       </div>
     </Router>

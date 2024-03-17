@@ -27,6 +27,10 @@ const forumSchema = new Schema({
         type: [Number],
         required: false
     },
+    pinnedPost: {
+        type: Number,
+        required: false
+    }
 });
 
 const Forum = model('Forum', forumSchema);
