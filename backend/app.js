@@ -1,14 +1,18 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 // Import controllers
 const userRoute = require('./routes/user'); 
 const forumRoute = require('./routes/forum'); 
-
+const postRoute = require('./routes/post'); 
+const watchListRoute = require('./routes/watchlist');
+const movieRoute = require('./routes/movie');
 // Add more controllers as needed
 
 // Create Express application
 const app = express();
+app.use(cors());
 
 // Middleware
 app.use(express.json()); // Parse JSON bodies
@@ -33,5 +37,8 @@ mongoose.connect(uri, {
 // Routes.
 app.use('/users', userRoute);
 app.use('/forums', forumRoute);
+app.use('/posts', postRoute);
+app.use('/watchlists', watchListRoute);
+app.use('/movies', movieRoute);
 
 module.exports = app;

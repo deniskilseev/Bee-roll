@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import PostList from './PostList';
+import { useNavigate, Link } from 'react-router-dom';
+import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import plusIcon from '../assets/edit.png';
+import plusIcon from './assets/edit.png';
 
 const Profile = ({ user }) => {
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
+  const navigate = useNavigate();
 
   const handleEditClick = () => {
     setEditing(true);
@@ -49,8 +51,12 @@ const Profile = ({ user }) => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    // const file = e.target.files[0];
     // Add logic to handle image change and update editedUser.profilePicture
+  };
+
+  const handleWatchlistsClick = () => {
+    navigate('/watchlists');
   };
 
   return (
@@ -114,7 +120,7 @@ const Profile = ({ user }) => {
               </p>
               {isEditing && (
                 <div className="d-flex justify-content-center">
-                  <button onClick={handleSaveClick} className="btn btn-primary mr-2">
+                  <button onClick={handleSaveClick} style={{ marginRight: '5px' }} className="btn btn-primary mr-2">
                     Save
                   </button>
                   <button onClick={handleCancelClick} className="btn btn-secondary">
@@ -124,8 +130,11 @@ const Profile = ({ user }) => {
               )}
               {!isEditing && (
                 <div className="d-flex justify-content-center">
-                  <button onClick={handleEditClick} className="btn btn-info mt-2">
+                  <button onClick={handleEditClick} style={{ marginRight: '5px' }} className="btn btn-info mt-2">
                     Edit
+                  </button>
+                  <button onClick={handleWatchlistsClick} className="btn btn-info mt-2">
+                    Watchlists
                   </button>
                 </div>
               )}
@@ -133,12 +142,26 @@ const Profile = ({ user }) => {
             <div className="card-body">
               <div className="row">
                 <div className="col-md-6 text-center">
-                  <h3 className='bio-follow-header'>Followers</h3>
-                  <p className='bio-follows'>{editedUser.followers.length}</p>
+                  <Link
+                      to="/followers"
+                      style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
+                    >
+                      <div className='bio-follow-header'>
+                        <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
+                        <p className='bio-follows'>{editedUser.followers.length}</p>
+                      </div>
+                  </Link>
                 </div>
                 <div className="col-md-6 text-center">
-                  <h3 className='bio-follow-header'>Following</h3>
-                  <p className='bio-follows'>{editedUser.following.length}</p>
+                    <Link
+                        to="/following"
+                        style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
+                      >
+                        <div className='bio-follow-header'>
+                          <h3 style={{ fontSize: 'inherit' }}>Following</h3>
+                          <p className='bio-follows'>{editedUser.following.length}</p>
+                        </div>
+                    </Link>
                 </div>
               </div>
             </div>

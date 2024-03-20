@@ -68,6 +68,20 @@ const forumController = {
             console.error("Error in createForum:", error);
             res.status(500).json({ error: "Internal server error" });
         }
+    },
+
+    async getForum(req, res) {
+        const forumTitle = req.params.title
+        const forum = await Forum.findOne({forumTitle: forumTitle});
+
+        if (!forum) {
+            return res.status(400).json({error: "Forum with such name does not exists"})
+        }
+        
+        forum.moderatorIds = undefined;
+        forum.forumId = undefined;
+
+        return res.status(200).json(forum);
     }
 }
 

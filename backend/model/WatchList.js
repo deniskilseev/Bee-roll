@@ -3,8 +3,12 @@ const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
 const watchListSchema = new Schema({
-    watchListsId: {
+    watchListId: {
         type: Number,
+        require: true
+    },
+    watchListTitle: {
+        type: String,
         require: true
     },
     isPublic: {
@@ -16,7 +20,7 @@ const watchListSchema = new Schema({
         require: true
     },
     movieIds: {
-        type: [String],
+        type: [Number],
         require: false
     },
     ratings: {

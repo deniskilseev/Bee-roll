@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
+import { useUser } from '../../UserContext';
 
 const LoginPageModal = ({ showModal, onClose }) => {
+  const { updateUser } = useUser();
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -52,7 +55,7 @@ const LoginPageModal = ({ showModal, onClose }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/login', {
+      const response = await fetch('http://localhost:3000/users/loginUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +64,10 @@ const LoginPageModal = ({ showModal, onClose }) => {
       });
 
       if (response.ok) {
+        const userData = await response.json();
         console.log('Login successful');
+
+        updateUser(userData);
       } else {
         console.error('Login failed');
         // Handle failed login scenarios
