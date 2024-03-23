@@ -1,6 +1,7 @@
 const testDatabaseConnection = require('./testDatabaseConnection');
 const User = require('../../model/User')
 const Counter = require('../../model/Counter')
+const Forum = require('../../model/Forum')
 
 module.exports = async () => {
     try {
@@ -8,7 +9,7 @@ module.exports = async () => {
 
         const counters = [
             {_id: "User", collectionCounter: 4},
-            {_id: "Forum", collectionCounter: 1}
+            {_id: "Forum", collectionCounter: 3}
         ]
 
         const users = [
@@ -18,10 +19,15 @@ module.exports = async () => {
             {uid: 4, login: 'sreekar', password: 'ytrewq', email: 'sreekar@gmail.com', }
         ];
 
-        const forums = [];
+        const forums = [
+            {forumId: 1, forumTitle: 'Apples', creatorId: 1},
+            {forumId: 2, forumTitle: 'Cars', creatorId: 2},
+            {forumId: 3, forumTitle: 'Pineapples', creatorId: 3}
+        ];
 
         await User.insertMany(users);
         await Counter.insertMany(counters);
+        await Forum.insertMany(forums);
 
 
     } catch (error) {

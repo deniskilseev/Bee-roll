@@ -17,7 +17,7 @@ const forumSchema = new Schema({
     },
     userIds: {
         type: [Number],
-        required: false
+        required: true
     },
     moderatorIds: {
         type: [Number],
