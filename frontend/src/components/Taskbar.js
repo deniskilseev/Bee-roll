@@ -1,6 +1,6 @@
 // Taskbar.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link component
 import LoginPageModal from './Modals/LoginPageModal';
 import RegisterPageModal from './Modals/RegisterPageModal';
 import { useUser } from '../UserContext';
@@ -47,12 +47,15 @@ const Taskbar = () => {
             </div>
           ) : (
             <div>
-            <Link to="/createforum" className="btn btn-outline-light mr-2">
-                <span className="d-inline-block text-center">Create Forum</span>
-            </Link>
-            <button className="btn btn-outline-light" onClick={handleLoginClick}>
-              <span className="d-inline-block text-center">Login</span>
-            </button>
+              <Link to="/movies" className="btn btn-outline-light mr-2"> {/* Add Link for Movies button */}
+                <span className="d-inline-block text-center">Movies</span>
+              </Link>
+              <Link to="/createforum" className="btn btn-outline-light mr-2">
+                  <span className="d-inline-block text-center">Create Forum</span>
+              </Link>
+              <button className="btn btn-outline-light" onClick={handleLoginClick}>
+                <span className="d-inline-block text-center">Login</span>
+              </button>
             </div>
           )}
         </div>

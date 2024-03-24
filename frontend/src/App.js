@@ -6,9 +6,10 @@ import Taskbar from './components/Taskbar';
 import ProfilePage from './Profile';
 import WatchlistPage from './WatchlistPage';
 import CreateForumPage from './CreateForum';
-import ForumPage from './ForumPage';
+//import ForumPage from './ForumPage';
 import FollowersPage from './FollowersPage';
 import FollowingPage from './FollowingPage';
+import MoviePage from './components/Modals/MoviePage';
 
 
 import { useUser } from './UserContext';
@@ -68,6 +69,7 @@ const App = () => {
           <Route path="/f/:forumName" element={<ForumPage forums={forums} />}/>
           <Route path="/followers" element={<FollowersPage />} />
           <Route path="/following" element={<FollowingPage />} />
+          <Route path="/movies" element={<MoviePage />} />
         </Routes>
       </div>
     </Router>
