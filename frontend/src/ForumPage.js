@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-const ForumPage = ({ forums }) => {
+const ForumPage = ({ forums, currentUser }) => {
   const { forumName } = useParams();
 
   const forum = forums.find((forum) => forum.name === forumName);
+  const [moderators, setModerators] = useState(forum.moderators || []);
+  const [newModerator, setNewModerator] = useState('');
+  const [isOwner, setIsOwner] = useState(currentUser === forum.owner);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  
 
   if (!forum) {
     return <div>Forum not found!</div>;
@@ -21,6 +26,13 @@ const ForumPage = ({ forums }) => {
     console.log(`Pin clicked for post ${postId}`);
   };
 
+  const handleAddModerator = () => {
+    if (newModerator && !moderators.includes(newModerator)) {
+      setModerators([...moderators, newModerator]);
+      setNewModerator('');
+    }
+  };
+
   const handleDeleteClick = (postId) => {
     // Handle delete button click
     console.log(`Delete clicked for post ${postId}`);
@@ -32,6 +44,40 @@ const ForumPage = ({ forums }) => {
 
       <div className="mb-3">
         <button className="btn btn-primary">Create Post</button>
+      </div>
+
+      {isOwner && (
+        <div className="mb-3">
+          <button className="btn btn-primary" onClick={() => setIsSearchVisible(!isSearchVisible)}>
+            {isSearchVisible ? 'Hide Moderator Search' : 'Show Moderator Search'}
+          </button>
+        </div>
+      )}
+
+      {isOwner && isSearchVisible && (
+        <div className="mb-3">
+        <div className="input-group">
+          <input
+            type="text"
+            value={newModerator}
+            onChange={(e) => setNewModerator(e.target.value)}
+            className="form-control"
+            placeholder="Enter username of new moderator"
+          />
+          <div className="input-group-append">
+            <button className="btn btn-success" onClick={handleAddModerator}>Add Moderator</button>
+          </div>
+        </div>
+      </div>
+      )}
+
+      <div>
+        <h3>Moderators:</h3>
+        <ul>
+          {moderators.map((moderator, index) => (
+            <li key={index}>{moderator}</li>
+          ))}
+        </ul>
       </div>
 
       {dummyPosts.map((post) => (
