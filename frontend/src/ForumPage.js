@@ -16,6 +16,16 @@ const ForumPage = ({ forums }) => {
     { id: 3, title: 'Post 3', content: 'Content of post 3' },
   ];
 
+  const handlePinClick = (postId) => {
+    // Handle pin button click
+    console.log(`Pin clicked for post ${postId}`);
+  };
+
+  const handleDeleteClick = (postId) => {
+    // Handle delete button click
+    console.log(`Delete clicked for post ${postId}`);
+  };
+
   return (
     <div className="container mt-5">
       <h1>{forum.title}</h1>
@@ -29,6 +39,8 @@ const ForumPage = ({ forums }) => {
           <div className="card-body">
             <h5 className="card-title">{post.title}</h5>
             <p className="card-text">{post.content}</p>
+            <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.id)}>Pin</button>
+            <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.id)}>Delete</button>
           </div>
         </div>
       ))}
