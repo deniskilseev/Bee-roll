@@ -9,6 +9,7 @@ const Taskbar = () => {
   const { user, logout } = useUser();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showSearchBar, setShowSearchBar] = useState(false);
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
@@ -30,12 +31,16 @@ const Taskbar = () => {
     setShowRegisterModal(false);
   };
 
+  const toggleSearchBar = () => {
+    setShowSearchBar(!showSearchBar); // Toggle search bar visibility
+  };
+
   return (
     <header className={`navbar navbar-dark bg-dark ${showLoginModal ? 'overlay' : ''}`}>
       <div className="container d-flex justify-content-between align-items-center">
         <Link className="navbar-brand" to="/">Bee-Roll</Link>
 
-        <div>
+        <div className="btn-group mr-2">
           {user ? (
             <div>
               <Link to="/profile" className="btn btn-outline-light mr-2">
@@ -47,16 +52,27 @@ const Taskbar = () => {
             </div>
           ) : (
             <div>
-            <Link to="/createforum" className="btn btn-outline-light mr-2">
-                <span className="d-inline-block text-center">Create Forum</span>
-            </Link>
-            <button className="btn btn-outline-light" onClick={handleLoginClick}>
-              <span className="d-inline-block text-center">Login</span>
-            </button>
+              <button className="btn btn-outline-light ml-2" onClick={toggleSearchBar}>
+                <span className="d-inline-block text-center">{showSearchBar ? 'Hide Search' : 'Search'}</span>
+              </button>
+              <Link to="/createforum" className="btn btn-outline-light mr-2">
+                  <span className="d-inline-block text-center">Create Forum</span>
+              </Link>
+              <button className="btn btn-outline-light" onClick={handleLoginClick}>
+                <span className="d-inline-block text-center">Login</span>
+              </button>
             </div>
           )}
         </div>
         
+        {showSearchBar && (
+          <div className="input-group ml-2">
+            <input type="text" className="form-control" placeholder="Search..." />
+            <div className="input-group-append">
+              <button className="btn btn-outline-light" type="button">Search</button>
+            </div>
+          </div>
+        )}
 
         <LoginPageModal showModal={showLoginModal} onClose={handleCloseModal} />
         <RegisterPageModal showModal={showRegisterModal} onClose={handleRegisterModal} />
