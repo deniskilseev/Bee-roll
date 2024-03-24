@@ -1,6 +1,7 @@
 import config as cfg
 
 import hashlib
+import pandas as pd
 import numpy as np
 from scipy import sparse as sp
 
