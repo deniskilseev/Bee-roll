@@ -75,7 +75,7 @@ const forumController = {
         const forum = await Forum.findOne({forumTitle: forumTitle});
 
         if (!forum) {
-            return res.status(400).json({error: "Forum with such name does not exists"})
+            return res.status(404).json({error: "Forum with such name does not exists"})
         }
         
         forum.moderatorIds = undefined;

@@ -20,7 +20,7 @@ const userConroller = {
             }
             
             // Counter for UID. Basically enforces auto-increment.
-            const data = await Counter.findOne({_id: "User"})
+            // const data = await Counter.findOne({_id: "User"})
             const data_request = await Counter.findOne({_id: "User"})
             const counter_value = data_request.collectionCounter
 

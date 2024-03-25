@@ -21,7 +21,7 @@ app.use(express.json()); // Parse JSON bodies
 const dbName = '';
 const username = 'denis';
 const password = 'kilseev';
-const host = '3.131.91.146';
+const host = '3.144.154.13';
 const portMongo = '28018';
 
 // Connection URI
@@ -29,7 +29,8 @@ const uri = `mongodb://${username}:${password}@${host}:${portMongo}/${dbName}`;
 
 // Connect to MongoDB
 mongoose.connect(uri, {
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    dbName: 'testDatabase'
   })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
