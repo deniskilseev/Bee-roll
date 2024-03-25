@@ -50,10 +50,31 @@ const Profile = ({ user }) => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    // const file = e.target.files[0];
-    // Add logic to handle image change and update editedUser.profilePicture
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+  
+    try {
+      const response = await fetch('/upload-profile-picture', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error('Failed to upload profile picture');
+      }
+      const { profilePicture } = await response.json();
+      setEditedUser((prevUser) => ({
+        ...prevUser,
+        profilePicture,
+      }));
+    } catch (error) {
+      console.error('Error uploading profile picture:', error.message);
+      // Handle error (e.g., display error message to the user)
+    }
   };
+  
+  
 
   const handleWatchlistsClick = () => {
     navigate('/watchlists');
@@ -87,6 +108,7 @@ const Profile = ({ user }) => {
                     onChange={handleImageChange}
                     style={{ display: 'none' }}
                   />
+
                 </label>
               )}
               {!isEditing && (

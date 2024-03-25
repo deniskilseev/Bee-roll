@@ -1,11 +1,22 @@
-// Import necessary modules and models
-const mongoose = require('mongoose');
-const express = require('express');
-const Counter = require('../model/Counter.js');
-const User = require('../model/User.js');
+// profileController.js
+
+const multer = require('multer');
+const path = require('path');
+const User = require('../model/User');
+
+// Multer configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '..', 'uploads'));
+  },
+  filename: function (req, file, cb) {
+    cb(null, 'profile_picture_' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage }).single('profilePicture');
 
 const profileController = {
-
   async updateUserProfile(req, res) {
     try {
       const { uid, username, bio, profilePicture } = req.body;
@@ -61,6 +72,33 @@ const profileController = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
+
+  async uploadProfilePicture(req, res) {
+    try {
+      upload(req, res, async function (err) {
+        if (err instanceof multer.MulterError) {
+          return res.status(500).json({ error: "Failed to upload profile picture" });
+        } else if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+
+        if (!req.file) {
+          return res.status(400).json({ error: 'No file uploaded' });
+        }
+        const profilePictureUrl = '/uploads/' + req.file.filename;
+
+        // Update user's profile picture in the database
+        // Assuming the user's UID is available in req.user.uid
+        // Replace it with the appropriate field if different
+        const user = await User.findOneAndUpdate({ uid: req.user.uid }, { profilePicture: profilePictureUrl }, { new: true });
+
+        res.json({ profilePicture: profilePictureUrl });
+      });
+    } catch (error) {
+      console.error("Error in uploading profile picture:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
 };
 
 module.exports = profileController;

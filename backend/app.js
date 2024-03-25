@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path'); // Import the path module
 
 // Import controllers
 const userRoute = require('./routes/user'); 
@@ -35,6 +36,7 @@ mongoose.connect(uri, {
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
 // Routes.
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/users', userRoute);
 app.use('/forums', forumRoute);
 app.use('/posts', postRoute);
