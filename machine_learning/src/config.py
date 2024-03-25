@@ -14,5 +14,5 @@ NUM_PARTS = 10
 # Path to Models
 
 PATH_TO_POPULAR_MOVIES_MODEL = "../models/popular_movies.model"
-PATH_TO_SIMILAR_MOVIES_MODEL = "../models/similar_movies.model"
+PATH_TO_ALS_MODEL = "../models/als.model"
 PATH_TO_MOVIE_ENCODER ="../models/movie.encoder"
