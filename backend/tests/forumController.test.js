@@ -111,7 +111,7 @@ describe('createForum', () => {
 
         const req2 = { body: {
             forumId: forum.forumId,
-            memberId: 3
+            memberId: 2
         }};
 
         await joinForum(req2, res);
