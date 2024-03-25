@@ -1,6 +1,6 @@
 import pandas as pd
 
-class DummyModel():
+class PopularMovies():
     def __init__(self, dataframe):
         self.sortedMovies = dataframe
 
@@ -11,3 +11,10 @@ class DummyModel():
         answer = [movieId for movieId in movieIds if movieId not in X]
         answer = pd.Series(answer[:nPredictions])
         return answer
+
+class SimilarMovies():
+    def __init__(self, model):
+        self.model = model
+
+    def predict(self, x, nPredictions=50):
+        return self.model.similar_items(x, N=nPredictions,filter_items=x)[0]
