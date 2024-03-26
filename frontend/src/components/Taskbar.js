@@ -4,12 +4,15 @@ import { Link } from 'react-router-dom';
 import LoginPageModal from './Modals/LoginPageModal';
 import RegisterPageModal from './Modals/RegisterPageModal';
 import { useUser } from '../UserContext';
+import axios from 'axios';
 
 const Taskbar = () => {
   const { user, logout } = useUser();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
@@ -33,6 +36,22 @@ const Taskbar = () => {
 
   const toggleSearchBar = () => {
     setShowSearchBar(!showSearchBar); // Toggle search bar visibility
+  };
+
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    fetchSearchResults(query);
+  };
+
+  const fetchSearchResults = async (query) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
+      console.log('Search results:', response.data);
+      setSearchResults(response.data.results.slice(0, 5)); // Limit results to 5
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+    }
   };
 
   return (
@@ -67,11 +86,25 @@ const Taskbar = () => {
         
         {showSearchBar && (
           <div className="input-group ml-2">
-            <input type="text" className="form-control" placeholder="Search..." />
+            <input 
+              type="text" 
+              className="form-control" 
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
             <div className="input-group-append">
               <button className="btn btn-outline-light" type="button">Search</button>
             </div>
           </div>
+        )}
+
+        {showSearchBar && searchResults.length > 0 && (
+          <ul className="list-group mt-2">
+            {searchResults.map((result, index) => (
+              <li key={index} className="list-group-item">{result.title}</li>
+            ))}
+          </ul>
         )}
 
         <LoginPageModal showModal={showLoginModal} onClose={handleCloseModal} />

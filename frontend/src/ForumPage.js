@@ -23,7 +23,6 @@ const ForumPage = ({ forums, currentUser }) => {
   ];
 
   const handlePinClick = (postId) => {
-    // Handle pin button click
     axios.post('http://localhost:3000/pinPost', { postId: postId, forumId: forum.id })
       .then(response => {
         console.log('Post pinned successfully:', response.data);
@@ -41,7 +40,7 @@ const ForumPage = ({ forums, currentUser }) => {
   };
 
   const handleDeleteClick = (postId) => {
-    axios.delete(`/deletePost/${postId}`)
+    axios.delete(`http://localhost:3000/deletePost/${postId}`)
       .then(response => {
         console.log('Post deleted successfully:', response.data);
       })
