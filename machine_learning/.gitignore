@@ -5,6 +5,8 @@ env/
 data/
 # Temporary Files
 tmp/
+# ALS model, since it's too heavy for GitHub
+als.model
 # Pycache stuff
 __pycache__/
 # Jupyter Notebook checkpoints
