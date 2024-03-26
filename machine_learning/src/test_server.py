@@ -23,21 +23,18 @@ def test_film_number():
 
 def test_invalid_input():
     json = {
-        "user_id": "Quentin Tarantino",
-        "movie_ids": ["The Hateful Eight", "Django Unchained"]
+        "userId": "Quentin Tarantino",
+        "movieIds": ["The Hateful Eight", "Django Unchained"]
     }
     with TestClient(app=app) as client:
         response = client.post("/popularMovies", json=json)
         assert response.status_code == 422
 
 def test_similar_films():
-    json = {
-        "movieId": 1,
-        "rating": 3.0
-    }
+    movieId = 1
     with TestClient(app=app) as client:
-        response = client.post("/similarMovies", json=json)
-        assert len(response.json()["movie_ids"]) == 50
+        response = client.post(f"/similarMovies?movieId={movieId}")
+        assert len(response.json()["movie_ids"]) == 1
 
 
 def test_updating_user():
@@ -52,7 +49,8 @@ def test_updating_user():
     with TestClient(app=app) as client:
         response = client.post("/updateUser", json=json)
         assert response.status_code == 200
-        response = client.post("/predictUser", json=json)
+        response = client.post(f"/predictUser", json=json)
+        print(response)
         assert len(response.json()["movie_ids"]) != 0
         json["reviews"] = []
         response = client.post("/updateUser", json=json)

@@ -31,13 +31,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-class Movie(BaseModel):
+class Review(BaseModel):
     movieId: int
     rating: float
 
 class History(BaseModel):
     userId: int
-    reviews: List[Movie] = []
+    reviews: List[Review] = []
 
 @app.post("/popularMovies")
 async def popular_movies(history: History):
@@ -50,8 +50,8 @@ async def popular_movies(history: History):
     }
 
 @app.post("/similarMovies")
-async def user_recommendations(movie: Movie):
-    output = ml_models["als"].predictSimilar(movie.movieId)
+async def similar_movies(movieId: int):
+    output = ml_models["als"].predictSimilarMovies(movieId)
     return {
         "movie_ids": output.tolist()
     }
@@ -64,6 +64,13 @@ async def user_recommendations(history: History):
     output = ml_models["als"].predict(history.userId, data)
     return {
         "movie_ids": output.tolist()
+    }
+
+@app.post("/similarUsers")
+async def similar_users(userId: int):
+    output = ml_models["als"].predictSimilarUsers(userId)
+    return {
+        "user_ids": output.tolist()
     }
 
 
