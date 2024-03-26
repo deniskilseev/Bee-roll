@@ -63,7 +63,7 @@ async def user_recommendations(history: History):
     data = make_coo_row(history.dict()["reviews"], ml_models["encoder"]).tocsr()
     output = ml_models["als"].predict(history.userId, data)
     return {
-            "movie_ids": output.tolist()
+        "movie_ids": output.tolist()
     }
 
 
@@ -71,4 +71,6 @@ async def user_recommendations(history: History):
 async def update_user(history: History,  status_code=200):
     data = make_coo_row(history.dict()["reviews"], ml_models["encoder"]).tocsr()
     ml_models["als"].update(history.userId, data)
-    
+    return {
+        "message": "User updated successfully"
+    }
