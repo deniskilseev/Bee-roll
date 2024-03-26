@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const ForumPage = ({ forums, currentUser }) => {
   const { forumName } = useParams();
 
   const forum = forums.find((forum) => forum.name === forumName);
-  const [moderators, setModerators] = useState(forum.moderators || []);
+  const [moderators, setModerators] = useState(forum.moderatorIds || []);
   const [newModerator, setNewModerator] = useState('');
   const [isOwner, setIsOwner] = useState(currentUser === forum.owner);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -23,7 +24,13 @@ const ForumPage = ({ forums, currentUser }) => {
 
   const handlePinClick = (postId) => {
     // Handle pin button click
-    console.log(`Pin clicked for post ${postId}`);
+    axios.post('http://localhost:3000/pinPost', { postId: postId, forumId: forum.id })
+      .then(response => {
+        console.log('Post pinned successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error pinning post:', error);
+      });
   };
 
   const handleAddModerator = () => {
@@ -34,8 +41,13 @@ const ForumPage = ({ forums, currentUser }) => {
   };
 
   const handleDeleteClick = (postId) => {
-    // Handle delete button click
-    console.log(`Delete clicked for post ${postId}`);
+    axios.delete(`/deletePost/${postId}`)
+      .then(response => {
+        console.log('Post deleted successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error deleting post:', error);
+      });
   };
 
   return (

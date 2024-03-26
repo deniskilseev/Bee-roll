@@ -43,6 +43,12 @@ const Taskbar = () => {
         <div className="btn-group mr-2">
           {user ? (
             <div>
+              <button className="btn btn-outline-light ml-2" onClick={toggleSearchBar}>
+                <span className="d-inline-block text-center">{showSearchBar ? 'Hide Search' : 'Search'}</span>
+              </button>
+              <Link to="/createforum" className="btn btn-outline-light mr-2">
+                  <span className="d-inline-block text-center">Create Forum</span>
+              </Link>
               <Link to="/profile" className="btn btn-outline-light mr-2">
                 <span className="d-inline-block text-center">Profile</span>
               </Link>
@@ -52,12 +58,6 @@ const Taskbar = () => {
             </div>
           ) : (
             <div>
-              <button className="btn btn-outline-light ml-2" onClick={toggleSearchBar}>
-                <span className="d-inline-block text-center">{showSearchBar ? 'Hide Search' : 'Search'}</span>
-              </button>
-              <Link to="/createforum" className="btn btn-outline-light mr-2">
-                  <span className="d-inline-block text-center">Create Forum</span>
-              </Link>
               <button className="btn btn-outline-light" onClick={handleLoginClick}>
                 <span className="d-inline-block text-center">Login</span>
               </button>

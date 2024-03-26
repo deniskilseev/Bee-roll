@@ -1,8 +1,9 @@
 // CreateForumPage.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const CreateForumPage = ({ onForumCreate }) => {
+const CreateForumPage = ({ onForumCreate, user }) => {
   const navigate = useNavigate();
   const [forumTitle, setForumTitle] = useState('');
   const [forumDescription, setForumDescription] = useState('');
@@ -10,18 +11,26 @@ const CreateForumPage = ({ onForumCreate }) => {
   const handleCreateForum = async () => {
     const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
 
+    console.log(user.id);
+
     const newForum = {
-      id: Date.now(),
-      name: forumName,
-      title: forumTitle,
-      description: forumDescription,
+      forumTitle: forumTitle,
+      creatorId: user.id,
     };
 
-    //Api call here
+    try {
+      const response = await axios.post('http://localhost:3000/forums/createForum', newForum);
+      const createdForum = response.data;
+  
+      onForumCreate(createdForum);
+      navigate(`/forums/${forumName}`);
+    } catch (error) {
+      console.error('Error creating forum:', error);
+    }
 
     onForumCreate(newForum);
 
-    navigate(`/f/${forumName}`);
+    navigate(`/forums/${forumName}`);
   };
 
   const handleCancel = () => {
