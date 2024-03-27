@@ -1,4 +1,4 @@
-const { loginUser, createUser } = require('../controllers/userController');
+const { loginUser, createUser, putUser} = require('../controllers/userController');
 const http = require('http');
 const request = require('supertest'); // Supertest is a library for testing HTTP servers
 const mongoose = require('mongoose')
@@ -138,6 +138,67 @@ describe('createUser', () => {
         };
 
         await createUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+    });
+});
+
+describe('putUser', () => {
+    test('return 200 if updating user that exists', async () => {
+
+        const req = { body: {
+            username: "denis",
+            password: "321",
+            email: "i_am_great@gmail.com"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await putUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const user = await User.findOne({login: "denis"});
+
+        expect(user.email).toEqual("i_am_great@gmail.com");
+        expect(user.password).toEqual("321");
+    });
+
+    test('return 404 if updating user that doesnt exists', async () => {
+
+        const req = { body: {
+            username: "oleg",
+            password: "321",
+            email: "i_am_great@gmail.com"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await putUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test('return 400 if updating user with email that is registered', async () => {
+
+        const req = { body: {
+            username: "denis",
+            password: "321",
+            email: "sreekar@gmail.com"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await putUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
     });

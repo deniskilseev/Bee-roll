@@ -63,8 +63,37 @@ const userController = {
             console.error("Error in loginUser:", error);
             res.status(500).json({ error: "Internal server error" });
         }
-    }
+    },
 
+    async putUser(req, res) {
+        try {
+            const {username, password, email, date_of_birth} = req.body;
+            
+            const user = await User.findOne({login: username})
+            
+            if (!user) {
+                return res.status(404).json({error: "User wasn't found"})
+            }
+
+            user.password = password;
+
+            const user_by_email = await User.findOne({email: email});
+
+            if (user_by_email && user_by_email.login != username) {
+                return res.status(400).json({error: "User with such email exists!"})
+            }
+
+            user.email = email;
+            user.date_of_birth = date_of_birth;
+
+            await user.save();
+
+            res.status(200).json({message: "Data updated successfully"});
+        } catch (error) {
+            console.error("Error in putUser:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
 }
 
 module.exports = userController;

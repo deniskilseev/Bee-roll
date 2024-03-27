@@ -1,17 +1,18 @@
-const url = 'http://localhost:3000/posts/2'; // Replace with your API endpoint
-// const data = {
-//     creatorId: 5,
-//     forumId: 16,
-//     postTitle: 'Hi, Im gay',
-//     postText: 'Well, yeah. Coming out.'
-// }; // Replace with the data you want to send
+const url = 'http://localhost:3000/users/putUser/'; // Replace with your API endpoint
+const data = {
+    creatorId: 5,
+    forumId: 16,
+    postTitle: 'Hi, Im gay',
+    postText: 'Well, yeah. Coming out.'
+}; // Replace with the data you want to send
 
 // Define request options
 const options = {
-    method: 'GET',
+    method: 'PUT',
     headers: {
         'Content-Type': 'application/json'
-    }
+    },
+    body: JSON.stringify(data)
 };
 
 // Send the POST request
