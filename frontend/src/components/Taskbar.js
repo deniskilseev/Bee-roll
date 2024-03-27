@@ -48,7 +48,7 @@ const Taskbar = () => {
     try {
       const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
       console.log('Search results:', response.data);
-      setSearchResults(response.data.results.slice(0, 5)); // Limit results to 5
+      setSearchResults(response.data.foundMovies.slice(0, 5)); // Limit results to 5
     } catch (error) {
       console.error('Error fetching search results:', error);
     }

@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const express = require('express')
 const Counter = require('../model/Counter.js')
 
-const userConroller = {
+const counterController = {
 
     async getController(req, res) {
         const {collection} = req.body;
