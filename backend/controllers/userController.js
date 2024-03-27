@@ -5,7 +5,7 @@ const User = require('../model/User.js')
 
 
 
-const userConroller = {
+const userController = {
     async createUser(req, res) {
         try {
             const {username, password, email} = req.body;
@@ -67,4 +67,4 @@ const userConroller = {
 
 }
 
-module.exports = userConroller;
+module.exports = userController;
