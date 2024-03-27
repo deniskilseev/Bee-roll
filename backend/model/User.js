@@ -11,7 +11,8 @@ const userSchema = new Schema({
   watchListsIds: [Number],
   postsIds: [Number],
   chatsIds: [Number],
-  forumIds: [Number]
+  forumIds: [Number],
+  reviewIds: [Number],
 });
 
 const User = model('User', userSchema);

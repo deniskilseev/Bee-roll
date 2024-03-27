@@ -1,6 +1,7 @@
 import config as cfg
 
 import hashlib
+import pandas as pd
 import numpy as np
 from scipy import sparse as sp
 
@@ -75,11 +76,11 @@ def make_coo_row(review_history, movie_encoder: MovieEncoder):
     values = []
 
     for review in review_history:
-        idx.append(movie_encoder.toidx(review["movieId"]))
+        idx.append(movie_encoder.to_idx(review["movieId"]))
         values.append(review["rating"])
 
     return sp.coo_matrix(
-        (np.array(values).astype(np.float64), ([0] * len(idx), idx)), shape=(1, product_encoder.num_items),
+        (np.array(values).astype(np.float64), ([0] * len(idx), idx)), shape=(1, movie_encoder.num_items),
     )
 
 

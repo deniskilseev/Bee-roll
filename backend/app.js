@@ -8,6 +8,7 @@ const forumRoute = require('./routes/forum');
 const postRoute = require('./routes/post'); 
 const watchListRoute = require('./routes/watchlist');
 const movieRoute = require('./routes/movie');
+const reviewRoute = require('./routes/review');
 // Add more controllers as needed
 
 // Create Express application
@@ -41,5 +42,6 @@ app.use('/forums', forumRoute);
 app.use('/posts', postRoute);
 app.use('/watchlists', watchListRoute);
 app.use('/movies', movieRoute);
+app.use('/reviews', reviewRoute);
 
 module.exports = app;

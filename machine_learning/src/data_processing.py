@@ -9,7 +9,7 @@ from utils import user_hash
 class Review:
     def __init__(self, movie_id, review_timestamp, review_rating, **kwargs):
         self.data = {
-            **{"movie_id": movie_id, "timestamp": review_timestamp, "rating": review_rating},
+            **{"movieId": movie_id, "timestamp": review_timestamp, "rating": review_rating},
             **kwargs,
         }
     
@@ -111,7 +111,7 @@ def process_input(input_path, output_path, n_parts=10):
 if __name__ == "__main__":
     random.seed(42) # Ah, yes, the number
     print("Processing input")
-    process_input(cfg.REVIEWS_CSV_PATH, cfg.TEMPORATY_FILES_PATH, n_parts=10)
+    process_input(cfg.REVIEWS_CSV_PATH, cfg.TEMPORATY_FILES_PATH, n_parts=cfg.NUM_PARTS)
     print("Checking if the output is correct")
     input_users = count_input_users(cfg.REVIEWS_CSV_PATH)
     output_users = count_output_users(cfg.TEMPORATY_FILES_PATH)
