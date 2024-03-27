@@ -133,6 +133,7 @@ const reviewController = {
             console.error("Error in deleteReview:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
-    }
-
+    },
 }
+
+module.exports = reviewController;
