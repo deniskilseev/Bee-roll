@@ -1,26 +1,58 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const ForumPage = ({ forums, currentUser }) => {
   const { forumName } = useParams();
 
-  const forum = forums.find((forum) => forum.name === forumName);
-  const [moderators, setModerators] = useState(forum.moderatorIds || []);
+  const [forum, setForum] = useState(null);
+  const [moderators, setModerators] = useState([]);
   const [newModerator, setNewModerator] = useState('');
-  const [isOwner, setIsOwner] = useState(currentUser === forum.owner);
+  const [isOwner, setIsOwner] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [posts, setPosts] = useState([]);
   
+  useEffect(() => {
+    const fetchForumData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
+        console.log('Fetched forum:', response.data);
+        const fetchedForum = response.data;
+        setForum(fetchedForum);
+        setModerators(fetchedForum.moderatorIds || []);
+        setIsOwner(currentUser === fetchedForum.owner);
+      } catch (error) {
+        console.error('Error fetching forum:', error);
+      }
+  };
+
+    fetchForumData();
+  }, [forumName, currentUser]);
+
+  useEffect(() => {
+    if (!forum) return; // Add this condition
+
+    const fetchPostData = async () => {
+    try {
+      const postsData = await Promise.all(
+        forum.postIds.map(async (postId) => {
+          const response = await axios.get(`http://localhost:3000/getPost/${postId}`);
+          return response.data;
+        })
+      );
+      
+      setPosts(postsData);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
+  
+    fetchPostData();
+  }, [forum]);
 
   if (!forum) {
     return <div>Forum not found!</div>;
   }
-
-  const dummyPosts = [
-    { id: 1, title: 'Post 1', content: 'Content of post 1' },
-    { id: 2, title: 'Post 2', content: 'Content of post 2' },
-    { id: 3, title: 'Post 3', content: 'Content of post 3' },
-  ];
 
   const handlePinClick = (postId) => {
     axios.post('http://localhost:3000/pinPost', { postId: postId, forumId: forum.id })
@@ -53,8 +85,9 @@ const ForumPage = ({ forums, currentUser }) => {
     <div className="container mt-5">
       <h1>{forum.title}</h1>
 
+      
       <div className="mb-3">
-        <button className="btn btn-primary">Create Post</button>
+        <Link to={`/forums/${forum.forumId}/createpost`} className="btn btn-primary">Create Post</Link>
       </div>
 
       {isOwner && (
@@ -91,7 +124,7 @@ const ForumPage = ({ forums, currentUser }) => {
         </ul>
       </div>
 
-      {dummyPosts.map((post) => (
+      {posts.map((post) => (
         <div key={post.id} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title">{post.title}</h5>
