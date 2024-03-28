@@ -16,7 +16,6 @@ const ForumPage = ({ forums, currentUser }) => {
     const fetchForumData = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
-        console.log('Fetched forum:', response.data);
         const fetchedForum = response.data;
         setForum(fetchedForum);
         setModerators(fetchedForum.moderatorIds || []);
@@ -36,7 +35,7 @@ const ForumPage = ({ forums, currentUser }) => {
     try {
       const postsData = await Promise.all(
         forum.postIds.map(async (postId) => {
-          const response = await axios.get(`http://localhost:3000/getPost/${postId}`);
+          const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
           return response.data;
         })
       );
@@ -55,7 +54,7 @@ const ForumPage = ({ forums, currentUser }) => {
   }
 
   const handlePinClick = (postId) => {
-    axios.post('http://localhost:3000/pinPost', { postId: postId, forumId: forum.id })
+    axios.post('http://localhost:3000/posts/pinPost', { postId: postId, forumId: forum.forumId })
       .then(response => {
         console.log('Post pinned successfully:', response.data);
       })
@@ -72,15 +71,33 @@ const ForumPage = ({ forums, currentUser }) => {
   };
 
   const handleDeleteClick = (postId) => {
-    axios.delete(`http://localhost:3000/deletePost/${postId}`)
-      .then(response => {
-        console.log('Post deleted successfully:', response.data);
-      })
-      .catch(error => {
-        console.error('Error deleting post:', error);
-      });
+    const isConfirmed = window.confirm("Are you sure you want to delete this post?");
+    if (isConfirmed) {
+      axios.delete(`http://localhost:3000/posts/deletePost/${postId}`)
+        .then(response => {
+          console.log('Post deleted successfully:', response.data);
+          // Optionally, you can update the state or perform any additional actions after successful deletion
+        })
+        .catch(error => {
+          console.error('Error deleting post:', error);
+        });
+    }
   };
 
+  const reorderPosts = (posts, pinnedPostId) => {
+    if (!pinnedPostId || !posts || posts.length === 0) {
+      return posts;
+    }
+    
+    const pinnedPostIndex = posts.findIndex(post => post.post_info.postId === pinnedPostId);
+    if (pinnedPostIndex === -1) {
+      return posts;
+    }
+    
+    const pinnedPost = posts.splice(pinnedPostIndex, 1)[0];
+    return [pinnedPost, ...posts];
+  };
+  
   return (
     <div className="container mt-5">
       <h1>{forum.title}</h1>
@@ -124,13 +141,15 @@ const ForumPage = ({ forums, currentUser }) => {
         </ul>
       </div>
 
-      {posts.map((post) => (
-        <div key={post.id} className="card mb-3">
+      <h2>Posts</h2>
+      {/* Currently does not show username or profile picture */}
+      {reorderPosts(posts, forum.pinnedPost).map((post) => (
+        <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
-            <h5 className="card-title">{post.title}</h5>
-            <p className="card-text">{post.content}</p>
-            <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.id)}>Pin</button>
-            <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.id)}>Delete</button>
+            <h5 className="card-title">{post.post_info.postTitle}</h5>
+            <p className="card-text">{post.post_info.postText}</p>
+            <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
+            <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
           </div>
         </div>
       ))}
