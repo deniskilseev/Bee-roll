@@ -13,6 +13,8 @@ const userSchema = new Schema({
   chatsIds: [Number],
   forumIds: [Number],
   reviewIds: [Number],
+  followsIds: [Number],
+  followersIds: [Number]
 });
 
 const User = model('User', userSchema);

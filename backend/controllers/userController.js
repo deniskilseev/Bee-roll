@@ -93,6 +93,60 @@ const userController = {
             console.error("Error in putUser:", error);
             res.status(500).json({ error: "Internal server error" });
         }
+    },
+
+    async followUser(req, res) {
+        try {
+            const {user_follower, user_followed} = req.body;
+
+            const user_follower_profile = await User.findOne({login: user_follower});
+            const user_followed_profile = await User.findOne({login: user_followed});
+
+            if (!user_follower_profile || !user_followed_profile) {
+                return res.status(404).json({message: "Users were not found!"});
+            }
+            
+            follower_id = user_follower_profile.uid;
+            followed_id = user_followed_profile.uid;
+
+            user_follower_profile.followsIds.push(followed_id);
+            user_followed_profile.followersIds.push(follower_id);
+
+            await user_follower_profile.save();
+            await user_followed_profile.save();
+
+            res.status(200).json({message: "Data updated successfully"});
+        } catch (error) {
+            console.error("Error in putUser:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
+    async unfollowUser(req, res) {
+        try {
+            const {user_follower, user_followed} = req.body;
+
+            const user_follower_profile = await User.findOne({login: user_follower});
+            const user_followed_profile = await User.findOne({login: user_followed});
+
+            if (!user_follower_profile || !user_followed_profile) {
+                return res.status(404).json({message: "Users were not found!"});
+            }
+            
+            follower_id = user_follower_profile.uid;
+            followed_id = user_followed_profile.uid;
+
+            user_follower_profile.followsIds.pull(followed_id);
+            user_followed_profile.followersIds.pull(follower_id);
+
+            await user_follower_profile.save();
+            await user_followed_profile.save();
+
+            res.status(200).json({message: "Data updated successfully"});
+        } catch (error) {
+            console.error("Error in putUser:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     }
 }
 
