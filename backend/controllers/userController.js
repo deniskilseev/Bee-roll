@@ -117,7 +117,7 @@ const userController = {
 
             res.status(200).json({message: "Data updated successfully"});
         } catch (error) {
-            console.error("Error in putUser:", error);
+            console.error("Error in followUser:", error);
             res.status(500).json({ error: "Internal server error" });
         }
     },
@@ -144,7 +144,7 @@ const userController = {
 
             res.status(200).json({message: "Data updated successfully"});
         } catch (error) {
-            console.error("Error in putUser:", error);
+            console.error("Error in unfollowUser:", error);
             res.status(500).json({ error: "Internal server error" });
         }
     }
