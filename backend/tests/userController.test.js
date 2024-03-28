@@ -1,4 +1,4 @@
-const { loginUser, createUser, putUser} = require('../controllers/userController');
+const { loginUser, createUser, putUser, followUser, unfollowUser} = require('../controllers/userController');
 const http = require('http');
 const request = require('supertest'); // Supertest is a library for testing HTTP servers
 const mongoose = require('mongoose')
@@ -201,5 +201,129 @@ describe('putUser', () => {
         await putUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
+    });
+});
+
+describe('(un)followUser', () => {
+    test('return 200 if following is successful', async () => {
+
+        const req = { body: {
+            user_follower: "denis",
+            user_followed: "sreekar"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await followUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const user1 = await User.findOne({login: "denis"});
+        const user2 = await User.findOne({login: "sreekar"});
+
+        expect(user1.followsIds).toContain(user2.uid);
+        expect(user2.followersIds).toContain(user1.uid);
+    });
+    test('return 404 if follower is inexistent', async () => {
+
+        const req = { body: {
+            user_follower: "inexistent",
+            user_followed: "sreekar"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await followUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    }); 
+    test('return 404 if person followed is inexistent', async () => {
+
+        const req = { body: {
+            user_follower: "inexistent",
+            user_followed: "sreekar"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await followUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    }); 
+
+    test('return 200 if following is successful then 200 if unfollowing', async () => {
+
+        const req = { body: {
+            user_follower: "denis",
+            user_followed: "sreekar"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await followUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const user1 = await User.findOne({login: "denis"});
+        const user2 = await User.findOne({login: "sreekar"});
+
+        expect(user1.followsIds).toContain(user2.uid);
+        expect(user2.followersIds).toContain(user1.uid);
+
+        await unfollowUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const user11 = await User.findOne({login: "denis"});
+        const user22 = await User.findOne({login: "sreekar"});
+
+        expect(user11.followsIds).not.toContain(user22.uid);
+        expect(user22.followersIds).not.toContain(user11.uid);
+    });
+
+    test('return 404 if one of users inexistent', async () => {
+
+        const req = { body: {
+            user_follower: "inexistent",
+            user_followed: "sreekar"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await followUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test('return 200 if users do not follow each other', async () => {
+
+        const req = { body: {
+            user_follower: "aarna",
+            user_followed: "artemii"
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await followUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
     });
 });
