@@ -16,7 +16,6 @@ const ForumPage = ({ forums, currentUser }) => {
     const fetchForumData = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
-        console.log('Fetched forum:', response.data);
         const fetchedForum = response.data;
         setForum(fetchedForum);
         setModerators(fetchedForum.moderatorIds || []);
@@ -84,6 +83,20 @@ const ForumPage = ({ forums, currentUser }) => {
         });
     }
   };
+
+  const reorderPosts = (posts, pinnedPostId) => {
+    if (!pinnedPostId || !posts || posts.length === 0) {
+      return posts;
+    }
+    
+    const pinnedPostIndex = posts.findIndex(post => post.post_info.postId === pinnedPostId);
+    if (pinnedPostIndex === -1) {
+      return posts;
+    }
+    
+    const pinnedPost = posts.splice(pinnedPostIndex, 1)[0];
+    return [pinnedPost, ...posts];
+  };
   
   return (
     <div className="container mt-5">
@@ -130,7 +143,7 @@ const ForumPage = ({ forums, currentUser }) => {
 
       <h2>Posts</h2>
       {/* Currently does not show username or profile picture */}
-      {posts.map((post) => (
+      {reorderPosts(posts, forum.pinnedPost).map((post) => (
         <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title">{post.post_info.postTitle}</h5>
