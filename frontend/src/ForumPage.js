@@ -36,7 +36,7 @@ const ForumPage = ({ forums, currentUser }) => {
     try {
       const postsData = await Promise.all(
         forum.postIds.map(async (postId) => {
-          const response = await axios.get(`http://localhost:3000/getPost/${postId}`);
+          const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
           return response.data;
         })
       );
@@ -55,7 +55,7 @@ const ForumPage = ({ forums, currentUser }) => {
   }
 
   const handlePinClick = (postId) => {
-    axios.post('http://localhost:3000/pinPost', { postId: postId, forumId: forum.id })
+    axios.post('http://localhost:3000/posts/pinPost', { postId: postId, forumId: forum.id })
       .then(response => {
         console.log('Post pinned successfully:', response.data);
       })
@@ -72,7 +72,7 @@ const ForumPage = ({ forums, currentUser }) => {
   };
 
   const handleDeleteClick = (postId) => {
-    axios.delete(`http://localhost:3000/deletePost/${postId}`)
+    axios.delete(`http://localhost:3000/posts/deletePost/${postId}`)
       .then(response => {
         console.log('Post deleted successfully:', response.data);
       })
@@ -125,12 +125,12 @@ const ForumPage = ({ forums, currentUser }) => {
       </div>
 
       {posts.map((post) => (
-        <div key={post.id} className="card mb-3">
+        <div key={post.post_info._id} className="card mb-3">
           <div className="card-body">
-            <h5 className="card-title">{post.title}</h5>
-            <p className="card-text">{post.content}</p>
-            <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.id)}>Pin</button>
-            <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.id)}>Delete</button>
+            <h5 className="card-title">{post.post_info.postTitle}</h5>
+            <p className="card-text">{post.post_info.postText}</p>
+            <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
+            <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
           </div>
         </div>
       ))}
