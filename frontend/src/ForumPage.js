@@ -55,7 +55,7 @@ const ForumPage = ({ forums, currentUser }) => {
   }
 
   const handlePinClick = (postId) => {
-    axios.post('http://localhost:3000/posts/pinPost', { postId: postId, forumId: forum.id })
+    axios.post('http://localhost:3000/posts/pinPost', { postId: postId, forumId: forum.forumId })
       .then(response => {
         console.log('Post pinned successfully:', response.data);
       })
@@ -131,7 +131,7 @@ const ForumPage = ({ forums, currentUser }) => {
       <h2>Posts</h2>
       {/* Currently does not show username or profile picture */}
       {posts.map((post) => (
-        <div key={post.post_info._id} className="card mb-3">
+        <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title">{post.post_info.postTitle}</h5>
             <p className="card-text">{post.post_info.postText}</p>
