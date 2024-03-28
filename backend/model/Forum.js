@@ -33,7 +33,7 @@ const forumSchema = new Schema({
     },
     isPrivate: {
         type: Boolean,
-        required: true
+        default: false
     }
 });
 
