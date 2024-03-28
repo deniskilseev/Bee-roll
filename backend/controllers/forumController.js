@@ -79,7 +79,6 @@ const forumController = {
         }
         
         forum.moderatorIds = undefined;
-        forum.forumId = undefined;
 
         return res.status(200).json(forum);
     },

@@ -115,8 +115,7 @@ const postController = {
 
             const user_post_ids = user_info.postIds;
             const user_index = user_post_ids.indexOf(post_id);
-
-
+          
             if (user_index != -1) {
                 user_post_ids.splice(user_index, 1);
             }
