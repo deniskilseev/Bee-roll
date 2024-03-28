@@ -30,6 +30,10 @@ const forumSchema = new Schema({
     pinnedPost: {
         type: Number,
         required: false
+    },
+    isPrivate: {
+        type: Boolean,
+        required: true
     }
 });
 

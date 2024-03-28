@@ -97,6 +97,14 @@ const postController = {
                 return res.status(400).json( {error: "post_id does not exist"} );
             }
 
+            const forum_id = post_info.forumId
+
+            const forum_info = await Forum.findOne( {forumId: forum_id} );
+
+            if (!forum_info) {
+                return res.status(400).json( {error: "The forum does not exist"} );
+            }
+
             const user_id = post_info.userId;
 
             const user_info = await User.findOne( {uid: user_id} );
@@ -105,14 +113,23 @@ const postController = {
                 return res.status(400).json( {error: "The owner of the post does not exist"} );
             }
 
-            const post_ids = user_info.postIds;
-            const index = post_ids.indexOf(post_id);
+            const user_post_ids = user_info.postIds;
+            const user_index = user_post_ids.indexOf(post_id);
 
-            if (index != -1) {
-                post_ids.splice(index, 1);
+
+            if (user_index != -1) {
+                user_post_ids.splice(user_index, 1);
             }
 
-            await User.findOneAndUpdate( {uid: user_id}, {postIds: post_ids}); // Remove the post entry from User
+            const forum_post_ids = forum_info.postIds;
+            const forum_index = forum_post_ids.indexOf(post_id);
+
+            if (forum_index != -1) {
+                forum_post_ids.splice(forum_index, 1);
+            }
+
+            await User.findOneAndUpdate( {uid: user_id}, {postIds: user_post_ids} ); // Remove the post entry from User
+            await Forum.findOneAndUpdate( {forumId: forum_id}, {postIds: forum_post_ids} ); // Remove the post entry from Forum
             await Post.deleteOne( {postId: post_id} ); // Remove the post entry from database.
 
             return res.status(200).json( {message: "Deleted a post successfuly"});
