@@ -72,15 +72,19 @@ const ForumPage = ({ forums, currentUser }) => {
   };
 
   const handleDeleteClick = (postId) => {
-    axios.delete(`http://localhost:3000/posts/deletePost/${postId}`)
-      .then(response => {
-        console.log('Post deleted successfully:', response.data);
-      })
-      .catch(error => {
-        console.error('Error deleting post:', error);
-      });
+    const isConfirmed = window.confirm("Are you sure you want to delete this post?");
+    if (isConfirmed) {
+      axios.delete(`http://localhost:3000/posts/deletePost/${postId}`)
+        .then(response => {
+          console.log('Post deleted successfully:', response.data);
+          // Optionally, you can update the state or perform any additional actions after successful deletion
+        })
+        .catch(error => {
+          console.error('Error deleting post:', error);
+        });
+    }
   };
-
+  
   return (
     <div className="container mt-5">
       <h1>{forum.title}</h1>
@@ -124,6 +128,8 @@ const ForumPage = ({ forums, currentUser }) => {
         </ul>
       </div>
 
+      <h2>Posts</h2>
+      {/* Currently does not show username or profile picture */}
       {posts.map((post) => (
         <div key={post.post_info._id} className="card mb-3">
           <div className="card-body">

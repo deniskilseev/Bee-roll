@@ -105,7 +105,7 @@ const postController = {
                 return res.status(400).json( {error: "The owner of the post does not exist"} );
             }
 
-            const post_ids = user_info.postIds;
+            const post_ids = user_info.postsIds;
             const index = post_ids.indexOf(post_id);
 
             if (index != -1) {
