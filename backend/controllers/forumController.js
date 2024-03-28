@@ -81,6 +81,26 @@ const forumController = {
         forum.moderatorIds = undefined;
 
         return res.status(200).json(forum);
+    },
+
+    async togglePrivate(req, res) {
+        try {
+            const {forumId} = req.body;
+
+            const forum_info = await Forum.findOne( {forumId: forumId} );
+    
+            if(!forum) {
+                return res.status(400).json( {error: "Forum with such name does not exist"} );
+            }
+            
+            const updated_private = !forum_info.isPrivate;
+
+            await Forum.findOneAndUpdate( {forumId: forumId}, {isPrivate: updated_private} );
+            return res.status(200).json( {message: "Changed Visibility of the forum"} );
+        } catch {
+            console.error("Error in createForum:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     }
 }
 
