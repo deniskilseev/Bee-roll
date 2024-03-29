@@ -17,6 +17,7 @@ import ForumPage from './components/Modals/ForumPage';
 import WritePost from './components/WritePost';
 
 
+
 const App = () => {
   const { user } = useUser();
   const [forums, setForums] = useState([]);

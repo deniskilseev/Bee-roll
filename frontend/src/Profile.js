@@ -3,10 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import plusIcon from './assets/edit.png';
+import { useUser } from './UserContext';
+
 
 const Profile = ({ user }) => {
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
+  const [profilePicture, setProfilePicture] = useState(null);
+  const { updateUser } = useUser();
   const navigate = useNavigate();
 
   const handleEditClick = () => {
@@ -15,17 +19,26 @@ const Profile = ({ user }) => {
 
   const handleSaveClick = async () => {
     try {
-      const { posts, ...userWithoutPosts } = editedUser;
+      //const { posts, id, ...userWithoutPosts } = editedUser;
 
       console.log(editedUser) //print edits to console
+      const { username, bio, profilePicture } = editedUser;
+
+      const userWithoutPosts = {
+        uid: user.id, // Assuming user object has uid field
+        username,
+        bio,
+        profilePicture
+      };
   
-      const response = await fetch('/profile', {
+      const response = await fetch('http://localhost:3000/profile/updateprofile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(userWithoutPosts),
       });
+      console.log("Testing the body: ", JSON.stringify(userWithoutPosts));
   
       if (!response.ok) {
         throw new Error('Failed to save changes');
@@ -53,10 +66,17 @@ const Profile = ({ user }) => {
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     const formData = new FormData();
+    console.log("file? ", file)
     formData.append('profilePicture', file);
-  
+    formData.append('userId', user.id);
+    for (var key of formData.entries()) {
+      console.log(key[0] + ', ' + key[1]);
+  }
+
+    console.log("formData: ", formData);
+
     try {
-      const response = await fetch('/upload-profile-picture', {
+      const response = await fetch('http://localhost:3000/profile/upload-profile-picture', {
         method: 'POST',
         body: formData,
       });
@@ -64,10 +84,18 @@ const Profile = ({ user }) => {
         throw new Error('Failed to upload profile picture');
       }
       const { profilePicture } = await response.json();
-      setEditedUser((prevUser) => ({
-        ...prevUser,
-        profilePicture,
-      }));
+      setProfilePicture(profilePicture);
+      if (response.ok) {
+        const userData = await response.json();
+        console.log('Profile retrieved', userData);
+
+        updateUser(userData);
+        navigate(`/profile/${userData.userId}`); // Redirect to the profile page
+        
+      } else {
+        console.error('Retreival failed');
+        // Handle failed login scenarios
+      }
     } catch (error) {
       console.error('Error uploading profile picture:', error.message);
       // Handle error (e.g., display error message to the user)
@@ -170,7 +198,9 @@ const Profile = ({ user }) => {
                     >
                       <div className='bio-follow-header'>
                         <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
+                        {editedUser.followers && (
                         <p className='bio-follows'>{editedUser.followers.length}</p>
+                        )}
                       </div>
                   </Link>
                 </div>
@@ -181,7 +211,9 @@ const Profile = ({ user }) => {
                       >
                         <div className='bio-follow-header'>
                           <h3 style={{ fontSize: 'inherit' }}>Following</h3>
+                          {editedUser.following && (
                           <p className='bio-follows'>{editedUser.following.length}</p>
+                          )}
                         </div>
                     </Link>
                 </div>

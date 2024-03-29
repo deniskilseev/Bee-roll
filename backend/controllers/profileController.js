@@ -1,5 +1,4 @@
 // profileController.js
-
 const multer = require('multer');
 const path = require('path');
 const User = require('../model/User');
@@ -20,9 +19,13 @@ const profileController = {
   async updateUserProfile(req, res) {
     try {
       const { uid, username, bio, profilePicture } = req.body;
+      const tempId = req.params.userId;
 
       // Find the user by UID
       const user = await User.findOne({ uid });
+
+      console.log("This is the uid: ", uid);
+      console.log("This is the req userID: ", tempId);
 
       if (!user) {
         return res.status(404).json({ error: "User not found" });
@@ -55,6 +58,7 @@ const profileController = {
         return res.status(404).json({ error: "User not found" });
       }
 
+      console.log("get profile test");
       // Remove sensitive information (if needed) before sending to the client
       const userProfile = {
         uid: user.uid,
@@ -74,7 +78,23 @@ const profileController = {
   },
 
   async uploadProfilePicture(req, res) {
+    console.log("Entered method")
     try {
+      const userId = req.body.userId;
+      console.log("req body: ", req.body);
+
+      // Find the user by UID
+      //const user = await User.findOne({ uid: userId });
+
+      console.log("Testing userId: ", userId);
+      console.log("Test 2")
+      if (!userId) {
+        console.log("am i here");
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      console.log("test 2 passed")
+
       upload(req, res, async function (err) {
         if (err instanceof multer.MulterError) {
           return res.status(500).json({ error: "Failed to upload profile picture" });
@@ -85,13 +105,15 @@ const profileController = {
         if (!req.file) {
           return res.status(400).json({ error: 'No file uploaded' });
         }
-        const profilePictureUrl = '/uploads/' + req.file.filename;
+        const profilePictureUrl = '/uploads/' + req.files.filename;
 
         // Update user's profile picture in the database
         // Assuming the user's UID is available in req.user.uid
         // Replace it with the appropriate field if different
-        const user = await User.findOneAndUpdate({ uid: req.user.uid }, { profilePicture: profilePictureUrl }, { new: true });
-
+        //const user = await User.findOne({ uid: userId });
+        user.profilePicture = profilePictureUrl;
+        await user.save();
+        console.log("Profile updated successfully:");
         res.json({ profilePicture: profilePictureUrl });
       });
     } catch (error) {
