@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './styles/forumSettings.css'; // Import your CSS file for styling
 
 const ForumSettings = ({ user }) => {
