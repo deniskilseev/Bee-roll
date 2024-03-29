@@ -1,5 +1,6 @@
 /backend/index.js
 
+app.js
 lib-cov
 *.seed
 *.log

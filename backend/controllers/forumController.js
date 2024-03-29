@@ -75,13 +75,102 @@ const forumController = {
         const forum = await Forum.findOne({forumTitle: forumTitle});
 
         if (!forum) {
-            return res.status(400).json({error: "Forum with such name does not exists"})
+            return res.status(404).json({error: "Forum with such name does not exists"})
         }
-        
-        forum.moderatorIds = undefined;
-        forum.forumId = undefined;
 
         return res.status(200).json(forum);
+    },
+
+    async addModerator(req, res) {
+        try {
+            const {to_add_id, who_adds_id, forum_id} = req.body;
+            
+            const forum_info = await Forum.findOne( {forumId: forum_id} );
+
+            if (!forum_info) {
+                return res.status(400).json( {error: "Forum does not exist"} );
+            }
+
+            const user_info = await User.findOne( {uid: to_add_id} );
+            
+            if (!user_info) {
+                return res.status(400).json( {error: "The person who you are trying to add does not exist"} );
+            }
+
+            const moderator_list = forum_info.moderatorIds;
+            const moderator_index = moderator_list.indexOf(who_adds_id);
+
+            if (forum_info.creatorId == who_adds_id || moderator_index != -1) {
+                moderator_list.push(to_add_id);
+                await Forum.findOneAndUpdate({forumId: forum_id}, {moderatorIds: moderator_list});
+                return res.status(200).json( {message: "OK"});
+            }
+
+            return res.status(403).json( {message: "Unauthorized"} );
+
+        } catch {
+            console.error("Error in addModerator", error);
+            res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
+    async removeModerator(req, res) {
+        try {
+            const {to_remove_id, who_removes_id, forum_id} = req.body;
+            
+            const forum_info = await Forum.findOne({forumId: forum_id});
+
+            if (!forum_info) {
+                return res.status(400).json( {error: "Forum does not exist"} );
+            }
+
+            const user_info = await User.findOne({uid: to_remove_id});
+            
+            if (!user_info) {
+                return res.status(400).json( {error: "The person who you are trying remove does not exist"} );
+            }
+
+            const moderator_list = forum_info.moderatorIds;
+            const index = moderator_list.indexOf(to_remove_id);
+
+            if (forum_info.creatorId == who_removes_id) {
+                if (index != -1) {
+                   moderator_list.splice(index, 1); 
+                }
+
+                await Forum.findOneAndUpdate({forumId: forum_id}, {moderatorIds: moderator_list});
+
+                return res.status(200).json( {message: "OK" });
+            }
+
+            return res.status(403).json( {message: "Unauthorized"} );
+
+            
+
+        } catch {
+            console.error("Error in removeModerator", error);
+            res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
+    async togglePrivate(req, res) {
+        try {
+            const {forumId} = req.body;
+
+            const forum_info = await Forum.findOne( {forumId: forumId} );
+    
+            if(!forum_info) {
+                return res.status(400).json( {error: "Forum with such name does not exist"} );
+            }
+            
+            const updated_private = !forum_info.isPrivate;
+
+            await Forum.findOneAndUpdate( {forumId: forumId}, {isPrivate: updated_private} );
+            return res.status(200).json( {message: "Changed Visibility of the forum"} );
+        } catch {
+            console.error("Error in togglePrivate:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     }
 }
 

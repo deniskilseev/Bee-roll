@@ -17,7 +17,7 @@ const forumSchema = new Schema({
     },
     userIds: {
         type: [Number],
-        required: false
+        required: true
     },
     moderatorIds: {
         type: [Number],
@@ -30,6 +30,10 @@ const forumSchema = new Schema({
     pinnedPost: {
         type: Number,
         required: false
+    },
+    isPrivate: {
+        type: Boolean,
+        default: false
     }
 });
 

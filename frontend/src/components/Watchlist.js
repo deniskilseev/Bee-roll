@@ -1,23 +1,52 @@
-// Watchlist.js
 import React, { useState, useEffect } from 'react';
 import AddMovieModal from './Modals/AddMovieModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 const Watchlist = ({ watchlist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [moviesInfo, setMoviesInfo] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [showSearchBar, setShowSearchBar] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
-  };
-
-  const addMovieToWatchlist = () => {
-    setIsPopupOpen(true);
+    if (!showSearchBar) {
+      setShowSearchBar(true);
+    }
   };
 
   const closePopup = () => {
     setIsPopupOpen(false);
+  };
+
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    fetchSearchResults(query);
+  };
+
+  const fetchSearchResults = async (query) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
+      setSearchResults(response.data.foundMovies.slice(0, 5)); // Limit results to 5
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+    }
+  };
+
+  const addToWatchlist = async (movieId) => {
+    try {
+      const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
+        watchlist_id: watchlist.data_by_id.watchListId,
+        movie_id: movieId
+      });
+      console.log('Added to watchlist:', response.data);
+    } catch (error) {
+      console.error('Error adding to watchlist:', error);
+    }
   };
 
   useEffect(() => {
@@ -49,9 +78,6 @@ const Watchlist = ({ watchlist }) => {
     }
   }, [isExpanded, watchlist.data_by_id.movieIds]);
 
-  console.log(watchlist.data_by_id.movieIds);
-  console.log(moviesInfo);
-
   return (
     <div className="card mt-3">
       <div className="card-body">
@@ -69,9 +95,27 @@ const Watchlist = ({ watchlist }) => {
                 ))}
               </ul>
             </div>
-            <button className="btn btn-primary mt-2" onClick={addMovieToWatchlist}>
-              Add Movie
-            </button>
+            <h7>Add Movie</h7>
+            {showSearchBar && (
+              <div className="input-group mt-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </div>
+            )}
+            {showSearchBar && searchResults.length > 0 && (
+              <ul className="list-group mt-2">
+                {searchResults.map((result, index) => (
+                  <li key={index} className="list-group-item" onClick={() => addToWatchlist(result.movieId)}>
+                    {result.title}
+                  </li>
+                ))}
+              </ul>
+            )}
             {isPopupOpen && <AddMovieModal onClose={closePopup} />}
           </div>
         )}

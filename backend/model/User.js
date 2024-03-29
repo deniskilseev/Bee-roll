@@ -12,6 +12,9 @@ const userSchema = new Schema({
   postsIds: [Number],
   chatsIds: [Number],
   forumIds: [Number],
+  reviewIds: [Number],
+  followsIds: [Number],
+  followersIds: [Number],
   profilePicture: String
 });
 

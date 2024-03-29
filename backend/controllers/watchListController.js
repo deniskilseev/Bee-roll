@@ -52,9 +52,8 @@ const watchListController = {
             await Counter.findOneAndUpdate( {_id: "WatchList"}, {collectionCounter: counter_value + 1}); // Update the autoincrement
 
             console.log("WatchList created successfully:", watchlist_title);
-            const newId =  newWatchListIds[newWatchListIds.length - 1]
 
-            return res.status(201).json( {message: "Created WatchList successfully", newId} );
+            return res.status(201).json( {message: "Created WatchList successfully"} );
         } catch (error) {
             console.error("Error in createWatchList:", error);
             return res.status(500).json( {error: "Internal server error"} );
@@ -81,7 +80,7 @@ const watchListController = {
 
     async addMovie(req, res) {
         try {
-            const {watchlist_id, movie_id, rating} = req.body;
+            const {watchlist_id, movie_id} = req.body;
 
             const data_by_id = await WatchList.findOne( {watchListId: watchlist_id} );
         
@@ -101,20 +100,16 @@ const watchListController = {
             }
             
             const movie_ids = data_by_id.movieIds;
-            const existing_ratings = data_by_id.ratings;
 
             const index = movie_ids.indexOf(movie_id);
 
             if (index == -1) { // The index does not exist
                 movie_ids.push(movie_id);
-                existing_ratings.push(rating);
-            } else {
-                existing_ratings[index] = rating;
             }
             
             // Modify the entry in the DataBase:
             
-            await WatchList.findOneAndUpdate( {watchListId: watchlist_id}, {movieIds: movie_ids, ratings: existing_ratings} );
+            await WatchList.findOneAndUpdate( {watchListId: watchlist_id}, {movieIds: movie_ids} );
 
             return res.status(200).json( {message: "Modified watchlist successfully"} );
 
@@ -141,34 +136,21 @@ const watchListController = {
             }
 
             const movie_ids = data_by_watchlist_id.movieIds;
-            const existing_ratings = data_by_watchlist_id.ratings;
 
             const index = movie_ids.indexOf(movie_id);
 
             if (index != -1) { // Movie exists
                 movie_ids.splice(index, 1);
-                existing_ratings.splice(index, 1);
             }
            
             // Modify the entry in the DataBase
 
-            await WatchList.findOneAndUpdate( {watchListId: watchlist_id}, {movieIds: movie_ids, ratings: existing_ratings });
+            await WatchList.findOneAndUpdate( {watchListId: watchlist_id}, {movieIds: movie_ids });
 
             return res.status(200).json( {message: "Modified watchlist successfully"} );
 
         } catch (error) {
             console.error("Error in removeMovie:", error);
-            return res.status(500).json( {error: "Internal server error"} );
-        }
-    },
-
-    async predictMovies(req, res) {
-        try {
-            const {watchlist_id} = req.params;
-            // TODO: Add the Machine Learning server. And send http request.
-            res.status(404).json( {message: "Not Found"} );
-        } catch (error) {
-            console.error("Error in predictMovies:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
     },
@@ -202,7 +184,7 @@ const watchListController = {
 
             res.status(200).json( {message: "Deleted the watchlist successfully"} );
         } catch (error) {
-            console.error("Error in predictMovies:", error);
+            console.error("Error in deleteWatchList:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
     }

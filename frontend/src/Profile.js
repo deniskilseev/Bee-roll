@@ -3,8 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import plusIcon from './assets/edit.png';
+import axios from 'axios';
 import { useUser } from './UserContext';
-
 
 const Profile = ({ user }) => {
   const [isEditing, setEditing] = useState(false);
@@ -30,19 +30,25 @@ const Profile = ({ user }) => {
         bio,
         profilePicture
       };
+      const dummyDateOfBirth = "1990-01-01"; // Modify as needed
+      const updatedUser = {
+        oldUser: user.username,
+        username,
+        email: user.email, // Keep the original email
+        date_of_birth: dummyDateOfBirth // Use the dummy date of birth
+      };
   
-      const response = await fetch('http://localhost:3000/profile/updateprofile', {
-        method: 'POST',
+      const response = await axios.put('http://localhost:3000/users/putuser', updatedUser, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userWithoutPosts),
       });
-      console.log("Testing the body: ", JSON.stringify(userWithoutPosts));
   
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Failed to save changes');
       }
+
+      updateUser({ ...editedUser});
   
       setEditing(false);
     } catch (error) {

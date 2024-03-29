@@ -8,7 +8,7 @@ import config as cfg
 
 def review_to_target(review):
     return {
-        "movie_id": review["movie_id"],
+        "movieId": review["movieId"],
         "timestamp": review["timestamp"],
         "rating": review["rating"],
     }
