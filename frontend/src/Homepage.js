@@ -10,6 +10,7 @@ const HomePage = ({ user:propUser }) => {
     useEffect(() => {
       const sendPostRequest = async () => {
           try {
+              console.log('User:', user.data_by_username.login);
               const response = await axios.post('http://localhost:3000/posts/getRecentPosts', {
                   user_login: user.data_by_username.login
               });
@@ -22,6 +23,8 @@ const HomePage = ({ user:propUser }) => {
 
       sendPostRequest();
   }, [user]);
+
+  console.log(postIds);
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -51,6 +54,8 @@ const HomePage = ({ user:propUser }) => {
     
     fetchPostData();
   }, [user, postIds]);
+    
+  console.log(posts);
 
   return (
     <div>

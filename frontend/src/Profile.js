@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,12 +9,7 @@ import { useUser } from './UserContext';
 const Profile = ({ user }) => {
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
-
-  const [posts, setPosts] = useState([]);
-  const navigate = useNavigate();
-
   const [profilePicture, setProfilePicture] = useState(null);
-
   const { updateUser } = useUser();
   const navigate = useNavigate();
 
@@ -111,35 +106,6 @@ const Profile = ({ user }) => {
     navigate('/watchlists');
   };
 
-
-  useEffect(() => {
-    const fetchPostData = async () => {
-      if (user && user.posts) { // Check if user and user.postsIds are not null
-        try {
-          const postsData = await Promise.all(
-            user.posts.map(async (postId) => {
-              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
-              const postData = postResponse.data.post_info;
-    
-              // Fetch user data for the post
-              const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
-              const userData = userResponse.data.user_info;
-    
-              // Combine post data with user data
-              return { ...postData, user: userData.login };
-            })
-          );
-          
-          setPosts(postsData);
-        } catch (error) {
-          console.error('Error fetching posts:', error);
-        }
-      }
-    };
-    
-    fetchPostData();
-  }, [user]);
-
   return (
     <div className="container mt-4">
       <div className="row">
@@ -225,7 +191,7 @@ const Profile = ({ user }) => {
               <div className="row">
                 <div className="col-md-6 text-center">
                   <Link
-                      to={`/followers/${editedUser.username}`}
+                      to="/followers"
                       style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
                     >
                       <div className='bio-follow-header'>
@@ -238,7 +204,7 @@ const Profile = ({ user }) => {
                 </div>
                 <div className="col-md-6 text-center">
                     <Link
-                        to={`/following/${editedUser.username}`}
+                        to="/following"
                         style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
                       >
                         <div className='bio-follow-header'>
@@ -253,15 +219,7 @@ const Profile = ({ user }) => {
             </div>
             <div className="card-footer">
               <h3 className="font-weight-bold">Posts</h3>
-              {posts.map((post) => (
-                <div key={post.postId} className="card mb-3">
-                  <div className="card-body">
-                    <h5 className="card-title">{post.postTitle}</h5>
-                    <p className="card-text">{post.postText}</p>
-                    <p className="card-text">Posted By: {post.user}</p>
-                  </div>
-                </div>
-              ))}
+              <PostList posts={editedUser.posts} />
             </div>
           </div>
         </div>
