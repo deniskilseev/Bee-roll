@@ -67,22 +67,24 @@ const userController = {
 
     async putUser(req, res) {
         try {
-            const {username, password, email, date_of_birth} = req.body;
+            // const {username, password, email, date_of_birth} = req.body;
+            const {oldUser, username, email, date_of_birth} = req.body;
             
-            const user = await User.findOne({login: username})
+            const user = await User.findOne({login: oldUser})
             
             if (!user) {
                 return res.status(404).json({error: "User wasn't found"})
             }
 
-            user.password = password;
+            // user.password = password;
 
             const user_by_email = await User.findOne({email: email});
 
-            if (user_by_email && user_by_email.login != username) {
-                return res.status(400).json({error: "User with such email exists!"})
-            }
+            // if (user_by_email && user_by_email.login != username) {
+            //     return res.status(400).json({error: "User with such email exists!"})
+            // }
 
+            user.login = username;
             user.email = email;
             user.date_of_birth = date_of_birth;
 

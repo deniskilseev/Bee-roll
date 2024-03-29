@@ -3,11 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import plusIcon from './assets/edit.png';
+import axios from 'axios';
+import { useUser } from './UserContext';
 
 const Profile = ({ user }) => {
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
   const navigate = useNavigate();
+  const { updateUser } = useUser();
 
   const handleEditClick = () => {
     setEditing(true);
@@ -15,21 +18,30 @@ const Profile = ({ user }) => {
 
   const handleSaveClick = async () => {
     try {
-      const { posts, ...userWithoutPosts } = editedUser;
-
-      console.log(editedUser) //print edits to console
+      const { username, password, email } = editedUser;
+      // Dummy date of birth constant
+      const dummyDateOfBirth = "1990-01-01"; // Modify as needed
   
-      const response = await fetch('/profile', {
-        method: 'POST',
+      const updatedUser = {
+        oldUser: user.username,
+        username,
+        email: user.email, // Keep the original email
+        date_of_birth: dummyDateOfBirth // Use the dummy date of birth
+      };
+
+      console.log(updatedUser)
+  
+      const response = await axios.put('http://localhost:3000/users/putuser', updatedUser, {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userWithoutPosts),
       });
   
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Failed to save changes');
       }
+
+      updateUser({ ...editedUser});
   
       setEditing(false);
     } catch (error) {
