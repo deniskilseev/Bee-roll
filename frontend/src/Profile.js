@@ -11,7 +11,6 @@ const Profile = ({ user }) => {
   const [editedUser, setEditedUser] = useState({ ...user });
   const [profilePicture, setProfilePicture] = useState(null);
   const { updateUser } = useUser();
-  const navigate = useNavigate();
 
   const handleEditClick = () => {
     setEditing(true);
