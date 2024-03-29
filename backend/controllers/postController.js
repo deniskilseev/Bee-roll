@@ -137,6 +137,37 @@ const postController = {
             console.error("Error in deletePost:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
+    },
+
+    async getRecentPosts(req, res) {
+        const {user_login} = req.body;
+
+        const user_asking = await User.findOne({login: user_login});
+
+        if (!user_asking) {
+            return res.status(404).json({error: "User wasn't found"});
+        }
+
+        const posts_to_return = [];
+
+        if (!user_asking.followsIds) {
+            return res.status(200).json({message: "No posts since you dont follow anybody"});
+        }
+        
+        for (const subscriptionUid of user_asking.followsIds) {
+            const current_user = await User.findOne({uid: subscriptionUid});
+
+            if (current_user.postsIds.length < 3) {
+                posts_to_return.push(...current_user.postsIds);
+            }
+            else {
+                const sliced_posts = current_user.postsIds.slice(-3);
+                posts_to_return.push(...sliced_posts);
+            }
+        }
+        console.log(posts_to_return);
+        await res.status(200).json({ posts: posts_to_return });
+        console.log(res)
     }
 }
 
