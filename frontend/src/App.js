@@ -64,8 +64,8 @@ const App = () => {
           <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} />}/>
           <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
           <Route path="/forums/:forumName" element={<ForumPage forums={forums} />}/>
-          <Route path="/followers" element={<FollowersPage />} />
-          <Route path="/following" element={<FollowingPage />} />
+          <Route path="/followers/:username" element={<FollowersPage />} />
+          <Route path="/following/:username" element={<FollowingPage />} />
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage user={dummyUser} />} />
         </Routes>
       </div>

@@ -14,7 +14,7 @@ const OtherUserProfile = ( {currentUser} ) => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
-    // Fetch user profile data using uid
+    // Fetch user profile data using username
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/users/getUserByUsername/${username}`);
@@ -86,7 +86,7 @@ const OtherUserProfile = ( {currentUser} ) => {
             <div className="card-body">
               <div className="row">
                 <div className="col-md-6 text-center">
-                  <Link to="/followers" style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}>
+                  <Link to={{ pathname: `/followers/${user.login}` }} style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}>
                     <div className='bio-follow-header'>
                       <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
                       <p className='bio-follows'>{user.followersIds.length}</p>
@@ -94,7 +94,7 @@ const OtherUserProfile = ( {currentUser} ) => {
                   </Link>
                 </div>
                 <div className="col-md-6 text-center">
-                  <Link to="/following" style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}>
+                  <Link to={{ pathname: `/following/${user.login}` }} style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}>
                     <div className='bio-follow-header'>
                       <h3 style={{ fontSize: 'inherit' }}>Following</h3>
                       <p className='bio-follows'>{user.followsIds.length || 0}</p>
