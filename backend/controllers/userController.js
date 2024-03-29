@@ -149,6 +149,24 @@ const userController = {
             console.error("Error in unfollowUser:", error);
             res.status(500).json({ error: "Internal server error" });
         }
+    },
+
+    async getUser(req, res) {
+        try {    
+            // Find the user based on the UID
+            const user_info = await User.findOne({ uid: user_id });
+    
+            if (!user_info) {
+                return res.status(404).json({ error: "User not found" });
+            }
+    
+            user_info.password = undefined;
+    
+            res.status(200).json({ user_info });
+        } catch (error) {
+            console.error("Error in getUser:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     }
 }
 

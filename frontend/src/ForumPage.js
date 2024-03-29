@@ -29,14 +29,18 @@ const ForumPage = ({ forums, currentUser }) => {
   }, [forumName, currentUser]);
 
   useEffect(() => {
-    if (!forum) return; // Add this condition
+    if (!forum) return;
 
     const fetchPostData = async () => {
     try {
       const postsData = await Promise.all(
         forum.postIds.map(async (postId) => {
           const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
-          return response.data;
+          const postData = response.data;
+          console.log(postData.post_info.userId)
+          const userResponse = await axios.get(`http://localhost:3000/users/getuser/${postData.post_info.userId}`);
+          const userData = userResponse.data;
+          return { ...postData, user: userData };
         })
       );
       
@@ -76,7 +80,6 @@ const ForumPage = ({ forums, currentUser }) => {
       axios.delete(`http://localhost:3000/posts/deletePost/${postId}`)
         .then(response => {
           console.log('Post deleted successfully:', response.data);
-          // Optionally, you can update the state or perform any additional actions after successful deletion
         })
         .catch(error => {
           console.error('Error deleting post:', error);
@@ -97,6 +100,8 @@ const ForumPage = ({ forums, currentUser }) => {
     const pinnedPost = posts.splice(pinnedPostIndex, 1)[0];
     return [pinnedPost, ...posts];
   };
+
+  console.log(posts)
   
   return (
     <div className="container mt-5">
@@ -148,6 +153,9 @@ const ForumPage = ({ forums, currentUser }) => {
           <div className="card-body">
             <h5 className="card-title">{post.post_info.postTitle}</h5>
             <p className="card-text">{post.post_info.postText}</p>
+            <Link to={`/user/profile/${post.user.user_info.login}`}>
+              {post.user && <p>Posted by: {post.user.user_info.login}</p>}
+            </Link>
             <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
             <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
           </div>
