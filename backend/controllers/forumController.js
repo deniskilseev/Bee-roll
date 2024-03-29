@@ -77,8 +77,6 @@ const forumController = {
         if (!forum) {
             return res.status(404).json({error: "Forum with such name does not exists"})
         }
-        
-        forum.moderatorIds = undefined;
 
         return res.status(200).json(forum);
     },

@@ -11,6 +11,7 @@ import FollowersPage from './FollowersPage';
 import FollowingPage from './FollowingPage';
 import CreatePostPage from './CreatePost';
 import OtherUserProfile from './OtherUserProfile';
+import ForumSettingsPage from './ForumSettings';
 import { useUser } from './UserContext';
 
 const App = () => {
@@ -63,10 +64,11 @@ const App = () => {
           <Route path="/user/profile/:username" element={<OtherUserProfile currentUser={dummyUser} />} />
           <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} />}/>
           <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
-          <Route path="/forums/:forumName" element={<ForumPage forums={forums} />}/>
+          <Route path="/forums/:forumName" element={<ForumPage forums={forums} currentUser={dummyUser} />}/>
           <Route path="/followers/:username" element={<FollowersPage />} />
           <Route path="/following/:username" element={<FollowingPage />} />
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage user={dummyUser} />} />
+          <Route path="/forums/:forumName/settings" element={<ForumSettingsPage user={dummyUser} />} />
         </Routes>
       </div>
     </Router>
