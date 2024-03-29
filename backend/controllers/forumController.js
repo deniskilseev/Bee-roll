@@ -111,7 +111,7 @@ const forumController = {
 
             return res.status(403).json( {message: "Unauthorized"} );
 
-        } catch {
+        } catch (error) {
             console.error("Error in addModerator", error);
             res.status(500).json( {error: "Internal server error"} );
         }
@@ -150,7 +150,7 @@ const forumController = {
 
             
 
-        } catch {
+        } catch (error) {
             console.error("Error in removeModerator", error);
             res.status(500).json( {error: "Internal server error"} );
         }
@@ -170,7 +170,7 @@ const forumController = {
 
             await Forum.findOneAndUpdate( {forumId: forumId}, {isPrivate: updated_private} );
             return res.status(200).json( {message: "Changed Visibility of the forum"} );
-        } catch {
+        } catch (error) {
             console.error("Error in togglePrivate:", error);
             res.status(500).json({ error: "Internal server error" });
         }
