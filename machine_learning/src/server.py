@@ -44,7 +44,6 @@ async def popular_movies(history: History):
     if len(history.reviews) < MIN_PREDICT_MOVIES:
         return HTTPException(status_code=412, detail="Provide more movie IDs")
     output = ml_models["popularMovies"].predict(history.reviews)
-    print(type(output))
     return {
         "movie_ids": list(output)
     }
@@ -53,7 +52,7 @@ async def popular_movies(history: History):
 async def similar_movies(movieId: int):
     output = ml_models["als"].predictSimilarMovies(movieId)
     return {
-        "movie_ids": output.tolist()
+        "movie_id": output.tolist()[0]
     }
 
 @app.post("/predictUser")
