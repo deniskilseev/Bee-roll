@@ -109,7 +109,7 @@ const forumController = {
 
             return res.status(403).json( {message: "Unauthorized"} );
 
-        } catch {
+        } catch (error) {
             console.error("Error in addModerator", error);
             res.status(500).json( {error: "Internal server error"} );
         }
@@ -145,10 +145,7 @@ const forumController = {
             }
 
             return res.status(403).json( {message: "Unauthorized"} );
-
-            
-
-        } catch {
+        } catch (error) {
             console.error("Error in removeModerator", error);
             res.status(500).json( {error: "Internal server error"} );
         }
@@ -168,9 +165,76 @@ const forumController = {
 
             await Forum.findOneAndUpdate( {forumId: forumId}, {isPrivate: updated_private} );
             return res.status(200).json( {message: "Changed Visibility of the forum"} );
-        } catch {
+        } catch (error) {
             console.error("Error in togglePrivate:", error);
             res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
+    async banUser(req, res) {
+        try {
+            const {modId, userId, forumId} = req.body;
+
+            const forum = await Forum.findOne({forumId: forumId});
+    
+            if(!forum) {
+                return res.status(404).json( {error: "Forum with such ID does not exist"} );
+            }
+    
+            const user = await User.findOne({uid: userId});
+    
+            if(!user) {
+                return res.status(404).json( {error: "User with such id does not exist"} );
+            }
+    
+            const mod = await User.findOne({uid: modId});
+    
+            if(!mod || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
+                return res.status(404).json( {error: "Mod with such id does not exist"} );
+            }
+    
+            forum.bannedUserIds.push(userId);
+            forum.userIds.pull(userId);
+            user.forumIds.pull(forumId);
+
+            await forum.save();
+            await user.save();
+
+            return res.status(200).json({message: "User banned succesfully"});
+        } catch (error) {
+            console.error("Error in banUser:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
+    async unbanUser(req, res) {
+        try {
+            const {modId, userId, forumId} = req.body;
+
+            const forum = await Forum.findOne({forumId: forumId});
+    
+            if(!forum) {
+                return res.status(404).json( {error: "Forum with such ID does not exist"} );
+            }
+    
+            const user = await User.findOne({uid: userId});
+    
+            if(!user || !forum.bannedUserIds?.includes(userId)) {
+                return res.status(404).json( {error: "User with such id does not exist"} );
+            }
+    
+            const mod = await User.findOne({uid: modId});
+    
+            if(!mod || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
+                return res.status(404).json( {error: "Mod with such id does not exist"} );
+            }
+            forum.bannedUserIds.pull(userId);
+            await forum.save();
+
+            return res.status(200).json({message: "User unbanned succesfully"});
+        } catch (error) {
+            console.error("Error in unbanUser:", error);
+            return res.status(500).json( {error: "Internal server error"} );
         }
     },
 

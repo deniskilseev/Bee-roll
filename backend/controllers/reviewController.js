@@ -4,6 +4,7 @@ const Counter = require('../model/Counter.js')
 const Movie = require('../model/Movie.js')
 const User = require('../model/User.js')
 const Review = require('../model/Review.js')
+const predictController = require('./predictController')
 
 
 const reviewController = {
@@ -23,8 +24,13 @@ const reviewController = {
                 return res.status(400).json( {error: "Movie does not exist"} );
             }
 
-            if (review > 5 || review < 0) {
+            if ((review > 5 || review < 0) && review) {
                 return res.status(400).json( {error: "Review should be between 0 and 5"} );
+            }
+
+            const review_data = Review.findOne( {userId: user_id, movieId: movie_id});
+            if(review_data) {
+                return res.status(400).json( {error: "Review already exists"} );
             }
 
             const data_request = await Counter.findOne( {_id: "Review"} );
@@ -34,7 +40,7 @@ const reviewController = {
                 reviewId: counter_value + 1,
                 userId: user_id,
                 movieId: movie_id,
-                review: review
+                review: review,
             });
 
             const newReviewIds = user_data.reviewIds;
@@ -47,10 +53,11 @@ const reviewController = {
             
             console.log("Review created successfully");
 
+            await predictController.updateUser(user_id);
+
             return res.status(201).json( {message: "Created Review successfully"} );
 
-
-        } catch {
+        } catch (error) {
             console.error("Error in createReview:", error);
             return res.status(500).json( {error: "internal server error"} );
         }
@@ -70,7 +77,7 @@ const reviewController = {
 
             return res.status(200).json( {reviews: review_data} );
 
-        } catch {
+        } catch (error) {
             console.error("Error in getReviews:", error);
             return res.status(500).json( {error: "internal server error"} );
         }
@@ -92,9 +99,12 @@ const reviewController = {
 
             await Review.findOneAndUpdate({reviewId: review_id}, {review: review});
 
+            const user_id = review_data.userId;
+            await predictController.updateUser(user_id);
+
             return res.status(200).json( {reviews: review_data} );
 
-        } catch {
+        } catch (error) {
             console.error("Error in updateReview:", error);
             return res.status(500).json( {error: "internal server error"} );
         }
@@ -127,9 +137,10 @@ const reviewController = {
 
             await Review.deleteOne({reviewId: review_id});
             await User.findOneAndUpdate({uid: user_id}, {reviewIds: review_list});
+            await predictController.updateUser(user_id);
             res.status(200).json( {message: "Deleted the review successfully"} );
 
-        } catch {
+        } catch (error) {
             console.error("Error in deleteReview:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }

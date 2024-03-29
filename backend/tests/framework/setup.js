@@ -16,8 +16,8 @@ module.exports = async () => {
         ]
 
         const users = [
-            {uid: 1, login: 'denis', password: '123', email: 'denis@gmail.com', followersIds: [3], postsIds: [1, 2]},
-            {uid: 2, login: 'artemii', password: '321', email: 'artemii@gmail.com',followersIds: [3], postsIds: [3, 4]},
+            {uid: 1, login: 'denis', password: '123', email: 'denis@gmail.com', followersIds: [3], postsIds: [1, 2], forumIds: [1]},
+            {uid: 2, login: 'artemii', password: '321', email: 'artemii@gmail.com', followersIds: [3], postsIds: [3, 4], forumIds: [1]},
             {uid: 3, login: 'aarna', password: 'qwerty', email: 'aarna@gmail.com', followsIds: [1, 2]},
             {uid: 4, login: 'sreekar', password: 'ytrewq', email: 'sreekar@gmail.com', }
         ];
@@ -30,7 +30,7 @@ module.exports = async () => {
         ];
 
         const forums = [
-            {forumId: 1, forumTitle: 'Apples', creatorId: 1},
+            {forumId: 1, forumTitle: 'Apples', creatorId: 1, userIds: [1, 2]},
             {forumId: 2, forumTitle: 'Cars', creatorId: 2},
             {forumId: 3, forumTitle: 'Pineapples', creatorId: 3}
         ];

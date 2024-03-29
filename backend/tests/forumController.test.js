@@ -1,4 +1,4 @@
-const {createForum, joinForum, getForum} = require('../controllers/forumController');
+const {createForum, joinForum, getForum, banUser, unbanUser} = require('../controllers/forumController');
 const http = require('http');
 const request = require('supertest'); // Supertest is a library for testing HTTP servers
 const mongoose = require('mongoose')
@@ -132,5 +132,41 @@ describe('createForum', () => {
         .expect(404);
 
         expect(response.body.error).toEqual('Forum with such name does not exists');
+    });
+});
+
+describe('(un)banUser', () => {
+    test('return 200 for correct ban and unban of a user', async () => {
+        const req = { body: {
+            modId: 1,
+            userId: 2,
+            forumId: 1 
+        }};
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await banUser(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const forum = await Forum.findOne({forumId: 1});
+        const user = await User.findOne({uid: 2});
+
+        expect(forum.bannedUserIds).toContain(2);
+        expect(user.forumIds).not.toContain(1);
+
+        const res1 = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await unbanUser(req, res1);
+
+        expect(res1.status).toHaveBeenCalledWith(200);
+
+        const forum1 = await Forum.findOne({forumId: 1});
+        expect(forum1.bannedUserIds).not.toContain(2);
     });
 });
