@@ -2,6 +2,8 @@ const testDatabaseConnection = require('./testDatabaseConnection');
 const User = require('../../model/User')
 const Counter = require('../../model/Counter')
 const Forum = require('../../model/Forum')
+const Post = require('../../model/Post')
+
 
 module.exports = async () => {
     try {
@@ -9,14 +11,22 @@ module.exports = async () => {
 
         const counters = [
             {_id: "User", collectionCounter: 4},
-            {_id: "Forum", collectionCounter: 3}
+            {_id: "Forum", collectionCounter: 3},
+            {_id: "Post", collectionCounter: 4}
         ]
 
         const users = [
-            {uid: 1, login: 'denis', password: '123', email: 'denis@gmail.com', },
-            {uid: 2, login: 'artemii', password: '321', email: 'artemii@gmail.com', },
-            {uid: 3, login: 'aarna', password: 'qwerty', email: 'aarna@gmail.com', },
+            {uid: 1, login: 'denis', password: '123', email: 'denis@gmail.com', followersIds: [3], postsIds: [1, 2]},
+            {uid: 2, login: 'artemii', password: '321', email: 'artemii@gmail.com',followersIds: [3], postsIds: [3, 4]},
+            {uid: 3, login: 'aarna', password: 'qwerty', email: 'aarna@gmail.com', followsIds: [1, 2]},
             {uid: 4, login: 'sreekar', password: 'ytrewq', email: 'sreekar@gmail.com', }
+        ];
+
+        const posts = [
+            {postId: 1, userId: 1, postTitle: "Mercedes", forumId: 2, postText: "Love mercedes."},
+            {postId: 2, userId: 1, postTitle: "BMW", forumId: 2, postText: "Maybe love BMW."},
+            {postId: 3, userId: 2, postTitle: "Big apples", forumId: 1, postText: "Hate big apples"},
+            {postId: 4, userId: 2, postTitle: "Small apples", forumId: 1, postText: "Maybe hate small apples."},
         ];
 
         const forums = [
@@ -28,7 +38,7 @@ module.exports = async () => {
         await User.insertMany(users);
         await Counter.insertMany(counters);
         await Forum.insertMany(forums);
-
+        await Post.insertMany(posts);
 
     } catch (error) {
         console.error('Error populating fields in tests/framework/setup.js', error);
