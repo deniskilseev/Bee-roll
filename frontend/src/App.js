@@ -31,12 +31,13 @@ const App = () => {
       username: user.data_by_username.login,
       bio: 'Example bio',
       email: user.data_by_username.email,
-
       profilePicture: `http://localhost:3000${user.data_by_username.profilePicture}`,
-      followers: user.data_by_username.followersIds,
-      following: user.data_by_username.followsIds,
-      posts: user.data_by_username.postsIds,
-
+      followers: [],
+      following: [],
+      posts: [
+        { id: 1, title: 'First Post', content: 'First post.', author: user.data_by_username },
+        { id: 2, title: 'Second Post', content: 'Second post.', author: user.data_by_username },
+      ],
       watchlists: user.data_by_username.watchListsIds,
     }
   : 
@@ -51,7 +52,12 @@ const App = () => {
     watchlists: []
   };
 
-
+  //console.log("profile pic url: ", user.data_by_username.profilePicture);
+  dummyUser.posts = [
+    { id: 1, title: 'First Post', content: 'First post.', author: dummyUser},
+    { id: 2, title: 'Second Post', content: 'Second post.', author: dummyUser},
+  ];
+  console.log("user test: ", dummyUser);
   const addForum = (forum) => {
     setForums([...forums, forum]);
   };
