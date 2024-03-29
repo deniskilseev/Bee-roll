@@ -34,6 +34,10 @@ const forumSchema = new Schema({
     isPrivate: {
         type: Boolean,
         default: false
+    },
+    bannedUserIds: {
+        type: [Number],
+        required: false
     }
 });
 
