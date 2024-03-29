@@ -228,9 +228,7 @@ const forumController = {
             if(!mod || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
                 return res.status(404).json( {error: "Mod with such id does not exist"} );
             }
-            console.log("BEFORE:", forum.bannedUserIds);
             forum.bannedUserIds.pull(userId);
-            console.log("AFTER:", forum.bannedUserIds);
             await forum.save();
 
             return res.status(200).json({message: "User unbanned succesfully"});

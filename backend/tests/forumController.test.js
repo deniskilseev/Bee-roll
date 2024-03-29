@@ -167,7 +167,6 @@ describe('(un)banUser', () => {
         expect(res1.status).toHaveBeenCalledWith(200);
 
         const forum1 = await Forum.findOne({forumId: 1});
-        console.log(forum1.bannedUserIds)
         expect(forum1.bannedUserIds).not.toContain(2);
     });
 });
