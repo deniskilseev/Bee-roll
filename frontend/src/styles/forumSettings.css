@@ -9,6 +9,13 @@
   .moderators-section {
     margin-bottom: 20px;
   }
+
+  .moderator-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; /* Adjust the margin as needed */
+  }
   
   .input-group {
     display: flex;

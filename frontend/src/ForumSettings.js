@@ -54,28 +54,46 @@ const ForumSettings = ({ user }) => {
     useEffect(() => {
         const fetchForumData = async () => {
             try {
-            const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
-            const fetchedForum = response.data;
-            console.log('Fetched forum:', fetchedForum);
-            setForum(fetchedForum);
-            setIsPublic(!fetchedForum.isPrivate);
+                const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
+                const fetchedForum = response.data;
+                setForum(fetchedForum);
+                setIsPublic(!fetchedForum.isPrivate);
 
-            const moderatorPromises = fetchedForum.moderatorIds.map(async moderatorId => {
-                const userResponse = await axios.get(`http://localhost:3000/users/getuser/${moderatorId}`);
-                console.log('Moderator response:', userResponse.data);
-                return userResponse.data;
-            });
+                const moderatorPromises = fetchedForum.moderatorIds.map(async moderatorId => {
+                    const userResponse = await axios.get(`http://localhost:3000/users/getuser/${moderatorId}`);
+                    return userResponse.data;
+                });
 
-            const moderatorsData = await Promise.all(moderatorPromises);
-            const moderatorUsernames = moderatorsData.map(moderator => moderator.user_info.login);
-            setModerators(moderatorUsernames)
+                const moderatorsData = await Promise.all(moderatorPromises);
+                const moderatorUsernames = moderatorsData.map(moderator => moderator.user_info.login);
+                setModerators(moderatorUsernames)
             } catch (error) {
-            console.error('Error fetching forum:', error);
+                console.error('Error fetching forum:', error);
             }
         };
     
         fetchForumData();
     }, [forumName]);
+
+    const handleDeleteModerator = async (moderator) => {
+        // Implement moderator deletion logic here
+        const userResponse = await axios.get(`http://localhost:3000/users/getUserByUsername/${moderator}`);
+
+        console.log('Forum:', forum.forumId);
+
+        axios.post('http://localhost:3000/forums/removeModerator', {
+            to_remove_id: userResponse.data.user_info.uid,
+            who_removes_id: user.id,
+            forum_id: forum.forumId,
+        })
+        .then(response => {
+            setModerators(prevModerators => prevModerators.filter(m => m !== moderator));
+            console.log('Moderator Deleted Successfully');
+        })
+        .catch(error => {
+            console.error('Error deleting moderator:', error);
+        });
+    };
 
     return (
         <div className="forum-settings-container">
@@ -84,9 +102,12 @@ const ForumSettings = ({ user }) => {
             <div className="moderators-section">
                 <h3>Moderators:</h3>
                 <ul>
-                {moderators.map((moderator, index) => (
-                    <li key={index}>{moderator}</li>
-                ))}
+                    {moderators.map((moderator, index) => (
+                        <li key={index} className="moderator-item">
+                            <span>{moderator}</span>
+                            <button className="btn btn-danger" onClick={() => handleDeleteModerator(moderator)}>Delete</button>
+                        </li>
+                    ))}
                 </ul>
                 <div className="input-group">
                 <input
