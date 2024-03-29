@@ -11,7 +11,7 @@ const CreateForumPage = ({ onForumCreate, user }) => {
   const handleCreateForum = async () => {
     const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
 
-    console.log(user.id);
+    console.log(user);
 
     const newForum = {
       forumTitle: forumTitle,
