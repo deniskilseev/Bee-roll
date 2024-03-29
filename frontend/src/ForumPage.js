@@ -8,7 +8,6 @@ const ForumPage = ({ forums, currentUser }) => {
 
   const [forum, setForum] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [posts, setPosts] = useState([]);
 
   const handleSettingsClick = () => {
