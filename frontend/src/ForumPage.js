@@ -22,8 +22,6 @@ const ForumPage = ({ forums, currentUser }) => {
         const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
         const fetchedForum = response.data;
         setForum(fetchedForum);
-        console.log(currentUser.id);
-        console.log(fetchedForum.creatorId);
         setIsOwner(currentUser.id === fetchedForum.creatorId);
       } catch (error) {
         console.error('Error fetching forum:', error);
