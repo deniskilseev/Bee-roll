@@ -28,6 +28,11 @@ const reviewController = {
                 return res.status(400).json( {error: "Review should be between 0 and 5"} );
             }
 
+            const review_data = Review.findOne( {userId: user_id, movieId: movie_id});
+            if(review_data) {
+                return res.status(400).json( {error: "Review already exists"} );
+            }
+
             const data_request = await Counter.findOne( {_id: "Review"} );
             const counter_value = data_request.collectionCounter;
 
@@ -94,6 +99,7 @@ const reviewController = {
 
             await Review.findOneAndUpdate({reviewId: review_id}, {review: review});
 
+            const user_id = review_data.userId;
             await predictController.updateUser(user_id);
 
             return res.status(200).json( {reviews: review_data} );
