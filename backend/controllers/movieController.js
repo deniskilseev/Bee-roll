@@ -39,6 +39,17 @@ const movieController = {
             console.error("Error in findMoviesWithPattern:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
+    },
+
+    async getAllMovies(req, res) {
+        try {
+            const allMovies = await Movie.find().limit(10); // Limiting to retrieve only 10 movies
+
+            return res.status(200).json({ movies: allMovies });
+        } catch (error) {
+            console.error("Error in getAllMovies:", error);
+            return res.status(500).json({ error: "Internal server error" });
+        }
     }
 }
 
