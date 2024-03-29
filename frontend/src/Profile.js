@@ -30,25 +30,19 @@ const Profile = ({ user }) => {
         bio,
         profilePicture
       };
-      const dummyDateOfBirth = "1990-01-01"; // Modify as needed
-      const updatedUser = {
-        oldUser: user.username,
-        username,
-        email: user.email, // Keep the original email
-        date_of_birth: dummyDateOfBirth // Use the dummy date of birth
-      };
   
-      const response = await axios.put('http://localhost:3000/users/putuser', updatedUser, {
+      const response = await fetch('http://localhost:3000/profile/updateprofile', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(userWithoutPosts),
       });
+      console.log("Testing the body: ", JSON.stringify(userWithoutPosts));
   
-      if (response.status !== 200) {
+      if (!response.ok) {
         throw new Error('Failed to save changes');
       }
-
-      updateUser({ ...editedUser});
   
       setEditing(false);
     } catch (error) {
@@ -77,7 +71,7 @@ const Profile = ({ user }) => {
     formData.append('userId', user.id);
     for (var key of formData.entries()) {
       console.log(key[0] + ', ' + key[1]);
-  }
+    }
 
     console.log("formData: ", formData);
 
@@ -89,18 +83,16 @@ const Profile = ({ user }) => {
       if (!response.ok) {
         throw new Error('Failed to upload profile picture');
       }
-      const { profilePicture } = await response.json();
-      setProfilePicture(profilePicture);
+      const responseData = await response.json(); // Parse JSON once
+      setProfilePicture(responseData.profilePicture);
+      setEditedUser(prevUser => ({ ...prevUser, profilePicture: responseData.profilePicture })); // Update editedUser state with the new profile picture
       if (response.ok) {
-        const userData = await response.json();
-        console.log('Profile retrieved', userData);
-
-        updateUser(userData);
-        navigate(`/profile/${userData.userId}`); // Redirect to the profile page
-        
+        console.log('Profile retrieved', responseData);
+        updateUser(responseData);
+        navigate(`/profile/${responseData.userId}`); // Redirect to the profile page
       } else {
-        console.error('Retreival failed');
-        // Handle failed login scenarios
+        console.error('Retrieval failed');
+        // Handle failed scenarios
       }
     } catch (error) {
       console.error('Error uploading profile picture:', error.message);

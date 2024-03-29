@@ -20,6 +20,8 @@ const reviewRoute = require('./routes/review');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Middleware
 app.use(express.json()); // Parse JSON bodies

@@ -2,6 +2,10 @@
 const multer = require('multer');
 const path = require('path');
 const User = require('../model/User');
+const multiparty = require('multiparty');
+const fs = require('fs');
+
+
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -80,45 +84,52 @@ const profileController = {
   async uploadProfilePicture(req, res) {
     console.log("Entered method")
     try {
-      const userId = req.body.userId;
-      console.log("req body: ", req.body);
-
-      // Find the user by UID
-      //const user = await User.findOne({ uid: userId });
-
-      console.log("Testing userId: ", userId);
-      console.log("Test 2")
-      if (!userId) {
-        console.log("am i here");
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      console.log("test 2 passed")
-
-      upload(req, res, async function (err) {
-        if (err instanceof multer.MulterError) {
-          return res.status(500).json({ error: "Failed to upload profile picture" });
-        } else if (err) {
-          return res.status(500).json({ error: err.message });
+      const form = new multiparty.Form();
+      form.parse(req, async (err, fields, files) => {
+        if (err) {
+          console.error('Error parsing form:', err);
+          return res.status(500).json({ error: 'Internal server error' });
         }
-
-        if (!req.file) {
-          return res.status(400).json({ error: 'No file uploaded' });
+  
+        const userId = fields.userId[0]; // Assuming userId is in the fields
+  
+        if (!userId) {
+          return res.status(400).json({ error: 'User ID is required' });
         }
-        const profilePictureUrl = '/uploads/' + req.files.filename;
-
-        // Update user's profile picture in the database
-        // Assuming the user's UID is available in req.user.uid
-        // Replace it with the appropriate field if different
-        //const user = await User.findOne({ uid: userId });
-        user.profilePicture = profilePictureUrl;
-        await user.save();
-        console.log("Profile updated successfully:");
-        res.json({ profilePicture: profilePictureUrl });
+  
+        const user = await User.findOne({ uid: userId });
+  
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+  
+        const profilePicture = files.profilePicture[0]; // Assuming profilePicture is the name of the file input
+  
+        if (!profilePicture) {
+          return res.status(400).json({ error: 'Profile picture is required' });
+        }
+  
+        const tempPath = profilePicture.path;
+        const targetPath = path.join(__dirname, '..', 'uploads', profilePicture.originalFilename);
+  
+        // Move the uploaded file to the desired location
+        fs.rename(tempPath, targetPath, async (err) => {
+          if (err) {
+            console.error('Error moving file:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+          }
+  
+          // Update user's profile picture in the database
+          user.profilePicture = '/uploads/' + profilePicture.originalFilename;
+          await user.save();
+  
+          console.log('Profile picture uploaded successfully');
+          res.status(200).json({ message: 'Profile picture uploaded successfully' });
+        });
       });
     } catch (error) {
-      console.error("Error in uploading profile picture:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('Error uploading profile picture:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 };
