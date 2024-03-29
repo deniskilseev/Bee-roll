@@ -2,13 +2,12 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import profileIcon from './assets/blank profile pic.jpg';
 import axios from 'axios';
 
 
-const OtherUserProfile = () => {
+const OtherUserProfile = ( {currentUser} ) => {
   const { username } = useParams(); // Extract uid parameter from URL
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -49,11 +48,25 @@ const OtherUserProfile = () => {
     fetchPostData();
   }, [user]);
 
+  const handleFollow = async () => {
+    console.log('Current User:', currentUser);
+    console.log('User followed/unfollowed:', user);
+
+    try {
+      const endpoint = isFollowing ? '/users/unfollowUser' : '/users/followUser';
+      await axios.post(`http://localhost:3000${endpoint}`, {
+        user_follower: currentUser.username,
+        user_followed: user.login
+      });
+      setIsFollowing(!isFollowing);
+    } catch (error) {
+      console.error('Error toggling follow status:', error);
+    }
+  };
+
   if (!user) {
     return <div>Loading...</div>;
   }
-
-  console.log('Posts:', posts)
 
   return (
     <div className="container mt-4">
