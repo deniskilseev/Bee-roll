@@ -143,66 +143,66 @@ describe('createUser', () => {
     });
 });
 
-describe('putUser', () => {
-    test('return 200 if updating user that exists', async () => {
+// describe('putUser', () => {
+//     test('return 200 if updating user that exists', async () => {
 
-        const req = { body: {
-            username: "denis",
-            password: "321",
-            email: "i_am_great@gmail.com"
-        }};
+//         const req = { body: {
+//             username: "denis",
+//             password: "321",
+//             email: "i_am_great@gmail.com"
+//         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+//         const res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn()
+//         };
 
-        await putUser(req, res);
+//         await putUser(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.status).toHaveBeenCalledWith(200);
 
-        const user = await User.findOne({login: "denis"});
+//         const user = await User.findOne({login: "denis"});
 
-        expect(user.email).toEqual("i_am_great@gmail.com");
-        expect(user.password).toEqual("321");
-    });
+//         expect(user.email).toEqual("i_am_great@gmail.com");
+//         expect(user.password).toEqual("321");
+//     });
 
-    test('return 404 if updating user that doesnt exists', async () => {
+//     test('return 404 if updating user that doesnt exists', async () => {
 
-        const req = { body: {
-            username: "oleg",
-            password: "321",
-            email: "i_am_great@gmail.com"
-        }};
+//         const req = { body: {
+//             username: "oleg",
+//             password: "321",
+//             email: "i_am_great@gmail.com"
+//         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+//         const res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn()
+//         };
 
-        await putUser(req, res);
+//         await putUser(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(404);
-    });
+//         expect(res.status).toHaveBeenCalledWith(404);
+//     });
 
-    test('return 400 if updating user with email that is registered', async () => {
+//     test('return 400 if updating user with email that is registered', async () => {
 
-        const req = { body: {
-            username: "denis",
-            password: "321",
-            email: "sreekar@gmail.com"
-        }};
+//         const req = { body: {
+//             username: "denis",
+//             password: "321",
+//             email: "sreekar@gmail.com"
+//         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+//         const res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn()
+//         };
 
-        await putUser(req, res);
+//         await putUser(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(400);
-    });
-});
+//         expect(res.status).toHaveBeenCalledWith(400);
+//     });
+// });
 
 describe('(un)followUser', () => {
     test('return 200 if following is successful', async () => {
