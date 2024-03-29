@@ -3,6 +3,7 @@ const express = require('express')
 const Counter = require('../model/Counter.js')
 const Forum = require('../model/Forum.js')
 const User = require('../model/User.js')
+const Post = require('../model/Post.js')
 
 const forumController = {
     async createForum(req, res) {
@@ -170,6 +171,49 @@ const forumController = {
         } catch {
             console.error("Error in togglePrivate:", error);
             res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
+    async getAllForums(req, res) {
+        console.log("testing forums");
+        try {
+            const allForums = await Forum.find();
+            return res.status(200).json(allForums);
+        } catch (error) {
+            console.error("Error in getAllForums:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    },
+    
+    async deletePost(req, res) {
+        try {
+            const { postId, userId } = req.body;
+
+            console.log("body: ", req.body);
+            // Find the post to be deleted
+            
+            const post = await Post.findOne( {postId: postId} );
+            if (!post) {
+                return res.status(404).json({ error: 'Post not found' });
+            }
+
+            // Find the forum associated with the post
+            const forum = await Forum.findOne( {forumId: post.forumId});
+            if (!forum) {
+                return res.status(404).json({ error: 'Forum not found' });
+            }
+
+            // Check if the user is a moderator for the forum
+            if (forum.moderatorIds.includes(userId)) {
+                // Delete the post
+                await Post.findOneAndDelete({ postId: post.postId});
+                return res.status(200).json({ message: 'Post deleted successfully' });
+            } else {
+                return res.status(403).json({ error: 'Unauthorized: User is not a moderator for this forum' });
+            }
+        } catch (error) {
+            console.error('Error in deletePost:', error);
+            res.status(500).json({ error: 'Internal server error' });
         }
     }
 }

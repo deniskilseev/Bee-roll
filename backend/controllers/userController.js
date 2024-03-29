@@ -189,7 +189,19 @@ const userController = {
             console.error("Error in getUser:", error);
             res.status(500).json({ error: "Internal server error" });
         }
-    }
+    },
+
+    async searchUsers (req, res) {
+        try {
+          const query = req.params.query;
+          // Assuming User model has a field called 'username' for searching
+          const users = await User.find({ username: { $regex: query, $options: 'i' } }).limit(10);
+          res.json({ users });
+        } catch (error) {
+          console.error('Error searching users:', error);
+          res.status(500).json({ error: 'Internal server error' });
+        }
+      }
 }
 
 module.exports = userController;
