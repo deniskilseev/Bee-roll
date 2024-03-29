@@ -24,7 +24,7 @@ const reviewController = {
                 return res.status(400).json( {error: "Movie does not exist"} );
             }
 
-            if (review > 5 || review < 0) {
+            if ((review > 5 || review < 0) && review) {
                 return res.status(400).json( {error: "Review should be between 0 and 5"} );
             }
 
@@ -35,7 +35,7 @@ const reviewController = {
                 reviewId: counter_value + 1,
                 userId: user_id,
                 movieId: movie_id,
-                review: review
+                review: review,
             });
 
             const newReviewIds = user_data.reviewIds;

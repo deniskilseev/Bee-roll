@@ -29,7 +29,6 @@ const predictController = {
 
             if (movie_recommendation.status == 200) {
                 const data = await movie_recommendation.json();
-                console.log(data);
                 return res.status(200).json(data);
             }
 
@@ -77,16 +76,19 @@ const predictController = {
             const needed_user_history = { userId: user_id, reviews: [] };
 
             for (review of user_history) {
-                needed_user_history.reviews.push({movieId: review.movieId, rating: review.rating});
+                needed_user_history.reviews.push({movieId: review.movieId, rating: review.review});
             }
 
-            const update = new Request(url + "/updateUser", {
-                    method: "POST",
-                    body: JSON.stringify(needed_user_history),
+            const uri = url + '/updateUser'
+            const options = {
+                method: "POST",
+                body: JSON.stringify(needed_user_history),
+                headers: {
+                    "Content-Type": "application/json",
                 }
-            );
+            }
 
-            fetch(update);
+            await fetch(uri, options);
 
             return ;
 
