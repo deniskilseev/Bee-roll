@@ -28,6 +28,4 @@ class ALS():
         return self.model.similar_items(movie_id, N=nPredictions,filter_items=movie_id)[0]
 
     def predictSimilarUsers(self, user_id, nPredictions=1):
-        print(self.model.user_factors)
-
         return self.model.similar_users(user_id, N=nPredictions, filter_users=user_id)[0]
