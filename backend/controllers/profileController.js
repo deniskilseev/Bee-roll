@@ -26,7 +26,7 @@ const profileController = {
       const tempId = req.params.userId;
 
       // Find the user by UID
-      const user = await User.findOne({ uid });
+      const user = await User.findOne({ uid: uid });
 
       console.log("This is the uid: ", uid);
       console.log("This is the req userID: ", tempId);
@@ -36,7 +36,7 @@ const profileController = {
       }
 
       // Update user data
-      user.username = username;
+      user.login = username;
       user.bio = bio;
       user.profilePicture = profilePicture;
 
