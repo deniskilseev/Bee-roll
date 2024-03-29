@@ -1,0 +1,77 @@
+.forum-settings-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .moderators-section {
+    margin-bottom: 20px;
+  }
+  
+  .input-group {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .input-group input[type="text"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-right: 10px;
+  }
+  
+  .privacy-section {
+    display: flex;
+    align-items: center;
+  }
+  
+  .privacy-label {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  .privacy-label input {
+    display: none;
+  }
+  
+  .privacy-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: .4s;
+  }
+  
+  .privacy-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+  }
+  
+  input:checked + .privacy-slider {
+    background-color: #2196F3;
+  }
+  
+  input:checked + .privacy-slider:before {
+    transform: translateX(26px);
+  }
+  
+  .privacy-text {
+    margin-left: 10px;
+  }

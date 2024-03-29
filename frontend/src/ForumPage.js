@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const ForumPage = ({ forums, currentUser }) => {
   const { forumName } = useParams();
+  const navigate = useNavigate();
 
   const [forum, setForum] = useState(null);
-  const [moderators, setModerators] = useState([]);
-  const [newModerator, setNewModerator] = useState('');
   const [isOwner, setIsOwner] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [posts, setPosts] = useState([]);
+
+  const handleSettingsClick = () => {
+    // Navigate to forum settings page when settings button is clicked
+    navigate(`/forums/${forumName}/settings`);
+  };
   
   useEffect(() => {
     const fetchForumData = async () => {
@@ -18,8 +22,9 @@ const ForumPage = ({ forums, currentUser }) => {
         const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
         const fetchedForum = response.data;
         setForum(fetchedForum);
-        setModerators(fetchedForum.moderatorIds || []);
-        setIsOwner(currentUser === fetchedForum.owner);
+        console.log(currentUser.id);
+        console.log(fetchedForum.creatorId);
+        setIsOwner(currentUser.id === fetchedForum.creatorId);
       } catch (error) {
         console.error('Error fetching forum:', error);
       }
@@ -37,7 +42,6 @@ const ForumPage = ({ forums, currentUser }) => {
         forum.postIds.map(async (postId) => {
           const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
           const postData = response.data;
-          console.log(postData.post_info.userId)
           const userResponse = await axios.get(`http://localhost:3000/users/getuser/${postData.post_info.userId}`);
           const userData = userResponse.data;
           return { ...postData, user: userData };
@@ -67,13 +71,6 @@ const ForumPage = ({ forums, currentUser }) => {
       });
   };
 
-  const handleAddModerator = () => {
-    if (newModerator && !moderators.includes(newModerator)) {
-      setModerators([...moderators, newModerator]);
-      setNewModerator('');
-    }
-  };
-
   const handleDeleteClick = (postId) => {
     const isConfirmed = window.confirm("Are you sure you want to delete this post?");
     if (isConfirmed) {
@@ -100,50 +97,21 @@ const ForumPage = ({ forums, currentUser }) => {
     const pinnedPost = posts.splice(pinnedPostIndex, 1)[0];
     return [pinnedPost, ...posts];
   };
-
-  console.log(posts)
   
   return (
     <div className="container mt-5">
       <h1>{forum.title}</h1>
 
-      
-      <div className="mb-3">
-        <Link to={`/forums/${forum.forumId}/createpost`} className="btn btn-primary">Create Post</Link>
-      </div>
-
       {isOwner && (
         <div className="mb-3">
-          <button className="btn btn-primary" onClick={() => setIsSearchVisible(!isSearchVisible)}>
-            {isSearchVisible ? 'Hide Moderator Search' : 'Show Moderator Search'}
+          <button className="btn btn-primary" onClick={handleSettingsClick}>
+            Forum Settings
           </button>
         </div>
       )}
 
-      {isOwner && isSearchVisible && (
-        <div className="mb-3">
-        <div className="input-group">
-          <input
-            type="text"
-            value={newModerator}
-            onChange={(e) => setNewModerator(e.target.value)}
-            className="form-control"
-            placeholder="Enter username of new moderator"
-          />
-          <div className="input-group-append">
-            <button className="btn btn-success" onClick={handleAddModerator}>Add Moderator</button>
-          </div>
-        </div>
-      </div>
-      )}
-
-      <div>
-        <h3>Moderators:</h3>
-        <ul>
-          {moderators.map((moderator, index) => (
-            <li key={index}>{moderator}</li>
-          ))}
-        </ul>
+      <div className="mb-3">
+        <Link to={`/forums/${forum.forumId}/createpost`} className="btn btn-primary">Create Post</Link>
       </div>
 
       <h2>Posts</h2>
@@ -156,8 +124,12 @@ const ForumPage = ({ forums, currentUser }) => {
             <Link to={{ pathname: `/user/profile/${post.user.user_info.login}` }}>
               {post.user && <p>Posted by: {post.user.user_info.login}</p>}
             </Link>
-            <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
-            <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
+              {isOwner && (
+                <>
+                  <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
+                  <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
+                </>
+              )}
           </div>
         </div>
       ))}
