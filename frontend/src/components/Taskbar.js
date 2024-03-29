@@ -1,6 +1,6 @@
 // Taskbar.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Import Link component
 import LoginPageModal from './Modals/LoginPageModal';
 import RegisterPageModal from './Modals/RegisterPageModal';
 import { useUser } from '../UserContext';
@@ -13,6 +13,13 @@ const Taskbar = () => {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+
+  const [showForums, setShowForums] = useState(false);
+  const [existingForums, setExistingForums] = useState([]);
+  const [showUserSearch, setShowUserSearch] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState([]);
+
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
@@ -44,6 +51,26 @@ const Taskbar = () => {
     fetchSearchResults(query);
   };
 
+  useEffect(() => {
+    const fetchForums = async () => {
+      try {
+        console.log("testing taskbar forums");
+        const response = await axios.get('http://localhost:3000/forums/forums'); // Update the endpoint
+        setExistingForums(response.data);
+      } catch (error) {
+        console.error('Error fetching forums:', error);
+      }
+    };
+
+    if (showForums) {
+      fetchForums();
+    }
+  }, [showForums]);
+
+  const handleForumsClick = () => {
+    setShowForums(!showForums);
+  };
+
   const fetchSearchResults = async (query) => {
     try {
       const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
@@ -54,19 +81,59 @@ const Taskbar = () => {
     }
   };
 
+  const handleUserSearchChange = async (event) => {
+    const query = event.target.value;
+    setUserSearchQuery(query);
+    if (query) {
+      try {
+        const response = await axios.get(`http://localhost:3000/users/search/${query}`);
+        console.log('Search results:', response.data);
+        setUserSearchResults(response.data.users.slice(0, 5));
+      } catch (error) {
+        console.error('Error fetching user search results:', error);
+      }
+    } else {
+      setUserSearchResults([]);
+    }
+  };
+
+
   return (
     <header className={`navbar navbar-dark bg-dark ${showLoginModal ? 'overlay' : ''}`}>
       <div className="container d-flex justify-content-between align-items-center">
         <Link className="navbar-brand" to="/">Bee-Roll</Link>
 
+    
         <div className="btn-group mr-2">
           {user ? (
+            
             <div>
+              
+              <Link to="/forums/forums" className="btn btn-outline-light mr-2">
+                  <span className="d-inline-block text-center">Forums</span>
+              </Link>
               <button className="btn btn-outline-light ml-2" onClick={toggleSearchBar}>
                 <span className="d-inline-block text-center">{showSearchBar ? 'Hide Search' : 'Search'}</span>
               </button>
+              <div className="input-group ml-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search Users..."
+                  value={userSearchQuery}
+                  onChange={handleUserSearchChange}
+                  onFocus={() => setShowUserSearch(true)}
+                  onBlur={() => setShowUserSearch(false)}
+                />
+                <div className="input-group-append">
+                  <button className="btn btn-outline-light" type="button">Search</button>
+                </div>
+              </div>
               <Link to="/createforum" className="btn btn-outline-light mr-2">
                   <span className="d-inline-block text-center">Create Forum</span>
+              </Link>
+              <Link to="/movies" className="btn btn-outline-light mr-2"> {/* Add Link for Movies button */}
+                <span className="d-inline-block text-center">Movies</span>
               </Link>
               <Link to="/profile" className="btn btn-outline-light mr-2">
                 <span className="d-inline-block text-center">Profile</span>
@@ -83,7 +150,6 @@ const Taskbar = () => {
             </div>
           )}
         </div>
-        
         {showSearchBar && (
           <div className="input-group ml-2">
             <input 
@@ -97,6 +163,16 @@ const Taskbar = () => {
               <button className="btn btn-outline-light" type="button">Search</button>
             </div>
           </div>
+        )}
+
+        {showUserSearch && userSearchResults.length > 0 && (
+          <ul className="list-group mt-2">
+            {userSearchResults.map((user, index) => (
+              <li key={index} className="list-group-item">
+                <Link to={`/profile/${user.id}`}>{user.username}</Link>
+              </li>
+            ))}
+          </ul>
         )}
 
         {showSearchBar && searchResults.length > 0 && (

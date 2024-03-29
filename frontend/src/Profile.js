@@ -9,9 +9,14 @@ import { useUser } from './UserContext';
 const Profile = ({ user }) => {
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
+
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
+
+  const [profilePicture, setProfilePicture] = useState(null);
+
   const { updateUser } = useUser();
+  const navigate = useNavigate();
 
   const handleEditClick = () => {
     setEditing(true);
@@ -19,30 +24,30 @@ const Profile = ({ user }) => {
 
   const handleSaveClick = async () => {
     try {
-      const { username, password, email } = editedUser;
-      // Dummy date of birth constant
-      const dummyDateOfBirth = "1990-01-01"; // Modify as needed
-  
-      const updatedUser = {
-        oldUser: user.username,
-        username,
-        email: user.email, // Keep the original email
-        date_of_birth: dummyDateOfBirth // Use the dummy date of birth
-      };
+      //const { posts, id, ...userWithoutPosts } = editedUser;
 
-      console.log(updatedUser)
+      console.log(editedUser) //print edits to console
+      const { username, bio, profilePicture } = editedUser;
+
+      const userWithoutPosts = {
+        uid: user.id, // Assuming user object has uid field
+        username,
+        bio,
+        profilePicture
+      };
   
-      const response = await axios.put('http://localhost:3000/users/putuser', updatedUser, {
+      const response = await fetch('http://localhost:3000/profile/updateprofile', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify(userWithoutPosts),
       });
+      console.log("Testing the body: ", JSON.stringify(userWithoutPosts));
   
-      if (response.status !== 200) {
+      if (!response.ok) {
         throw new Error('Failed to save changes');
       }
-
-      updateUser({ ...editedUser});
   
       setEditing(false);
     } catch (error) {
@@ -63,10 +68,44 @@ const Profile = ({ user }) => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    // const file = e.target.files[0];
-    // Add logic to handle image change and update editedUser.profilePicture
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    console.log("file? ", file)
+    formData.append('profilePicture', file);
+    formData.append('userId', user.id);
+    for (var key of formData.entries()) {
+      console.log(key[0] + ', ' + key[1]);
+    }
+
+    console.log("formData: ", formData);
+
+    try {
+      const response = await fetch('http://localhost:3000/profile/upload-profile-picture', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error('Failed to upload profile picture');
+      }
+      const responseData = await response.json(); // Parse JSON once
+      setProfilePicture(responseData.profilePicture);
+      setEditedUser(prevUser => ({ ...prevUser, profilePicture: responseData.profilePicture })); // Update editedUser state with the new profile picture
+      if (response.ok) {
+        console.log('Profile retrieved', responseData);
+        updateUser(responseData);
+        navigate(`/profile/${responseData.userId}`); // Redirect to the profile page
+      } else {
+        console.error('Retrieval failed');
+        // Handle failed scenarios
+      }
+    } catch (error) {
+      console.error('Error uploading profile picture:', error.message);
+      // Handle error (e.g., display error message to the user)
+    }
   };
+  
+  
 
   const handleWatchlistsClick = () => {
     navigate('/watchlists');
@@ -129,6 +168,7 @@ const Profile = ({ user }) => {
                     onChange={handleImageChange}
                     style={{ display: 'none' }}
                   />
+
                 </label>
               )}
               {!isEditing && (
@@ -190,7 +230,9 @@ const Profile = ({ user }) => {
                     >
                       <div className='bio-follow-header'>
                         <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
+                        {editedUser.followers && (
                         <p className='bio-follows'>{editedUser.followers.length}</p>
+                        )}
                       </div>
                   </Link>
                 </div>
@@ -201,7 +243,9 @@ const Profile = ({ user }) => {
                       >
                         <div className='bio-follow-header'>
                           <h3 style={{ fontSize: 'inherit' }}>Following</h3>
+                          {editedUser.following && (
                           <p className='bio-follows'>{editedUser.following.length}</p>
+                          )}
                         </div>
                     </Link>
                 </div>

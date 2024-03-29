@@ -6,13 +6,20 @@ import Taskbar from './components/Taskbar';
 import ProfilePage from './Profile';
 import WatchlistPage from './WatchlistPage';
 import CreateForumPage from './CreateForum';
-import ForumPage from './ForumPage';
+//import ForumPage from './ForumPage';
 import FollowersPage from './FollowersPage';
 import FollowingPage from './FollowingPage';
 import CreatePostPage from './CreatePost';
 import OtherUserProfile from './OtherUserProfile';
 import ForumSettingsPage from './ForumSettings';
 import { useUser } from './UserContext';
+import ForumPage from './components/Modals/ForumPage';
+import WritePost from './components/WritePost';
+import MoviePage from './components/Modals/MoviePage';
+
+
+
+
 
 const App = () => {
   const { user } = useUser();
@@ -24,10 +31,12 @@ const App = () => {
       username: user.data_by_username.login,
       bio: 'Example bio',
       email: user.data_by_username.email,
-      profilePicture: 'blank profile pic.jpg',
+
+      profilePicture: `http://localhost:3000${user.data_by_username.profilePicture}`,
       followers: user.data_by_username.followersIds,
       following: user.data_by_username.followsIds,
       posts: user.data_by_username.postsIds,
+
       watchlists: user.data_by_username.watchListsIds,
     }
   : 
@@ -41,6 +50,7 @@ const App = () => {
     following: [1, 2, 3],
     watchlists: []
   };
+
 
   const addForum = (forum) => {
     setForums([...forums, forum]);
@@ -56,6 +66,10 @@ const App = () => {
           <Route path="/user/profile/:username" element={<OtherUserProfile currentUser={dummyUser} />} />
           <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} user={dummyUser} />}/>
           <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
+          <Route path="/forums" element={<ForumPage forums={forums} />}/>
+          <Route path="/followers" element={<FollowersPage />} />
+          <Route path="/following" element={<FollowingPage />} />
+          <Route path="/movies" element={<MoviePage />} />
           <Route path="/forums/:forumName" element={<ForumPage forums={forums} currentUser={dummyUser} />}/>
           <Route path="/followers/:username" element={<FollowersPage />} />
           <Route path="/following/:username" element={<FollowingPage />} />

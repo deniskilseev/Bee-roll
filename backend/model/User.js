@@ -14,7 +14,8 @@ const userSchema = new Schema({
   forumIds: [Number],
   reviewIds: [Number],
   followsIds: [Number],
-  followersIds: [Number]
+  followersIds: [Number],
+  profilePicture: String
 });
 
 const User = model('User', userSchema);

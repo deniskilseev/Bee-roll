@@ -8,6 +8,8 @@ router.get('/:title', forumController.getForum);
 router.post('/togglePrivate', forumController.togglePrivate);
 router.post('/addModerator', forumController.addModerator);
 router.post('/removeModerator', forumController.removeModerator);
+router.get('/forums', forumController.getAllForums);
+router.delete('/deletePost/:post_id', forumController.deletePost);
 
 // Export the router
 module.exports = router;

@@ -96,13 +96,24 @@ const predictController = {
                 return res.status(400).json( {error: "No user with such ID"} );
             }
 
-            return res.status(404).json( {message: "Not yet implemented"} ); 
+            const uri = url + '/similarUsers?userId=' + user_id;
 
-            /*const request = new Request(url + "/predictUser", {
+            const options = {
                 method: "POST",
-                body: {
-                    },
-            });*/
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+
+            const similar_users = await fetch(uri, options);
+
+            if (similar_users.status == 200) {
+                data = await similar_users.json()
+                return res.status(200).json(data);
+            }
+
+            console.log("Error in the Machine Learning server");
+            return res.status(500).json( {error: "Internal server error"} );
 
         } catch (error) {
             console.error("Error in similarUser:", error);

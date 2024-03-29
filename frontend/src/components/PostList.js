@@ -1,14 +1,22 @@
+// PostList.js
 import React from 'react';
-import Post from './Post';
 
-const PostList = ({ posts }) => {
+// PostList.js
+const PostList = ({ posts, onDelete }) => {
   return (
     <div>
       {posts.map((post) => (
-        <Post key={post.id} title={post.title} content={post.content} author={post.author} />
+        <div key={post.id}>
+          {/* Render post content */}
+          <p>{post.content}</p>
+          {/* Button to delete the post */}
+          <button onClick={() => onDelete(post.id)}>Delete</button>
+        </div>
       ))}
     </div>
   );
 };
 
+
 export default PostList;
+
