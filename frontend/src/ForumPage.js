@@ -153,7 +153,7 @@ const ForumPage = ({ forums, currentUser }) => {
           <div className="card-body">
             <h5 className="card-title">{post.post_info.postTitle}</h5>
             <p className="card-text">{post.post_info.postText}</p>
-            <Link to={`/user/profile/${post.user.user_info.login}`}>
+            <Link to={{ pathname: `/user/profile/${post.user.user_info.login}` }}>
               {post.user && <p>Posted by: {post.user.user_info.login}</p>}
             </Link>
             <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>

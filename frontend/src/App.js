@@ -10,8 +10,8 @@ import ForumPage from './ForumPage';
 import FollowersPage from './FollowersPage';
 import FollowingPage from './FollowingPage';
 import CreatePostPage from './CreatePost';
+import OtherUserProfile from './OtherUserProfile';
 import { useUser } from './UserContext';
-import { useParams } from 'react-router-dom';
 
 const App = () => {
   const { user } = useUser();
@@ -60,7 +60,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage user={dummyUser} />} />
           <Route path="/profile" element={<ProfilePage user={dummyUser} />} />
-          <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} user={dummyUser} />}/>
+          <Route path="/user/profile/:username" element={<OtherUserProfile user={dummyUser} />} />
+          <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} />}/>
           <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
           <Route path="/forums/:forumName" element={<ForumPage forums={forums} />}/>
           <Route path="/followers" element={<FollowersPage />} />
