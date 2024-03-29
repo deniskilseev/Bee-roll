@@ -40,6 +40,52 @@ const predictController = {
         }
     },
 
+    async predictUser(req, res) {
+        try {
+            const {user_id} = req.params;
+
+            const user_info =  User.findOne( {uid: user_id} );
+
+            if (!user_info) {
+                return res.status(400).json( {error: "No user with such ID"} );
+            }
+
+            const user_history = await Review.find( {userId: user_id} );
+            const needed_user_history = { userId: user_id, reviews: [] };
+
+            for (review of user_history) {
+                needed_user_history.reviews.push({movieId: review.movieId, rating: review.review});
+            }
+
+            const uri = url + '/predictUser'
+            const options = {
+                method: "POST",
+                body: JSON.stringify(needed_user_history),
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+
+            const movie_recommendation = await fetch(uri, options);
+
+            if (movie_recommendation.status == 200) {
+                data = await movie_recommendation.json();
+                if (data.status_code == 412) {
+                    return res.status(412).json( {error: "User needs more reviews to be recommended movies"} );
+                }
+                return res.status(200).json(data);
+            }
+
+            console.log("Error in the Machine Learning server");
+            return res.status(500).json( {error: "Internal server error"} );
+
+
+        } catch {
+            console.error("Error in predictUser:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
     async similarUser(req, res) {
         try {
             const {user_id} = req.params;
