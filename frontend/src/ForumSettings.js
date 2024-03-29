@@ -16,7 +16,6 @@ const ForumSettings = ({ user }) => {
                 // Send GET request to validate the user exists
                 const userResponse = await axios.get(`http://localhost:3000/users/getUserByUsername/${newModerator}`);
                 const userToAdd = userResponse.data.user_info;
-                console.log('User to add:', forum);
 
                 // If user exists, add moderator
                 if (userToAdd) {
@@ -60,6 +59,16 @@ const ForumSettings = ({ user }) => {
             console.log('Fetched forum:', fetchedForum);
             setForum(fetchedForum);
             setIsPublic(!fetchedForum.isPrivate);
+
+            const moderatorPromises = fetchedForum.moderatorIds.map(async moderatorId => {
+                const userResponse = await axios.get(`http://localhost:3000/users/getuser/${moderatorId}`);
+                console.log('Moderator response:', userResponse.data);
+                return userResponse.data;
+            });
+
+            const moderatorsData = await Promise.all(moderatorPromises);
+            const moderatorUsernames = moderatorsData.map(moderator => moderator.user_info.login);
+            setModerators(moderatorUsernames)
             } catch (error) {
             console.error('Error fetching forum:', error);
             }
