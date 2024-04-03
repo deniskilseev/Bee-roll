@@ -6,20 +6,13 @@ import Taskbar from './components/Taskbar';
 import ProfilePage from './Profile';
 import WatchlistPage from './WatchlistPage';
 import CreateForumPage from './CreateForum';
-//import ForumPage from './ForumPage';
+import ForumPage from './ForumPage';
 import FollowersPage from './FollowersPage';
 import FollowingPage from './FollowingPage';
 import CreatePostPage from './CreatePost';
 import OtherUserProfile from './OtherUserProfile';
 import ForumSettingsPage from './ForumSettings';
 import { useUser } from './UserContext';
-import ForumPage from './components/Modals/ForumPage';
-import WritePost from './components/WritePost';
-import MoviePage from './components/Modals/MoviePage';
-
-
-
-
 
 const App = () => {
   const { user } = useUser();
@@ -31,13 +24,10 @@ const App = () => {
       username: user.data_by_username.login,
       bio: 'Example bio',
       email: user.data_by_username.email,
-      profilePicture: `http://localhost:3000${user.data_by_username.profilePicture}`,
-      followers: [],
-      following: [],
-      posts: [
-        { id: 1, title: 'First Post', content: 'First post.', author: user.data_by_username },
-        { id: 2, title: 'Second Post', content: 'Second post.', author: user.data_by_username },
-      ],
+      profilePicture: 'blank profile pic.jpg',
+      followers: user.data_by_username.followersIds,
+      following: user.data_by_username.followsIds,
+      posts: user.data_by_username.postsIds,
       watchlists: user.data_by_username.watchListsIds,
     }
   : 
@@ -52,12 +42,6 @@ const App = () => {
     watchlists: []
   };
 
-  //console.log("profile pic url: ", user.data_by_username.profilePicture);
-  dummyUser.posts = [
-    { id: 1, title: 'First Post', content: 'First post.', author: dummyUser},
-    { id: 2, title: 'Second Post', content: 'Second post.', author: dummyUser},
-  ];
-  console.log("user test: ", dummyUser);
   const addForum = (forum) => {
     setForums([...forums, forum]);
   };
@@ -67,15 +51,11 @@ const App = () => {
       <div className="app">
         <Taskbar />
         <Routes>
-          <Route path="/" element={<HomePage user={dummyUser} />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage user={dummyUser} />} />
           <Route path="/user/profile/:username" element={<OtherUserProfile currentUser={dummyUser} />} />
           <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} user={dummyUser} />}/>
           <Route path="/watchlists" element={<WatchlistPage user={dummyUser} />} />
-          <Route path="/forums" element={<ForumPage forums={forums} />}/>
-          <Route path="/followers" element={<FollowersPage />} />
-          <Route path="/following" element={<FollowingPage />} />
-          <Route path="/movies" element={<MoviePage />} />
           <Route path="/forums/:forumName" element={<ForumPage forums={forums} currentUser={dummyUser} />}/>
           <Route path="/followers/:username" element={<FollowersPage />} />
           <Route path="/following/:username" element={<FollowingPage />} />
