@@ -8,17 +8,19 @@ const Post = require('../model/Post.js')
 const forumController = {
     async createForum(req, res) {
         try {
-            const {forumTitle, creatorId} = req.body;
-            
+            const {forumTitle} = req.body;
+            const creator_login = req.user.login; 
             const existing_title = await Forum.findOne({forumTitle: forumTitle});
             if (existing_title) {
                 return res.status(400).json({error: "Forum with such name exists"})
             }
             
             const counter_fetch = await Counter.findOne({_id: "Forum"});
-            const forum_counter_value = counter_fetch.collectionCounter
-            const forumId = counter_fetch.collectionCounter + 1
+            const forum_counter_value = counter_fetch.collectionCounter;
+            const forumId = counter_fetch.collectionCounter + 1;
 
+            const creator = await User.findOne({login: creator_login});
+            const creatorId = creator.uid;
             const newForum = new Forum({
                 forumId: forumId,
                 forumTitle: forumTitle,
@@ -45,8 +47,9 @@ const forumController = {
 
     async joinForum(req, res) {
         try {
-            const {forumId, memberId} = req.body;
-
+            const {forumId} = req.body;
+            const user = await User.findOne({login: req.user.login});
+            const memberId = user.uid;
             const forum = await Forum.findOne({forumId: forumId});
             if (!forum) {
                 return res.status(400).json({error: "Forum with such name does not exists"})
@@ -85,7 +88,7 @@ const forumController = {
     async addModerator(req, res) {
         try {
             const {to_add_id, who_adds_id, forum_id} = req.body;
-            
+
             const forum_info = await Forum.findOne( {forumId: forum_id} );
 
             if (!forum_info) {
@@ -154,7 +157,7 @@ const forumController = {
     async togglePrivate(req, res) {
         try {
             const {forumId} = req.body;
-
+            
             const forum_info = await Forum.findOne( {forumId: forumId} );
     
             if(!forum_info) {
@@ -173,24 +176,25 @@ const forumController = {
 
     async banUser(req, res) {
         try {
-            const {modId, userId, forumId} = req.body;
-
+            const {userId, forumId} = req.body;
+            
+            const moderator = await User.findOne({login: req.user.login});
+    
+            const modId = moderator.uid;
             const forum = await Forum.findOne({forumId: forumId});
     
             if(!forum) {
                 return res.status(404).json( {error: "Forum with such ID does not exist"} );
             }
-    
-            const user = await User.findOne({uid: userId});
-    
-            if(!user) {
-                return res.status(404).json( {error: "User with such id does not exist"} );
+
+            if(!moderator || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
+                return res.status(404).json( {error: "Mod with such id does not exist"} );
             }
     
-            const mod = await User.findOne({uid: modId});
-    
-            if(!mod || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
-                return res.status(404).json( {error: "Mod with such id does not exist"} );
+            const user = await User.findOne({uid: userId});
+
+            if(!user) {
+                return res.status(404).json( {error: "User with such id does not exist"} );
             }
     
             forum.bannedUserIds.push(userId);
@@ -209,12 +213,19 @@ const forumController = {
 
     async unbanUser(req, res) {
         try {
-            const {modId, userId, forumId} = req.body;
+            const {userId, forumId} = req.body;
+            
+            const moderator = await User.findOne({login: req.user.login});
+            const modId = moderator.uid;
 
             const forum = await Forum.findOne({forumId: forumId});
     
             if(!forum) {
                 return res.status(404).json( {error: "Forum with such ID does not exist"} );
+            }
+
+            if(!moderator || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
+                return res.status(404).json( {error: "Mod with such id does not exist"} );
             }
     
             const user = await User.findOne({uid: userId});
@@ -246,38 +257,6 @@ const forumController = {
         } catch (error) {
             console.error("Error in getAllForums:", error);
             res.status(500).json({ error: "Internal server error" });
-        }
-    },
-    
-    async deletePost(req, res) {
-        try {
-            const { postId, userId } = req.body;
-
-            console.log("body: ", req.body);
-            // Find the post to be deleted
-            
-            const post = await Post.findOne( {postId: postId} );
-            if (!post) {
-                return res.status(404).json({ error: 'Post not found' });
-            }
-
-            // Find the forum associated with the post
-            const forum = await Forum.findOne( {forumId: post.forumId});
-            if (!forum) {
-                return res.status(404).json({ error: 'Forum not found' });
-            }
-
-            // Check if the user is a moderator for the forum
-            if (forum.moderatorIds.includes(userId)) {
-                // Delete the post
-                await Post.findOneAndDelete({ postId: post.postId});
-                return res.status(200).json({ message: 'Post deleted successfully' });
-            } else {
-                return res.status(403).json({ error: 'Unauthorized: User is not a moderator for this forum' });
-            }
-        } catch (error) {
-            console.error('Error in deletePost:', error);
-            res.status(500).json({ error: 'Internal server error' });
         }
     }
 }

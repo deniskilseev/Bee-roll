@@ -1,8 +1,8 @@
-const { loginUser, createUser, putUser, followUser, unfollowUser} = require('../controllers/userController');
 const http = require('http');
 const request = require('supertest'); // Supertest is a library for testing HTTP servers
 const mongoose = require('mongoose')
 const User = require('../model/User.js')
+const app = require('../app');
 
 
 // let server;
@@ -10,7 +10,6 @@ const User = require('../model/User.js')
 // Setup: Start the server before running tests
 beforeAll((done) => {
     // Create and start the server
-    const app = require('../app');
     server = http.createServer(app);
     server.listen(done);
 });
@@ -29,50 +28,32 @@ describe('loginUser', () => {
             password: "123"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"})
 
-        await loginUser(req, res);
+        const token = response.body.token;
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(response.status).toEqual(200);
     });
     test('should return 401 if user provides wrong credentials', async () => {
 
-        const req = { body: {
-            username: "denis",
-            password: "321"
-        }};
+        const response2 = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "321"});
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-        await loginUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(401);
+        expect(response2.status).toEqual(401);
     });
 });
 
 describe('createUser', () => {
     test('return 201 if creating user that doesnt exist', async () => {
 
-        const req = { body: {
-            username: "newuser",
-            password: "123",
-            email: "newuser@gmail.com"
-        }};
+        const response = await request(app)
+            .post('/users/createUser')
+            .send({username: "newuser", password: "123", email: "newuser@gmail.com"});
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-        await createUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(201);
+        expect(response.status).toEqual(201);
 
         const user = await User.findOne({login: "newuser"});
 
@@ -87,23 +68,17 @@ describe('createUser', () => {
             email: "abc_user@gmail.com"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const response = await request(app)
+            .post('/users/createUser')
+            .send(req.body);
 
-        await createUser(req, res);
+        expect(response.status).toEqual(201);
 
-        expect(res.status).toHaveBeenCalledWith(201);
+        const response_login = await request(app)
+            .post('/users/loginUser')
+            .send({username: "new", password: "password"});
 
-        req = { body: {
-            username: "new",
-            password: "password"
-        }};
-
-        await loginUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(response_login.status).toEqual(200);
     });
 
     test('return 400 if creating user with existing email', async () => {
@@ -114,14 +89,11 @@ describe('createUser', () => {
             email: "denis@gmail.com"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const response = await request(app)
+            .post('/users/createUser')
+            .send(req.body);
 
-        await createUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(response.status).toEqual(400);
     });
 
     test('return 400 if creating user with existing username', async () => {
@@ -132,94 +104,91 @@ describe('createUser', () => {
             email: "denis@gmail.com"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const response = await request(app)
+            .post('/users/createUser')
+            .send(req.body);
 
-        await createUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(response.status).toEqual(400);
     });
 });
 
-// describe('putUser', () => {
-//     test('return 200 if updating user that exists', async () => {
+describe('putUser', () => {
+    test('return 200 if updating user that exists', async () => {
 
-//         const req = { body: {
-//             username: "denis",
-//             password: "321",
-//             email: "i_am_great@gmail.com"
-//         }};
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"})
 
-//         const res = {
-//             status: jest.fn().mockReturnThis(),
-//             json: jest.fn()
-//         };
+        const token = response.body.token;
 
-//         await putUser(req, res);
+        const req2 = { body: {
+            username: "denis",
+            password: "123",
+            email: "i_am_great@gmail.com"
+        }};
 
-//         expect(res.status).toHaveBeenCalledWith(200);
+        const res = await request(app)
+            .put('/users/putUser')
+            .send(req2.body)
+            .set({Authorization: 'Bee-roll ' + token});
 
-//         const user = await User.findOne({login: "denis"});
+        expect(res.status).toBe(200);
 
-//         expect(user.email).toEqual("i_am_great@gmail.com");
-//         expect(user.password).toEqual("321");
-//     });
+        const user = await User.findOne({login: "denis"});
 
-//     test('return 404 if updating user that doesnt exists', async () => {
+        expect(user.email).toEqual("i_am_great@gmail.com");
+        expect(user.password).toEqual("123");
+    });
 
-//         const req = { body: {
-//             username: "oleg",
-//             password: "321",
-//             email: "i_am_great@gmail.com"
-//         }};
+    test('return 400 if updating user with email that is registered', async () => {
 
-//         const res = {
-//             status: jest.fn().mockReturnThis(),
-//             json: jest.fn()
-//         };
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"})
 
-//         await putUser(req, res);
+        const token = response.body.token;
+        
+        console.log("Second case: " + response.status);
 
-//         expect(res.status).toHaveBeenCalledWith(404);
-//     });
+        const req = { body: {
+            username: "denis",
+            password: "321",
+            email: "sreekar@gmail.com"
+        }};
 
-//     test('return 400 if updating user with email that is registered', async () => {
+        const res = await request(app)
+            .put('/users/putUser')
+            .send(req.body)
+            .set({Authorization: 'Bee-roll ' + token});
 
-//         const req = { body: {
-//             username: "denis",
-//             password: "321",
-//             email: "sreekar@gmail.com"
-//         }};
-
-//         const res = {
-//             status: jest.fn().mockReturnThis(),
-//             json: jest.fn()
-//         };
-
-//         await putUser(req, res);
-
-//         expect(res.status).toHaveBeenCalledWith(400);
-//     });
-// });
+        expect(res.status).toBe(400);
+    });
+});
 
 describe('(un)followUser', () => {
     test('return 200 if following is successful', async () => {
 
+        const login = { body: {
+            username: "denis",
+            password: "123"
+        }};
+            
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send(login.body);
+
+        const token = response.body.token;
+
         const req = { body: {
-            user_follower: "denis",
             user_followed: "sreekar"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const res = await request(app)
+            .post('/users/followUser')
+            .send(req.body)
+            .set({Authorization: 'Bee-roll ' + token});
 
-        await followUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toEqual(200);
 
         const user1 = await User.findOne({login: "denis"});
         const user2 = await User.findOne({login: "sreekar"});
@@ -227,54 +196,48 @@ describe('(un)followUser', () => {
         expect(user1.followsIds).toContain(user2.uid);
         expect(user2.followersIds).toContain(user1.uid);
     });
-    test('return 404 if follower is inexistent', async () => {
-
-        const req = { body: {
-            user_follower: "inexistent",
-            user_followed: "sreekar"
-        }};
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-        await followUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(404);
-    }); 
     test('return 404 if person followed is inexistent', async () => {
 
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"})
+
+        const token = response.body.token;
+
+        expect(response.status).toEqual(200);
+
         const req = { body: {
-            user_follower: "inexistent",
-            user_followed: "sreekar"
+            user_followed: "inexistent"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const res = await request(app)
+            .post('/users/followUser')
+            .send(req.body)
+            .set({Authorization: 'Bee-roll ' + token});
 
-        await followUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.status).toEqual(404);
     }); 
 
     test('return 200 if following is successful then 200 if unfollowing', async () => {
 
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"})
+
+        const token = response.body.token;
+
+        expect(response.status).toEqual(200);
+        
         const req = { body: {
-            user_follower: "denis",
             user_followed: "sreekar"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const res = await request(app)
+            .post('/users/followUser')
+            .send(req.body)
+            .set({Authorization: 'Bee-roll ' + token});
 
-        await followUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toEqual(200);
 
         const user1 = await User.findOne({login: "denis"});
         const user2 = await User.findOne({login: "sreekar"});
@@ -282,9 +245,12 @@ describe('(un)followUser', () => {
         expect(user1.followsIds).toContain(user2.uid);
         expect(user2.followersIds).toContain(user1.uid);
 
-        await unfollowUser(req, res);
+        const res1 = await request(app)
+            .post('/users/unfollowUser')
+            .send(req.body)
+            .set({Authorization: 'Bee-roll ' + token});
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res1.status).toEqual(200);
 
         const user11 = await User.findOne({login: "denis"});
         const user22 = await User.findOne({login: "sreekar"});
@@ -295,35 +261,23 @@ describe('(un)followUser', () => {
 
     test('return 404 if one of users inexistent', async () => {
 
-        const req = { body: {
-            user_follower: "inexistent",
-            user_followed: "sreekar"
-        }};
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"})
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const token = response.body.token;
 
-        await followUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(404);
-    });
-
-    test('return 200 if users do not follow each other', async () => {
+        expect(response.status).toEqual(200);
 
         const req = { body: {
-            user_follower: "aarna",
-            user_followed: "artemii"
+            user_followed: "inexistent"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const res1 = await request(app)
+            .post('/users/followUser')
+            .send(req.body)
+            .set({Authorization: 'Bee-roll ' + token});
 
-        await followUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res1.status).toEqual(404);
     });
 });

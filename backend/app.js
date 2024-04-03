@@ -11,9 +11,9 @@ const forumRoute = require('./routes/forum');
 const postRoute = require('./routes/post'); 
 const watchListRoute = require('./routes/watchlist');
 const movieRoute = require('./routes/movie');
-const profileRoute = require('./routes/profile')
+const profileRoute = require('./routes/profile');
 const reviewRoute = require('./routes/review');
-const predictRoute = require('./routes/predict')
+const predictRoute = require('./routes/predict');
 // Add more controllers as needed
 
 

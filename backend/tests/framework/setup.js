@@ -3,12 +3,13 @@ const User = require('../../model/User')
 const Counter = require('../../model/Counter')
 const Forum = require('../../model/Forum')
 const Post = require('../../model/Post')
+// const jest = require('jest');
 
 
 module.exports = async () => {
     try {
         await testDatabaseConnection();
-
+        // jest.setTimeout(10000);
         const counters = [
             {_id: "User", collectionCounter: 4},
             {_id: "Forum", collectionCounter: 3},

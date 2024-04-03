@@ -1,4 +1,3 @@
-const {createForum, joinForum, getForum, banUser, unbanUser} = require('../controllers/forumController');
 const http = require('http');
 const request = require('supertest'); // Supertest is a library for testing HTTP servers
 const mongoose = require('mongoose')
@@ -8,12 +7,31 @@ const app = require('../app');
 
 
 // let server;
+let token;
 
 // Setup: Start the server before running tests
-beforeAll((done) => {
+beforeAll(async () => {
     // Create and start the server
     server = http.createServer(app);
-    server.listen(done);
+    await new Promise(resolve => server.listen(resolve));
+
+    const req = { body: {
+        username: "denis",
+        password: "123"
+    }};
+
+    try {
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send(req.body);
+
+        token = 'Bee-roll ' + response.body.token;
+
+        // done();
+    } catch (error) {
+        console.error("Before all error: ", error);
+        // done.fail(error);
+    }
 });
 
 // Teardown: Shutdown the server after running tests and mongoose connection
@@ -25,103 +43,58 @@ afterAll(() => {
 describe('createForum', () => {
     test('return 201 & correct fields if forum is created correctly', async () => {
         const req = { body: {
-            forumTitle: "Tanks",
-            creatorId: 4 
+            forumTitle: "Tanks"
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const res = await request(app)
+            .post('/forums/createForum')
+            .send(req.body)
+            .set({Authorization: token});
 
-        await createForum(req, res);
-        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.status).toBe(201);
 
         const forum = await Forum.findOne({forumTitle: "Tanks"})
 
         expect(forum.forumTitle).toEqual('Tanks');
-        expect(forum.userIds).toEqual([4]);
-        expect(forum.creatorId).toEqual(4);
+        expect(forum.userIds).toEqual([1]);
+        expect(forum.creatorId).toEqual(1);
 
     });
 
     test('return 400 when creating forum with existing name', async () => {
         const req = { body: {
             forumTitle: "Apples",
-            creatorId: 2
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const res = await request(app)
+            .post('/forums/createForum')
+            .send(req.body)
+            .set({Authorization: token});
 
-        await createForum(req, res);
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.status).toBe(400);
     });
 
-    test('return 400 when creating forum with existing name', async () => {
-        const req = { body: {
-            forumTitle: "Apples",
-            creatorId: 2
-        }};
+    test('join a forum with real user – 201', async () => {
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-        await createForum(req, res);
-        expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    test('return 400 when creating forum with existing name', async () => {
-        const req = { body: {
-            forumTitle: "Apples",
-            creatorId: 2
-        }};
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-        await createForum(req, res);
-        expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    test('create a forum - 201 and join with real user – 201', async () => {
-        
-        const req1 = { body: {
-            forumTitle: "Bubbles",
-            creatorId: 3
-        }};
-
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
-
-        await createForum(req1, res);
-        expect(res.status).toHaveBeenCalledWith(201);
-
-        var forum = await Forum.findOne({forumTitle: "Bubbles"});
+        var forum = await Forum.findOne({forumTitle: "Cars"});
 
         expect(forum).toBeTruthy();
 
-        const req2 = { body: {
-            forumId: forum.forumId,
-            memberId: 2
+        const req = { body: {
+            forumId: forum.forumId
         }};
 
-        await joinForum(req2, res);
+        const res = await request(app)
+            .post('/forums/joinForum')
+            .send(req.body)
+            .set({Authorization: token});
 
-        expect(res.status).toHaveBeenCalledWith(201);
-        
-        forum = await Forum.findOne({forumTitle: "Bubbles"});
-        const user = await User.findOne({uid: 3});
+        expect(res.status).toBe(201);
 
-        expect(forum.userIds).toContain(3);
+        forum = await Forum.findOne({forumTitle: "Cars"});
+        const user = await User.findOne({login: "denis"});
+
+        expect(forum.userIds).toContain(user.uid);
         expect(user.forumIds).toContain(forum.forumId);
     });
 
@@ -138,18 +111,17 @@ describe('createForum', () => {
 describe('(un)banUser', () => {
     test('return 200 for correct ban and unban of a user', async () => {
         const req = { body: {
-            modId: 1,
             userId: 2,
             forumId: 1 
         }};
 
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const res = await request(app)
+            .post('/forums/banUser')
+            .send(req.body)
+            .set({Authorization: token});
 
-        await banUser(req, res);
-        expect(res.status).toHaveBeenCalledWith(200);
+
+        expect(res.status).toBe(200);
 
         const forum = await Forum.findOne({forumId: 1});
         const user = await User.findOne({uid: 2});
@@ -157,14 +129,12 @@ describe('(un)banUser', () => {
         expect(forum.bannedUserIds).toContain(2);
         expect(user.forumIds).not.toContain(1);
 
-        const res1 = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn()
-        };
+        const res1 = await request(app)
+            .post('/forums/unbanUser')
+            .send(req.body)
+            .set({Authorization: token});
 
-        await unbanUser(req, res1);
-
-        expect(res1.status).toHaveBeenCalledWith(200);
+        expect(res1.status).toBe(200);
 
         const forum1 = await Forum.findOne({forumId: 1});
         expect(forum1.bannedUserIds).not.toContain(2);

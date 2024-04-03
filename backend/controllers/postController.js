@@ -140,7 +140,7 @@ const postController = {
     },
 
     async getRecentPosts(req, res) {
-        const {user_login} = req.body;
+        const user_login = req.user.login;
 
         const user_asking = await User.findOne({login: user_login});
 
@@ -165,9 +165,9 @@ const postController = {
                 posts_to_return.push(...sliced_posts);
             }
         }
-        console.log(posts_to_return);
+
         await res.status(200).json({ posts: posts_to_return });
-        console.log(res)
+
     }
 }
 
