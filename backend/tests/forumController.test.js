@@ -140,3 +140,96 @@ describe('(un)banUser', () => {
         expect(forum1.bannedUserIds).not.toContain(2);
     });
 });
+
+describe('add/removeModerator', () => {
+    test('return 200 for correct add and remove moderator', async () => {
+        const req = { body: {
+            userId: 2,
+            forumId: 1
+        }};
+
+        const res = await request(app)
+            .post('/forums/addModerator')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const forum = await Forum.findOne({forumId: 1});
+
+        expect(forum.moderatorIds).toContain(2);
+
+        const res1 = await request(app)
+            .post('/forums/removeModerator')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res1.status).toBe(200);
+
+        const forum1 = await Forum.findOne({forumId: 1});
+        expect(forum1.moderatorIds).not.toContain(2);
+    });
+
+    test('return 403 for Unauthorized', async () => {
+        const req = { body: {
+            userId: 2,
+            forumId: 2
+        }};
+
+        const res = await request(app)
+            .post('/forums/addModerator')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(403);
+    });
+
+});
+
+describe('togglePrivate', () => {
+    test('200 for correctly toggling private', async () => {
+        const req = { body: {
+            forumId: 1
+        }};
+
+         const res = await request(app)
+            .post('/forums/togglePrivate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const forum = await Forum.findOne({forumId: 1});
+
+        expect(forum.isPrivate).toBe(true);
+    });
+
+    test('403 when unauthorized', async () => {
+        const req = { body: {
+            forumId: 2
+        }};
+
+         const res = await request(app)
+            .post('/forums/togglePrivate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(403);
+
+    });
+
+     test('400 when the forum is inexisting', async () => {
+        const req = { body: {
+            forumId: 6
+        }};
+
+         const res = await request(app)
+            .post('/forums/togglePrivate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(400);
+
+    });
+
+});
