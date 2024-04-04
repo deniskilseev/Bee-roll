@@ -31,9 +31,9 @@ module.exports = async () => {
         ];
 
         const forums = [
-            {forumId: 1, forumTitle: 'Apples', creatorId: 1, userIds: [1, 2]},
-            {forumId: 2, forumTitle: 'Cars', creatorId: 2, userIds: [2]},
-            {forumId: 3, forumTitle: 'Pineapples', creatorId: 3, userIds: [3]}
+            {forumId: 1, forumTitle: 'Apples', creatorId: 1, userIds: [1, 2], isPrivate: false},
+            {forumId: 2, forumTitle: 'Cars', creatorId: 2, [2], isPrivate: true},
+            {forumId: 3, forumTitle: 'Pineapples', creatorId: 3, [3], isPrivate: false}
         ];
 
         await User.insertMany(users);
