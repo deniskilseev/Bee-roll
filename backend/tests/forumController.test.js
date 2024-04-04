@@ -141,6 +141,40 @@ describe('(un)banUser', () => {
     });
 });
 
+describe('(un)banUser', () => {
+    test('return 200 for correct ban and unban of a user', async () => {
+        const req = { body: {
+            userId: 2,
+            forumId: 1 
+        }};
+
+        const res = await request(app)
+            .post('/forums/banUser')
+            .send(req.body)
+            .set({Authorization: token});
+
+
+        expect(res.status).toBe(200);
+
+        const forum = await Forum.findOne({forumId: 1});
+        const user = await User.findOne({uid: 2});
+
+        expect(forum.bannedUserIds).toContain(2);
+        expect(user.forumIds).not.toContain(1);
+
+        const res1 = await request(app)
+            .post('/forums/unbanUser')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res1.status).toBe(200);
+
+        const forum1 = await Forum.findOne({forumId: 1});
+        expect(forum1.moderatorIds).not.toContain(2);
+        expect(forum1.bannedUserIds).not.toContain(2);
+    });
+});
+
 describe('add/removeModerator', () => {
     test('return 200 for correct add and remove moderator', async () => {
         const req = { body: {
@@ -161,14 +195,6 @@ describe('add/removeModerator', () => {
 
         const res1 = await request(app)
             .post('/forums/removeModerator')
-            .send(req.body)
-            .set({Authorization: token});
-
-        expect(res1.status).toBe(200);
-
-        const forum1 = await Forum.findOne({forumId: 1});
-        expect(forum1.moderatorIds).not.toContain(2);
-    });
 
     test('return 403 for Unauthorized', async () => {
         const req = { body: {
@@ -183,8 +209,23 @@ describe('add/removeModerator', () => {
 
         expect(res.status).toBe(403);
     });
+  });
 
+describe('getAllForums', () => {
+    test('return 200 with correct forums', async () => {
+        const req = { body: {
+            userId: 2,
+            forumId: 1 
+        }};
+
+        const res = await request(app)
+            .get('/forums/');
+
+        const forums = res.body.publicForums;
+        expect(forums.length).toEqual(4);
+    });
 });
+
 
 describe('togglePrivate', () => {
     test('200 for correctly toggling private', async () => {
@@ -231,5 +272,4 @@ describe('togglePrivate', () => {
         expect(res.status).toBe(400);
 
     });
-
 });
