@@ -59,7 +59,7 @@ const userController = {
             data_by_username.password = undefined; // delete password from data.
     
             const token = jwt.sign({ login: data_by_username.login }, JWT_SECRET, {expiresIn: '1hr'});
-            console.log("Token issued: " + token)
+
             return res.status(200).json({data_by_username, token: token});
         } catch (error) {
             console.error("Error in loginUser:", error);

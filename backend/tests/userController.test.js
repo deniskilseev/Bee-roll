@@ -281,3 +281,56 @@ describe('(un)followUser', () => {
         expect(res1.status).toEqual(404);
     });
 });
+
+describe('getUser(byId/byLogin)', () => {
+    test('return 200 if getting correct user is successful', async () => {
+        
+        const uid = 1;
+
+        const res = await request(app)
+            .get('/users/getUser/' + uid);
+        
+        const user_info = res.body.user_info;
+
+        expect(res.status).toEqual(200);
+        const user = await User.findOne({uid: 1});
+
+        expect(user.login).toEqual(user_info.login);
+        expect(user.date_of_birth).toEqual(user_info.date_of_birth);
+        expect(user.followsIds).toEqual(user_info.followsIds);
+    });
+    test('return 404 if user does not exist', async () => {
+        
+        const uid = 0;
+
+        const res = await request(app)
+            .get('/users/getUser/' + 0);
+
+        expect(res.status).toEqual(404);
+    });
+    test('return 200 if getting correct user is successful', async () => {
+        
+        const username = 'denis';
+
+        const res = await request(app)
+            .get('/users/getUserByUsername/' + username);
+        
+        const user_info = res.body.user_info;
+
+        expect(res.status).toEqual(200);
+        const user = await User.findOne({login: username});
+
+        expect(user.login).toEqual(user_info.login);
+        expect(user.date_of_birth).toEqual(user_info.date_of_birth);
+        expect(user.followsIds).toEqual(user_info.followsIds);
+    });
+    test('return 404 if user does not exist', async () => {
+        
+        const username = 'baba';
+
+        const res = await request(app)
+            .get('/users/getUserByUsername/' + username);
+
+        expect(res.status).toEqual(404);
+    });
+});

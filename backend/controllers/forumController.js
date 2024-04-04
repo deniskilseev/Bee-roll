@@ -250,10 +250,18 @@ const forumController = {
     },
 
     async getAllForums(req, res) {
-        console.log("testing forums");
         try {
             const allForums = await Forum.find();
-            return res.status(200).json(allForums);
+            publicForums = []
+            for (const forum of allForums) {
+                if (!forum.isPrivate) {
+                    forum.moderatorIds = undefined;
+                    forum.__v = undefined;
+                    forum.bannedUserIds = undefined;
+                    publicForums.push(forum);
+                }
+            }
+            return res.status(200).json({publicForums});
         } catch (error) {
             console.error("Error in getAllForums:", error);
             res.status(500).json({ error: "Internal server error" });
