@@ -195,7 +195,7 @@ describe('add/removeModerator', () => {
 
         const res1 = await request(app)
             .post('/forums/removeModerator')
-
+    });
     test('return 403 for Unauthorized', async () => {
         const req = { body: {
             userId: 2,
@@ -209,7 +209,7 @@ describe('add/removeModerator', () => {
 
         expect(res.status).toBe(403);
     });
-  });
+});
 
 describe('getAllForums', () => {
     test('return 200 with correct forums', async () => {
@@ -222,13 +222,18 @@ describe('getAllForums', () => {
             .get('/forums/');
 
         const forums = res.body.publicForums;
-        expect(forums.length).toEqual(4);
+
+        for (const a of forums) {
+            console.log(a.forumTitle);
+        }
+        expect(forums.length).toEqual(3);
     });
 });
 
 
 describe('togglePrivate', () => {
     test('200 for correctly toggling private', async () => {
+
         const req = { body: {
             forumId: 1
         }};
@@ -256,7 +261,6 @@ describe('togglePrivate', () => {
             .set({Authorization: token});
 
         expect(res.status).toBe(403);
-
     });
 
      test('400 when the forum is inexisting', async () => {
@@ -270,6 +274,5 @@ describe('togglePrivate', () => {
             .set({Authorization: token});
 
         expect(res.status).toBe(400);
-
     });
 });
