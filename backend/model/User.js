@@ -16,7 +16,10 @@ const userSchema = new Schema({
   reviewIds: [Number],
   followsIds: [Number],
   followersIds: [Number],
-  profilePicture: String
+  profilePicture: {
+    data: { type: Buffer, default: Buffer.from([]) },
+    type: { type: String, default: '' }
+  }
 });
 
 const User = model('User', userSchema);
