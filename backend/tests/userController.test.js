@@ -338,8 +338,7 @@ describe('getUser(byId/byLogin)', () => {
 describe('uploadUserImage', () => {
     test('should upload a profile picture', async () => {
 
-        const userlogin = 'denis';
-        const filePath = '/Users/deniskilseev/Coding/Bee-roll/backend/uploads/image.jpg';    
+        const filePath = 'uploads/image.jpg';    
 
         const response = await request(app)
             .post('/users/loginUser')
@@ -361,8 +360,6 @@ describe('uploadUserImage', () => {
 
         const res = await request(app)
             .get('/users/getProfilePicture/denis');
-        
-        console.log(res);
 
         expect(res.status).toEqual(200);
         expect(res.headers['content-type']).toEqual('image/jpeg');

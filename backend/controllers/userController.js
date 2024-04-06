@@ -4,8 +4,6 @@ const Counter = require('../model/Counter.js')
 const User = require('../model/User.js')
 const JWT_SECRET = require('../secrets/jwt')
 const jwt = require('jsonwebtoken')
-const { uploadProfilePicture } = require('./profileController.js')
-
 
 const userController = {
     async createUser(req, res) {
