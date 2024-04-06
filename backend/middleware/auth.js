@@ -4,7 +4,6 @@ const JWT_SECRET = require('../secrets/jwt')
 const verifyToken = async (req, res, next) => {
   try {
     let token = req.header("Authorization");
-    console.log(token);
 
     if (!token) {
       return res.status(403).send("Access Denied");
@@ -13,7 +12,7 @@ const verifyToken = async (req, res, next) => {
     if (token.startsWith("Bee-roll ")) {
       token = token.slice(9, token.length).trimLeft();
     }
-    console.log(token);
+
     const verified = jwt.verify(token, JWT_SECRET);
 
     req.user = verified;

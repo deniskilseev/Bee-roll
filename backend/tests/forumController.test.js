@@ -223,9 +223,6 @@ describe('getAllForums', () => {
 
         const forums = res.body.publicForums;
 
-        for (const a of forums) {
-            console.log(a.forumTitle);
-        }
         expect(forums.length).toEqual(3);
     });
 });
