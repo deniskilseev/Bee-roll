@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useUser } from './UserContext';
 import axios from 'axios';
 
-const HomePage = ({ }) => {
+const HomePage = () => {
     const { user } = useUser();
     const [posts, setPosts] = useState([]);
     const [postIds, setPostIds] = useState([]);

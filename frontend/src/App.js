@@ -12,6 +12,7 @@ import FollowingPage from './FollowingPage';
 import CreatePostPage from './CreatePost';
 import OtherUserProfile from './OtherUserProfile';
 import ForumSettingsPage from './ForumSettings';
+import MoviePage from './MoviePage';
 import { useUser } from './UserContext';
 
 const App = () => {
@@ -59,6 +60,7 @@ const App = () => {
           <Route path="/forums/:forumName" element={<ForumPage forums={forums} currentUser={dummyUser} />}/>
           <Route path="/followers/:username" element={<FollowersPage />} />
           <Route path="/following/:username" element={<FollowingPage />} />
+          <Route path="/movies/:movieId" element={<MoviePage />} />
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage user={dummyUser} />} />
           <Route path="/forums/:forumName/settings" element={<ForumSettingsPage user={dummyUser} />} />
         </Routes>

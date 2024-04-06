@@ -1,6 +1,6 @@
 // Taskbar.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LoginPageModal from './Modals/LoginPageModal';
 import RegisterPageModal from './Modals/RegisterPageModal';
 import { useUser } from '../UserContext';
@@ -13,6 +13,7 @@ const Taskbar = () => {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const navigate = useNavigate();
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
@@ -35,7 +36,7 @@ const Taskbar = () => {
   };
 
   const toggleSearchBar = () => {
-    setShowSearchBar(!showSearchBar); // Toggle search bar visibility
+    setShowSearchBar(!showSearchBar);
   };
 
   const handleSearchChange = (event) => {
@@ -48,9 +49,22 @@ const Taskbar = () => {
     try {
       const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
       console.log('Search results:', response.data);
-      setSearchResults(response.data.foundMovies.slice(0, 5)); // Limit results to 5
+      setSearchResults(response.data.foundMovies.slice(0, 5));
     } catch (error) {
       console.error('Error fetching search results:', error);
+    }
+  };
+
+  const handleSearchResultClick = async (movieId) => {
+    try {
+      console.log(movieId);
+      const response = await axios.get(`http://localhost:3000/movies/getInfo/${movieId}`);
+      
+      console.log('Movie info:', response.data);
+
+      navigate(`/movies/${movieId}`, { state: { movieInfo: response.data } });
+    } catch (error) {
+      console.error('Error fetching movie info:', error);
     }
   };
 
@@ -102,7 +116,9 @@ const Taskbar = () => {
         {showSearchBar && searchResults.length > 0 && (
           <ul className="list-group mt-2">
             {searchResults.map((result, index) => (
-              <li key={index} className="list-group-item">{result.title}</li>
+              <li key={index} className="list-group-item" onClick={() => handleSearchResultClick(result.movieId)}>
+                {result.title}
+              </li>
             ))}
           </ul>
         )}
