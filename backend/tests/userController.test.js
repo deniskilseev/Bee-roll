@@ -334,3 +334,37 @@ describe('getUser(byId/byLogin)', () => {
         expect(res.status).toEqual(404);
     });
 });
+
+describe('uploadUserImage', () => {
+    test('should upload a profile picture', async () => {
+
+        const userlogin = 'denis';
+        const filePath = '/Users/deniskilseev/Coding/Bee-roll/backend/uploads/image.jpg';    
+
+        const response = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"});
+
+        const token = response.body.token;
+
+        const res = await request(app)
+            .post('/users/uploadProfilePicture')
+            .attach('profile-picture', filePath)
+            .set({Authorization: 'Bee-roll ' + token});
+
+        const user = await User.findOne({login: 'denis'});
+
+        expect(res.statusCode).toEqual(200);
+        expect(user.profilePicture).toBeTruthy();
+    });
+    test('200 when requesting existing image', async () => {
+
+        const res = await request(app)
+            .get('/users/getProfilePicture/denis');
+        
+        console.log(res);
+
+        expect(res.status).toEqual(200);
+        expect(res.headers['content-type']).toEqual('image/jpeg');
+    });
+  }, 20 * 1000);

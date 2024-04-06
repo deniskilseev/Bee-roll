@@ -6,9 +6,6 @@ module.exports = {
     coverageDirectory: 'coverage',
     collectCoverageFrom: [
         'controllers/*.js',
-        'model/*.js',
         'middleware/*.js',
-        'routes/*.js',
-        '*.js',
       ]
 };
