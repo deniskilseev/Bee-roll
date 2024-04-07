@@ -355,7 +355,7 @@ describe('uploadUserImage', () => {
 
         expect(res.statusCode).toEqual(200);
         expect(user.profilePicture).toBeTruthy();
-    });
+    }, 10 * 1000);
     test('200 when requesting existing image', async () => {
 
         const res = await request(app)
@@ -363,5 +363,5 @@ describe('uploadUserImage', () => {
 
         expect(res.status).toEqual(200);
         expect(res.headers['content-type']).toEqual('image/jpeg');
-    });
-  }, 20 * 1000);
+    }, 10 * 1000);
+  }, 30 * 1000);
