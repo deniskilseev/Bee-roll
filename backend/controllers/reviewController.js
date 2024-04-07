@@ -10,13 +10,15 @@ const predictController = require('./predictController')
 const reviewController = {
     async createReview(req, res) {
         try {
-           const {user_id, movie_id, review} = req.body;
-            
-            const user_data = await User.findOne( {uid: user_id} );
+            const {movie_id, review} = req.body;
+
+            const user_data = await User.findOne( {login: req.user.login } );
 
             if (!user_data) {
                 return res.status(400).json( {error: "User does not exist"} );
             }
+
+            const user_id = user_data.uid;
 
             const movie_data = await Movie.findOne( {movieId: movie_id} );
             
@@ -65,13 +67,13 @@ const reviewController = {
 
     async getReviews(req, res) {
         try {
-            const {user_id} = req.params;
-            
-            const user_data = await User.findOne( {uid: user_id} );
+            const user_data = await User.findOne( {login: req.user.login} );
 
             if (!user_data) {
                 return res.status(400).json( {error: "User does not exist"} );
             }
+
+            const user_id = user_data.uid;
 
             const review_data = await Review.find( {userId: user_id} );
 
@@ -86,6 +88,8 @@ const reviewController = {
     async updateReview(req, res) {
         try {
             const {review_id, review} = req.body;
+
+            const user_data = await User.findOne( {login: req.user.login} );
             
             const review_data = await Review.findOne( {reviewId: review_id} );
 
@@ -97,12 +101,16 @@ const reviewController = {
                 return res.status(400).json( {error: "Review should be between 0 and 5"} );
             }
 
-            await Review.findOneAndUpdate({reviewId: review_id}, {review: review});
-
             const user_id = review_data.userId;
-            await predictController.updateUser(user_id);
 
-            return res.status(200).json( {reviews: review_data} );
+            if (user_data.uid == user_id) {
+                await Review.findOneAndUpdate({reviewId: review_id}, {review: review});
+
+                await predictController.updateUser(user_id);
+
+                return res.status(200).json( {reviews: review_data} );
+            }
+            return res.status(403).json( {error: "Unauthorized"} );
 
         } catch (error) {
             console.error("Error in updateReview:", error);
@@ -116,30 +124,32 @@ const reviewController = {
 
             const review_data = await Review.findOne( {reviewId: review_id });
 
+            const user_data = await User.findOne( {login: req.user.login} );
+
             if (!review_data) {
                 return res.status(400).json( {error: "Review does not exist"} );
             }
 
-            const user_id = review_data.userId
-            const user_data = await User.findOne( {uid: user_id} );
+            const user_id = review_data.userId;
 
             if (!user_data) {
                 return res.status(400).json( {error: "User does not exist"} );
             }
 
-            const review_list = user_data.reviewIds;
+            if (user_data.uid == user_id) {
+                const review_list = user_data.reviewIds;
+                const index = review_list.indexOf(review_id);
 
-            const index = review_list.indexOf(review_id);
+                if (index != -1) {
+                    review_list.splice(index, 1);
+                }
 
-            if (index != -1) {
-                review_list.splice(index, 1);
+                await Review.deleteOne( {reviewId: review_id} );
+                await User.findOneAndUpdate( {uid: user_id}, {reviewIds: review_list} );
+                await predictController.updateUser(user_id);
+                res.status(200).json( {message: "Deleted the review successfully"} );
             }
-
-            await Review.deleteOne({reviewId: review_id});
-            await User.findOneAndUpdate({uid: user_id}, {reviewIds: review_list});
-            await predictController.updateUser(user_id);
-            res.status(200).json( {message: "Deleted the review successfully"} );
-
+            return res.status(403).json( {error: "Unauthorized"} );
         } catch (error) {
             console.error("Error in deleteReview:", error);
             return res.status(500).json( {error: "Internal server error"} );
