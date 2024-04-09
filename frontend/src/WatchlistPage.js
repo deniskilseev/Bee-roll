@@ -2,25 +2,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Watchlist from './components/Watchlist';
 import { useUser } from './UserContext';
-// import watchlists from './dummyWatchlistData';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const WatchlistsPage = ({ user }) => {
+const WatchlistsPage = ({ }) => {
   const [watchlists, setWatchlists] = useState([]);
   const { updateWatchlists } = useUser();
+  const { user } = useUser();
+  const token = user.userData.token;
 
   const createWatchlist = async () => {
+    //TODO: Fix create watchlist
     try {
       const response = await fetch('http://localhost:3000/watchlists/createWatchlist', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bee-roll ${authToken}',
-          'Content-Type': 'application/json'
+          'Authorization': `Bee-roll ${token}`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: user.username,
+          username: user.userData.data_by_username.login,
           is_public: false,
-          watchlist_title: 'New Watchlist',
+          watchlist_title: 'New Watchlist 3',
         }),
       });
 
@@ -46,8 +48,8 @@ const WatchlistsPage = ({ user }) => {
       const response = await fetch(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
         method: 'GET',
         headers: {
-          'Authorization': 'Bee-roll ${authToken}',
-          'Content-Type': 'application/json'
+          'Authorization': `Bee-roll ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -70,9 +72,8 @@ const WatchlistsPage = ({ user }) => {
   }, [watchlists]);
 
   useEffect(() => {
-    // Fetch initial watchlists when the component mounts
     const fetchInitialWatchlists = async () => {
-      for (const watchListId of user.watchlists) {
+      for (const watchListId of user.userData.data_by_username.watchListsIds) {
         await fetchWatchlist(watchListId);
       }
     };

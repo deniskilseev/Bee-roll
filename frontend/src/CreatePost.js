@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
+import { useUser } from './UserContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const CreatePost = ({ user }) => {
+const CreatePost = ({ }) => {
     const navigate = useNavigate();
     const { forumName } = useParams()
     const [postTitle, setPostTitle] = useState('');
     const [postText, setPostText] = useState('');
     const userId = user.id;
+    const { user } = useUser();
+    const { token } = user;
 
     // console.log('forumId:', params)
 
@@ -21,14 +24,18 @@ const CreatePost = ({ user }) => {
             };
             console.log('New post:', newPost);
 
+            // Send post data to the backend
             const headers = {
-              'Authorization': 'Bee-roll ${authToken}',
+              'Authorization': `Bee-roll ${token}`,
               'Content-Type': 'application/json'
             };
 
             await axios.post('http://localhost:3000/posts/createPost', newPost, { headers });
 
+            // Optionally, you can redirect the user to the forum page after post creation
+            // navigate(`/forums/${forumId}`);
 
+            // Clear input fields after successful post creation
             setPostTitle('');
             setPostText('');
             } catch (error) {
@@ -37,6 +44,7 @@ const CreatePost = ({ user }) => {
         };
 
   const handleCancel = () => {
+    // Go back to the previous page
     navigate(-1);
   };
 

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useUser } from './UserContext';
+
 
 const ForumPage = ({ forums, currentUser }) => {
   const { forumName } = useParams();
@@ -9,26 +11,14 @@ const ForumPage = ({ forums, currentUser }) => {
   const [forum, setForum] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [forums, setForums] = useState([])
+
+  const { user } = useUser();
+  const { token } = user;
 
   const handleSettingsClick = () => {
     // Navigate to forum settings page when settings button is clicked
     navigate(`/forums/${forumName}/settings`);
   };
-
-  useEffect(() => {
-    const fetchForums = async () => {
-      try {
-        console.log("testing frontend forum");
-        const response = await axios.get('http://localhost:3000/forums/forums');
-        setForum(response.data);
-      } catch (error) {
-        console.error('Error fetching forums:', error);
-      }
-    };
-
-    fetchForums();
-  }, []);
   
   useEffect(() => {
     const fetchForumData = async () => {
@@ -52,7 +42,12 @@ const ForumPage = ({ forums, currentUser }) => {
     try {
       const postsData = await Promise.all(
         forum.postIds.map(async (postId) => {
-          const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
+          const headers = {
+            'Authorization': `Bee-roll ${token}`,
+            'Content-Type': 'application/json'
+          };
+
+          const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
           const postData = response.data;
           const userResponse = await axios.get(`http://localhost:3000/users/getuser/${postData.post_info.userId}`);
           const userData = userResponse.data;
@@ -75,7 +70,7 @@ const ForumPage = ({ forums, currentUser }) => {
 
   const handlePinClick = (postId) => {
     const headers = {
-      'Authorization': 'Bee-roll ${authToken}',
+      'Authorization': `Bee-roll ${token}`,
       'Content-Type': 'application/json'
     };
 
@@ -92,11 +87,11 @@ const ForumPage = ({ forums, currentUser }) => {
     const isConfirmed = window.confirm("Are you sure you want to delete this post?");
     if (isConfirmed) {
       const headers = {
-        'Authorization': 'Bee-roll ${authToken}',
+        'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
 
-      axios.delete(`http://localhost:3000/forums/deletePost/${postId}`, { headers })
+      axios.delete(`http://localhost:3000/posts/deletePost/${postId}`, { headers })
         .then(response => {
           console.log('Post deleted successfully:', response.data);
         })
@@ -122,16 +117,6 @@ const ForumPage = ({ forums, currentUser }) => {
   
   return (
     <div className="container mt-5">
-
-      <h1>All Forums</h1>
-      <div className="list-group">
-        {forums.map((forum) => (
-          <Link key={forum.forumId} to={`/forums/${forum.forumId}`} className="list-group-item list-group-item-action">
-            {forum.forumTitle}
-          </Link>
-        ))}
-      </div>
-
       <h1>{forum.title}</h1>
 
       {isOwner && (

@@ -1,46 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import PostList from './components/PostList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import plusIcon from './assets/edit.png';
 import axios from 'axios';
 import { useUser } from './UserContext';
 
-const Profile = ({ user }) => {
+const Profile = ({ }) => {
+  const { user } = useUser();
+  const token = user.userData.token;
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
   const [profilePicture, setProfilePicture] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
   const { updateUser } = useUser();
-
+  
   const handleEditClick = () => {
     setEditing(true);
   };
 
   const handleSaveClick = async () => {
     try {
-      //const { posts, id, ...userWithoutPosts } = editedUser;
-
-      console.log(editedUser) //print edits to console
-      const { username, bio, profilePicture } = editedUser;
-
-      const userWithoutPosts = {
-        uid: user.id, // Assuming user object has uid field
+      const { username, password, email } = editedUser;
+      // Dummy date of birth constant
+      const dummyDateOfBirth = "1990-01-01"; // Modify as needed
+  
+      const updatedUser = {
+        oldUser: user.username,
         username,
-        bio,
-        profilePicture
+        email: user.email, // Keep the original email
+        date_of_birth: dummyDateOfBirth // Use the dummy date of birth
+      };
+
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
       };
   
-      const response = await fetch('http://localhost:3000/profile/updateprofile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userWithoutPosts),
-      });
-      console.log("Testing the body: ", JSON.stringify(userWithoutPosts));
+      const response = await axios.put('http://localhost:3000/users/putuser', updatedUser, { headers });
   
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error('Failed to save changes');
+      }
+
+      updateUser({ ...editedUser});
+
+      if (profilePicture && isEditing) {
+        const formData = new FormData();
+        formData.append('profilePicture', profilePicture);
+        const headers = {
+          'Authorization': `Bee-roll ${token}`,
+          'Content-Type': 'multipart/form-data'
+        };
+        await axios.post('http://localhost:3000/users/uploadprofilepicture', formData, { headers });
       }
   
       setEditing(false);
@@ -62,48 +74,47 @@ const Profile = ({ user }) => {
     }));
   };
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
-    const formData = new FormData();
-    console.log("file? ", file)
-    formData.append('profilePicture', file);
-    formData.append('userId', user.id);
-    for (var key of formData.entries()) {
-      console.log(key[0] + ', ' + key[1]);
-    }
-
-    console.log("formData: ", formData);
-
-    try {
-      const response = await fetch('http://localhost:3000/profile/upload-profile-picture', {
-        method: 'POST',
-        body: formData,
-      });
-      if (!response.ok) {
-        throw new Error('Failed to upload profile picture');
-      }
-      const responseData = await response.json(); // Parse JSON once
-      setProfilePicture(responseData.profilePicture);
-      setEditedUser(prevUser => ({ ...prevUser, profilePicture: responseData.profilePicture })); // Update editedUser state with the new profile picture
-      if (response.ok) {
-        console.log('Profile retrieved', responseData);
-        updateUser(responseData);
-        navigate(`/profile/${responseData.userId}`); // Redirect to the profile page
-      } else {
-        console.error('Retrieval failed');
-        // Handle failed scenarios
-      }
-    } catch (error) {
-      console.error('Error uploading profile picture:', error.message);
-      // Handle error (e.g., display error message to the user)
-    }
+    setProfilePicture(file);
   };
-  
-  
 
   const handleWatchlistsClick = () => {
     navigate('/watchlists');
   };
+
+
+  useEffect(() => {
+    const fetchPostData = async () => {
+      if (user.userData && user.userData.data_by_username.postsIds) { // Check if user and user.postsIds are not null
+        try {
+          const postsData = await Promise.all(
+            user.userData.data_by_username.postsIds.map(async (postId) => {
+              const headers = {
+                'Authorization': `Bee-roll ${token}`,
+                'Content-Type': 'application/json'
+              };
+              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+              const postData = postResponse.data.post_info;
+    
+              // Fetch user data for the post
+              const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
+              const userData = userResponse.data.user_info;
+    
+              // Combine post data with user data
+              return { ...postData, user: userData.login };
+            })
+          );
+          
+          setPosts(postsData);
+        } catch (error) {
+          console.error('Error fetching posts:', error);
+        }
+      }
+    };
+    
+    fetchPostData();
+  }, [user]);
 
   return (
     <div className="container mt-4">
@@ -115,7 +126,7 @@ const Profile = ({ user }) => {
                 <label htmlFor="profile-picture" className="edit-profile-picture">
                   <div className="d-flex justify-content-center align-items-center">
                     <img
-                      src={editedUser.profilePicture || plusIcon}
+                      src={editedUser.userData.data_by_username.profilePicture || plusIcon}
                       alt="User Avatar"
                       className="avatar img-fluid"
                     />
@@ -133,11 +144,10 @@ const Profile = ({ user }) => {
                     onChange={handleImageChange}
                     style={{ display: 'none' }}
                   />
-
                 </label>
               )}
               {!isEditing && (
-                <img src={editedUser.profilePicture} alt="User Avatar" className="avatar img-fluid" />
+                <img src={editedUser.userData.data_by_username.profilePicture} alt="User Avatar" className="avatar img-fluid" />
               )}
               <h2 className="username mt-3">
                 {isEditing ? (
@@ -149,7 +159,7 @@ const Profile = ({ user }) => {
                     className="form-control text-center"
                   />
                 ) : (
-                  editedUser.username
+                  editedUser.userData.data_by_username.login
                 )}
               </h2>
               <p className="bio text-center">
@@ -157,12 +167,12 @@ const Profile = ({ user }) => {
                   <input
                     type="text"
                     name="bio"
-                    value={editedUser.bio}
+                    value={editedUser.userData.data_by_username.bio}
                     onChange={handleInputChange}
                     className="form-control"
                   />
                 ) : (
-                  editedUser.bio || 'No bio available'
+                  editedUser.userData.data_by_username.bio || 'No bio available'
                 )}
               </p>
               {isEditing && (
@@ -190,27 +200,23 @@ const Profile = ({ user }) => {
               <div className="row">
                 <div className="col-md-6 text-center">
                   <Link
-                      to="/followers"
+                      to={`/followers/${editedUser.userData.data_by_username.username}`}
                       style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
                     >
                       <div className='bio-follow-header'>
                         <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
-                        {editedUser.followers && (
-                        <p className='bio-follows'>{editedUser.followers.length}</p>
-                        )}
+                        <p className='bio-follows'>{editedUser.userData.data_by_username.followersIds.length}</p>
                       </div>
                   </Link>
                 </div>
                 <div className="col-md-6 text-center">
                     <Link
-                        to="/following"
+                        to={`/following/${editedUser.userData.data_by_username.username}`}
                         style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
                       >
                         <div className='bio-follow-header'>
                           <h3 style={{ fontSize: 'inherit' }}>Following</h3>
-                          {editedUser.following && (
-                          <p className='bio-follows'>{editedUser.following.length}</p>
-                          )}
+                          <p className='bio-follows'>{editedUser.userData.data_by_username.followsIds.length}</p>
                         </div>
                     </Link>
                 </div>
@@ -218,7 +224,15 @@ const Profile = ({ user }) => {
             </div>
             <div className="card-footer">
               <h3 className="font-weight-bold">Posts</h3>
-              <PostList posts={editedUser.posts} />
+              {posts.map((post) => (
+                <div key={post.postId} className="card mb-3">
+                  <div className="card-body">
+                    <h5 className="card-title">{post.postTitle}</h5>
+                    <p className="card-text">{post.postText}</p>
+                    <p className="card-text">Posted By: {post.user}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

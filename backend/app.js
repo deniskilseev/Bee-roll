@@ -38,7 +38,7 @@ const uri = `mongodb://${username}:${password}@${host}:${portMongo}/${dbName}`;
 // Connect to MongoDB
 mongoose.connect(uri, {
     useUnifiedTopology: true,
-    dbName: 'testDatabase'
+    dbName: 'prodDatabase'
   })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('Error connecting to MongoDB:', err));

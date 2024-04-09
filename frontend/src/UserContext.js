@@ -1,13 +1,15 @@
 import React, { createContext, useContext, useState } from 'react';
 
-
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({
+    userData: null,
+    token: null
+  });
 
-  const updateUser = (userData) => {
-    setUser((prevUser) => ({ ...prevUser, ...userData }));
+  const updateUser = (userData, token) => {
+    setUser(prevUser => ({ ...prevUser, userData, token }));
   };
 
   const updateWatchlists = (newWatchlist) => {
@@ -22,7 +24,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const logout = () => {
-    setUser(null);
+    setUser({ userData: null, token: null });
   };
 
   return (

@@ -1,12 +1,15 @@
 // CreateForumPage.js
 import React, { useState } from 'react';
+import { useUser } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CreateForumPage = ({ onForumCreate, user }) => {
+const CreateForumPage = ({ onForumCreate }) => {
   const navigate = useNavigate();
   const [forumTitle, setForumTitle] = useState('');
   const [forumDescription, setForumDescription] = useState('');
+  const { user } = useUser();
+  const { token } = user;
 
   const handleCreateForum = async () => {
     const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
@@ -20,7 +23,7 @@ const CreateForumPage = ({ onForumCreate, user }) => {
 
     try {
       const headers = {
-        'Authorization': 'Bee-roll ${authToken}',
+        'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
 
