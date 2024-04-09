@@ -8,6 +8,7 @@ import { useUser } from './UserContext';
 const Profile = ({ user }) => {
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
+  const [profilePicture, setProfilePicture] = useState(null);
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
   const { updateUser } = useUser();
@@ -42,6 +43,16 @@ const Profile = ({ user }) => {
       }
 
       updateUser({ ...editedUser});
+
+      if (profilePicture && isEditing) {
+        const formData = new FormData();
+        formData.append('profilePicture', profilePicture);
+        await axios.post('http://localhost:3000/users/uploadprofilepicture', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      }
   
       setEditing(false);
     } catch (error) {
@@ -63,8 +74,8 @@ const Profile = ({ user }) => {
   };
 
   const handleImageChange = (e) => {
-    // const file = e.target.files[0];
-    // Add logic to handle image change and update editedUser.profilePicture
+    const file = e.target.files[0];
+    setProfilePicture(file);
   };
 
   const handleWatchlistsClick = () => {
