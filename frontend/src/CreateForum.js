@@ -4,14 +4,15 @@ import { useUser } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CreateForumPage = ({ onForumCreate }) => {
+const CreateForumPage = ({ }) => {
   const navigate = useNavigate();
   const [forumTitle, setForumTitle] = useState('');
   const [forumDescription, setForumDescription] = useState('');
   const { user } = useUser();
-  const { token } = user;
+  const token = user.userData.token;
 
   const handleCreateForum = async () => {
+    // TODO: Forums not being created correctly
     const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
 
     console.log(user);
@@ -29,14 +30,11 @@ const CreateForumPage = ({ onForumCreate }) => {
 
       const response = await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
       const createdForum = response.data;
-  
-      onForumCreate(createdForum);
+
       navigate(`/forums/${forumName}`);
     } catch (error) {
       console.error('Error creating forum:', error);
     }
-
-    onForumCreate(newForum);
 
     navigate(`/forums/${forumName}`);
   };

@@ -8,13 +8,13 @@ import axios from 'axios';
 import { useUser } from './UserContext';
 
 
-const OtherUserProfile = ( {currentUser} ) => {
+const OtherUserProfile = ( { } ) => {
   const { username } = useParams(); // Extract uid parameter from URL
   const [otherUser, setOtherUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const { user } = useUser();
-  const { token } = otherUser;
+  const token = user.userData.token;
 
   useEffect(() => {
     // Fetch user profile data using username
@@ -56,7 +56,7 @@ const OtherUserProfile = ( {currentUser} ) => {
   }, [otherUser]);
 
   const handleFollow = async () => {
-    console.log('Current User:', currentUser);
+    console.log('Current User:', user);
     console.log('User followed/unfollowed:', otherUser);
 
     try {
@@ -66,7 +66,7 @@ const OtherUserProfile = ( {currentUser} ) => {
         'Content-Type': 'application/json'
       };
       await axios.post(`http://localhost:3000${endpoint}`, {
-        user_follower: currentUser.username,
+        user_follower: user.username,
         user_followed: otherUser.login
       }, { headers });
       setIsFollowing(!isFollowing);

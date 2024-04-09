@@ -8,9 +8,10 @@ const CreatePost = ({ }) => {
     const { forumName } = useParams()
     const [postTitle, setPostTitle] = useState('');
     const [postText, setPostText] = useState('');
-    const userId = user.id;
     const { user } = useUser();
-    const { token } = user;
+    console.log('user:', user)
+    const userId = user.id;
+    const token = user.userData.token;
 
     // console.log('forumId:', params)
 

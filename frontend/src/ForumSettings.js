@@ -11,13 +11,15 @@ const ForumSettings = ({ }) => {
     const [newModerator, setNewModerator] = useState('');
     const [isPublic, setIsPublic] = useState(true);
     const { user } = useUser();
-    const { token } = user;
+    const token = user.userData.token;
 
     const handleAddModerator = async () => {
         if (newModerator && !moderators.includes(newModerator)) {
             try {
                 const userResponse = await axios.get(`http://localhost:3000/users/getUserByUsername/${newModerator}`);
                 const userToAdd = userResponse.data.user_info;
+                console.log('Forum:', forum)
+                console.log('User:', user)
 
                 if (userToAdd) {
                     const moderatorData = {

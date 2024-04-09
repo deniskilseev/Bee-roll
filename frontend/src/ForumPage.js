@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useUser } from './UserContext';
 
 
-const ForumPage = ({ forums, currentUser }) => {
+const ForumPage = ({ }) => {
   const { forumName } = useParams();
   const navigate = useNavigate();
 
@@ -13,7 +13,8 @@ const ForumPage = ({ forums, currentUser }) => {
   const [posts, setPosts] = useState([]);
 
   const { user } = useUser();
-  const { token } = user;
+  console.log('ForumName:', forum)
+  const token = user.userData.token;
 
   const handleSettingsClick = () => {
     // Navigate to forum settings page when settings button is clicked
@@ -26,14 +27,14 @@ const ForumPage = ({ forums, currentUser }) => {
         const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
         const fetchedForum = response.data;
         setForum(fetchedForum);
-        setIsOwner(currentUser.id === fetchedForum.creatorId);
+        setIsOwner(user.userData.data_by_username.uid === fetchedForum.creatorId);
       } catch (error) {
         console.error('Error fetching forum:', error);
       }
   };
 
     fetchForumData();
-  }, [forumName, currentUser]);
+  }, [forumName, user]);
 
   useEffect(() => {
     if (!forum) return;

@@ -17,7 +17,6 @@ import { useUser } from './UserContext';
 
 const App = () => {
   const { user } = useUser();
-  const [forums, setForums] = useState([]);
 
   const dummyUser = user.userData
   ? {
@@ -43,10 +42,6 @@ const App = () => {
     watchlists: []
   };
 
-  const addForum = (forum) => {
-    setForums([...forums, forum]);
-  };
-
   return (
     <Router>
       <div className="app">
@@ -54,10 +49,10 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/user/profile/:username" element={<OtherUserProfile currentUser={dummyUser} />} />
-          <Route path="/createforum" element={<CreateForumPage onForumCreate={addForum} />}/>
+          <Route path="/user/profile/:username" element={<OtherUserProfile />} />
+          <Route path="/createforum" element={<CreateForumPage />}/>
           <Route path="/watchlists" element={<WatchlistPage />} />
-          <Route path="/forums/:forumName" element={<ForumPage forums={forums} currentUser={dummyUser} />}/>
+          <Route path="/forums/:forumName" element={<ForumPage currentUser={dummyUser} />}/>
           <Route path="/followers/:username" element={<FollowersPage />} />
           <Route path="/following/:username" element={<FollowingPage />} />
           <Route path="/movies/:movieId" element={<MoviePage />} />
