@@ -39,10 +39,14 @@ const Watchlist = ({ watchlist }) => {
 
   const addToWatchlist = async (movieId) => {
     try {
+      const headers = {
+        'Authorization': 'Bee-roll ${authToken}',
+        'Content-Type': 'application/json'
+      };
       const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
         watchlist_id: watchlist.data_by_id.watchListId,
         movie_id: movieId
-      });
+      }, { headers });
       console.log('Added to watchlist:', response.data);
     } catch (error) {
       console.error('Error adding to watchlist:', error);

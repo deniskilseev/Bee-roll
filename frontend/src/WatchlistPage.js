@@ -14,7 +14,8 @@ const WatchlistsPage = ({ user }) => {
       const response = await fetch('http://localhost:3000/watchlists/createWatchlist', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': 'Bee-roll ${authToken}',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           username: user.username,
@@ -44,6 +45,10 @@ const WatchlistsPage = ({ user }) => {
 
       const response = await fetch(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
         method: 'GET',
+        headers: {
+          'Authorization': 'Bee-roll ${authToken}',
+          'Content-Type': 'application/json'
+        },
       });
 
       if (response.ok) {

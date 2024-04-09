@@ -33,7 +33,11 @@ const OtherUserProfile = ( {currentUser} ) => {
         try {
           const postsData = await Promise.all(
             user.postsIds.map(async (postId) => {
-              const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
+              const headers = {
+                'Authorization': 'Bee-roll ${authToken}',
+                'Content-Type': 'application/json'
+              };
+              const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
               return response.data.post_info; // Extract post_info object from response data
             })
           );
@@ -54,10 +58,14 @@ const OtherUserProfile = ( {currentUser} ) => {
 
     try {
       const endpoint = isFollowing ? '/users/unfollowUser' : '/users/followUser';
+      const headers = {
+        'Authorization': 'Bee-roll ${authToken}',
+        'Content-Type': 'application/json'
+      };
       await axios.post(`http://localhost:3000${endpoint}`, {
         user_follower: currentUser.username,
         user_followed: user.login
-      });
+      }, { headers });
       setIsFollowing(!isFollowing);
     } catch (error) {
       console.error('Error toggling follow status:', error);

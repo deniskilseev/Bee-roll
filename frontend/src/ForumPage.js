@@ -74,7 +74,12 @@ const ForumPage = ({ forums, currentUser }) => {
   }
 
   const handlePinClick = (postId) => {
-    axios.post('http://localhost:3000/posts/pinPost', { postId: postId, forumId: forum.forumId })
+    const headers = {
+      'Authorization': 'Bee-roll ${authToken}',
+      'Content-Type': 'application/json'
+    };
+
+    axios.post('http://localhost:3000/posts/pinPost', { postId: postId, forumId: forum.forumId }, { headers })
       .then(response => {
         console.log('Post pinned successfully:', response.data);
       })
@@ -86,7 +91,12 @@ const ForumPage = ({ forums, currentUser }) => {
   const handleDeleteClick = (postId) => {
     const isConfirmed = window.confirm("Are you sure you want to delete this post?");
     if (isConfirmed) {
-      axios.delete(`http://localhost:3000/forums/deletePost/${postId}`)
+      const headers = {
+        'Authorization': 'Bee-roll ${authToken}',
+        'Content-Type': 'application/json'
+      };
+
+      axios.delete(`http://localhost:3000/forums/deletePost/${postId}`, { headers })
         .then(response => {
           console.log('Post deleted successfully:', response.data);
         })

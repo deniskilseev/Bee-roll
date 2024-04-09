@@ -10,7 +10,7 @@ const MoviePage = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const response = await fetch('http://localhost:3000/movies/getMovies'); // Assuming '/api/movies' is the endpoint to fetch all movies
+        const response = await fetch('http://localhost:3000/movies/getMovies');
         if (!response.ok) {
           throw new Error('Failed to fetch movies');
         }

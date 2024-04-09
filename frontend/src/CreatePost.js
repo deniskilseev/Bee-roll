@@ -21,13 +21,14 @@ const CreatePost = ({ user }) => {
             };
             console.log('New post:', newPost);
 
-            // Send post data to the backend
-            await axios.post('http://localhost:3000/posts/createPost', newPost);
+            const headers = {
+              'Authorization': 'Bee-roll ${authToken}',
+              'Content-Type': 'application/json'
+            };
 
-            // Optionally, you can redirect the user to the forum page after post creation
-            // navigate(`/forums/${forumId}`);
+            await axios.post('http://localhost:3000/posts/createPost', newPost, { headers });
 
-            // Clear input fields after successful post creation
+
             setPostTitle('');
             setPostText('');
             } catch (error) {
@@ -36,7 +37,6 @@ const CreatePost = ({ user }) => {
         };
 
   const handleCancel = () => {
-    // Go back to the previous page
     navigate(-1);
   };
 

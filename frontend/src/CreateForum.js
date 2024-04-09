@@ -19,7 +19,12 @@ const CreateForumPage = ({ onForumCreate, user }) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:3000/forums/createForum', newForum);
+      const headers = {
+        'Authorization': 'Bee-roll ${authToken}',
+        'Content-Type': 'application/json'
+      };
+
+      const response = await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
       const createdForum = response.data;
   
       onForumCreate(createdForum);

@@ -25,7 +25,13 @@ const ForumSettings = ({ user }) => {
                         who_adds_id: user.id,
                         forum_id: forum.forumId
                     };
-                    await axios.post('http://localhost:3000/forums/addModerator', moderatorData);
+
+                    const headers = {
+                        'Authorization': 'Bee-roll ${authToken}',
+                        'Content-Type': 'application/json'
+                    };
+
+                    await axios.post('http://localhost:3000/forums/addModerator', moderatorData, { headers });
                     setModerators([...moderators, newModerator]);
                     setNewModerator('');
                 } else {
@@ -40,9 +46,14 @@ const ForumSettings = ({ user }) => {
     const handleTogglePrivacy = () => {
         setIsPublic(prevState => !prevState);
         // Send POST request to toggle forum privacy
+        const headers = {
+            'Authorization': 'Bee-roll ${authToken}',
+            'Content-Type': 'application/json'
+        };
+
         axios.post('http://localhost:3000/forums/togglePrivate', {
             forumId: forum.forumId,
-        })
+        }, { headers })
         .then(response => {
             console.log('Privacy toggled successfully');
         })
@@ -81,11 +92,16 @@ const ForumSettings = ({ user }) => {
 
         console.log('Forum:', forum.forumId);
 
+        const headers = {
+            'Authorization': 'Bee-roll ${authToken}',
+            'Content-Type': 'application/json'
+        };
+
         axios.post('http://localhost:3000/forums/removeModerator', {
             to_remove_id: userResponse.data.user_info.uid,
             who_removes_id: user.id,
             forum_id: forum.forumId,
-        })
+        }, { headers })
         .then(response => {
             setModerators(prevModerators => prevModerators.filter(m => m !== moderator));
             console.log('Moderator Deleted Successfully');

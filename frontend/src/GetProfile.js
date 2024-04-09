@@ -17,8 +17,8 @@ const GetProfile = () => {
         const response = await fetch('http://localhost:3000/users/getUserProfile/${username}', {
           method: 'GET',
           headers: {
-            // Include any necessary headers, such as authorization if needed
-            'Content-Type': 'application/json',
+            'Authorization': 'Bee-roll ${authToken}',
+            'Content-Type': 'application/json'
           },
         });
 

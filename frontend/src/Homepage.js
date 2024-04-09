@@ -11,9 +11,13 @@ const HomePage = ({ user:propUser }) => {
       const sendPostRequest = async () => {
           try {
               console.log('User:', user.data_by_username.login);
+              const headers = {
+                'Authorization': 'Bee-roll ${authToken}',
+                'Content-Type': 'application/json'
+              };
               const response = await axios.post('http://localhost:3000/posts/getRecentPosts', {
                   user_login: user.data_by_username.login
-              });
+              }, { headers });
 
               setPostIds(response.data);
           } catch (error) {
@@ -33,7 +37,11 @@ const HomePage = ({ user:propUser }) => {
           const postsData = await Promise.all(
             postIds.posts.map(async (postId) => {
               // Fetch post data
-              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
+              const headers = {
+                'Authorization': 'Bee-roll ${authToken}',
+                'Content-Type': 'application/json'
+              };
+              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
               const postData = postResponse.data.post_info;
     
               // Fetch user data for the post
