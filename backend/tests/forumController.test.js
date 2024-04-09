@@ -43,7 +43,7 @@ afterAll(() => {
 describe('createForum', () => {
     test('return 201 & correct fields if forum is created correctly', async () => {
         const req = { body: {
-            forumTitle: "Tanks"
+            forumTitle: "tanks"
         }};
 
         const res = await request(app)
@@ -53,9 +53,9 @@ describe('createForum', () => {
 
         expect(res.status).toBe(201);
 
-        const forum = await Forum.findOne({forumTitle: "Tanks"})
+        const forum = await Forum.findOne({forumTitle: "tanks"})
 
-        expect(forum.forumTitle).toEqual('Tanks');
+        expect(forum.forumTitle).toEqual('tanks');
         expect(forum.userIds).toEqual([1]);
         expect(forum.creatorId).toEqual(1);
 
@@ -63,7 +63,7 @@ describe('createForum', () => {
 
     test('return 400 when creating forum with existing name', async () => {
         const req = { body: {
-            forumTitle: "Apples",
+            forumTitle: "apples",
         }};
 
         const res = await request(app)
@@ -76,7 +76,7 @@ describe('createForum', () => {
 
     test('join a forum with real user – 201', async () => {
 
-        var forum = await Forum.findOne({forumTitle: "Cars"});
+        var forum = await Forum.findOne({forumTitle: "cars"});
 
         expect(forum).toBeTruthy();
 
@@ -91,7 +91,7 @@ describe('createForum', () => {
 
         expect(res.status).toBe(201);
 
-        forum = await Forum.findOne({forumTitle: "Cars"});
+        forum = await Forum.findOne({forumTitle: "cars"});
         const user = await User.findOne({login: "denis"});
 
         expect(forum.userIds).toContain(user.uid);
@@ -194,7 +194,7 @@ describe('add/removeModerator', () => {
         expect(forum.moderatorIds).toContain(2);
 
         const res1 = await request(app)
-            .post('/forums/removeModerator')
+            .post('/forums/removeModerator');
     });
     test('return 403 for Unauthorized', async () => {
         const req = { body: {
@@ -273,3 +273,67 @@ describe('togglePrivate', () => {
         expect(res.status).toBe(400);
     });
 });
+
+describe('changeTitle', () => {
+
+    test('200 when title is valid', async () => {
+        const req = { body: {
+            forumId: 1,
+            forumTitle: "books"
+        }};
+
+        const res = await request(app)
+            .put('/forums/changeTitle')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const forum_info = await Forum.findOne({forumId: 1});
+
+        expect(forum_info.forumTitle).toBe("books");
+    });
+
+    test('400 when the title is not valid', async () => {
+        const req = { body: {
+            forumId: 1,
+            forumTitle: "BOOKS ARE THE BEST!"
+        }};
+
+        const res = await request(app)
+            .put('/forums/changeTitle')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(400);
+    });
+
+    test('400 when the forum is inexisting', async () => {
+        const req = { body: {
+            forumId: 1000,
+            forumTitle: "books",
+        }};
+
+        const res = await request(app)
+            .put('/forums/changeTitle')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(400);
+    });
+
+    test('403 when the unauthorized', async () => {
+         const req = { body: {
+            forumId: 3,
+            forumTitle: "guitars",
+        }};
+
+        const res = await request(app)
+            .put('/forums/changeTitle')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(403);
+    });
+
+}); 
