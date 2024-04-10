@@ -3,7 +3,7 @@ import { useUser } from './UserContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const CreatePost = ({ }) => {
+const CreatePost = () => {
     const navigate = useNavigate();
     const { forumName } = useParams()
     const [postTitle, setPostTitle] = useState('');
@@ -11,7 +11,7 @@ const CreatePost = ({ }) => {
     const { user } = useUser();
     console.log('user:', user)
     const userId = user.id;
-    const token = user.userData.token;
+    const token = user.token;
 
     // console.log('forumId:', params)
 

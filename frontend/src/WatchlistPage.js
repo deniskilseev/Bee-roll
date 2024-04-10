@@ -4,11 +4,11 @@ import Watchlist from './components/Watchlist';
 import { useUser } from './UserContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const WatchlistsPage = ({ }) => {
+const WatchlistsPage = () => {
   const [watchlists, setWatchlists] = useState([]);
   const { updateWatchlists } = useUser();
   const { user } = useUser();
-  const token = user.userData.token;
+  const token = user.token;
 
   const createWatchlist = async () => {
     //TODO: Fix create watchlist
@@ -69,7 +69,7 @@ const WatchlistsPage = ({ }) => {
     } catch (error) {
       console.error(`Error fetching watchlist: ${watchListId}`, error);
     }
-  }, [watchlists]);
+  }, [watchlists, token]);
 
   useEffect(() => {
     const fetchInitialWatchlists = async () => {
@@ -79,7 +79,7 @@ const WatchlistsPage = ({ }) => {
     };
 
     fetchInitialWatchlists();
-  }, [user.watchlists, fetchWatchlist]);
+  }, [user.watchlists, fetchWatchlist, user.userData.data_by_username.watchListsIds]);
   
 
   return (

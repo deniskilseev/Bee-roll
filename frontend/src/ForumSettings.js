@@ -4,14 +4,14 @@ import { useParams } from 'react-router-dom';
 import './styles/forumSettings.css';
 import { useUser } from './UserContext';
 
-const ForumSettings = ({ }) => {
+const ForumSettings = () => {
     const { forumName } = useParams();
     const [moderators, setModerators] = useState([]);
     const [forum, setForum] = useState(null);
     const [newModerator, setNewModerator] = useState('');
     const [isPublic, setIsPublic] = useState(true);
     const { user } = useUser();
-    const token = user.userData.token;
+    const token = user.token;
 
     const handleAddModerator = async () => {
         if (newModerator && !moderators.includes(newModerator)) {

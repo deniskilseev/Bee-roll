@@ -10,7 +10,7 @@ const HomePage = () => {
     useEffect(() => {
       const sendPostRequest = async () => {
         if (user.userData) {
-          const token = user.userData.token;
+          const token = user.token;
           try {
             const headers = {
               'Authorization': `Bee-roll ${token}`,
@@ -29,12 +29,12 @@ const HomePage = () => {
       };
 
       sendPostRequest();
-  }, [user]);
+  }, [user, postIds]);
 
   useEffect(() => {
     const fetchPostData = async () => {
       if (user.userData && postIds.posts) {
-        const token = user.userData.token;
+        const token = user.token;
         try {
           const postsData = await Promise.all(
             postIds.posts.map(async (postId) => {

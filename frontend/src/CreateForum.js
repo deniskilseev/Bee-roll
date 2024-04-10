@@ -4,12 +4,12 @@ import { useUser } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CreateForumPage = ({ }) => {
+const CreateForumPage = () => {
   const navigate = useNavigate();
   const [forumTitle, setForumTitle] = useState('');
   const [forumDescription, setForumDescription] = useState('');
   const { user } = useUser();
-  const token = user.userData.token;
+  const token = user.token;
 
   const handleCreateForum = async () => {
     // TODO: Forums not being created correctly
@@ -19,7 +19,6 @@ const CreateForumPage = ({ }) => {
 
     const newForum = {
       forumTitle: forumTitle,
-      creatorId: user.id,
     };
 
     try {
@@ -28,8 +27,7 @@ const CreateForumPage = ({ }) => {
         'Content-Type': 'application/json'
       };
 
-      const response = await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
-      const createdForum = response.data;
+      await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
 
       navigate(`/forums/${forumName}`);
     } catch (error) {
@@ -42,7 +40,6 @@ const CreateForumPage = ({ }) => {
   const handleCancel = () => {
     navigate('/');
   };
-
   
   return (
     <div className="container mt-5">

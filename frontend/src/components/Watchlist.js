@@ -12,7 +12,7 @@ const Watchlist = ({ watchlist }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const { user } = useUser();
-  const token = user.userData.token;
+  const token = user.token;
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);

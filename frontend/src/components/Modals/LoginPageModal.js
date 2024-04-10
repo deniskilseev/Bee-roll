@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
 import { useUser } from '../../UserContext';
+import Cookies from 'js-cookie';
 
 const LoginPageModal = ({ showModal, onClose }) => {
   const { updateUser } = useUser();
@@ -69,6 +70,9 @@ const LoginPageModal = ({ showModal, onClose }) => {
         console.log('User data:', userData);
 
         updateUser(userData);
+        console.log(userData.token);
+        Cookies.set('beerollToken', userData.token, { expires: 7, secure: true });
+        console.log('Cookie saved:', Cookies.get('beerollToken'));
       } else {
         console.error('Login failed');
         // Handle failed login scenarios

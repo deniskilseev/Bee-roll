@@ -5,9 +5,9 @@ import plusIcon from './assets/edit.png';
 import axios from 'axios';
 import { useUser } from './UserContext';
 
-const Profile = ({ }) => {
+const Profile = () => {
   const { user } = useUser();
-  const token = user.userData.token;
+  const token = user.token;
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
   const [profilePicture, setProfilePicture] = useState(null);
@@ -114,7 +114,7 @@ const Profile = ({ }) => {
     };
     
     fetchPostData();
-  }, [user]);
+  }, [user, token]);
 
   return (
     <div className="container mt-4">

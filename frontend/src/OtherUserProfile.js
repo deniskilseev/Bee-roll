@@ -8,13 +8,13 @@ import axios from 'axios';
 import { useUser } from './UserContext';
 
 
-const OtherUserProfile = ( { } ) => {
+const OtherUserProfile = () => {
   const { username } = useParams(); // Extract uid parameter from URL
   const [otherUser, setOtherUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const { user } = useUser();
-  const token = user.userData.token;
+  const token = user.token;
 
   useEffect(() => {
     // Fetch user profile data using username
@@ -53,7 +53,7 @@ const OtherUserProfile = ( { } ) => {
     };
     
     fetchPostData();
-  }, [otherUser]);
+  }, [otherUser, token]);
 
   const handleFollow = async () => {
     console.log('Current User:', user);

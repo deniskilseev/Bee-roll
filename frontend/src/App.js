@@ -18,6 +18,7 @@ import { useUser } from './UserContext';
 const App = () => {
   const { user } = useUser();
 
+
   const dummyUser = user.userData
   ? {
       id: user.userData.data_by_username.uid,

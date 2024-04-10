@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useUser } from './UserContext';
 
 
-const ForumPage = ({ }) => {
+const ForumPage = () => {
   const { forumName } = useParams();
   const navigate = useNavigate();
 
@@ -14,7 +14,7 @@ const ForumPage = ({ }) => {
 
   const { user } = useUser();
   console.log('ForumName:', forum)
-  const token = user.userData.token;
+  const token = user.token;
 
   const handleSettingsClick = () => {
     // Navigate to forum settings page when settings button is clicked
@@ -63,7 +63,7 @@ const ForumPage = ({ }) => {
   };
   
     fetchPostData();
-  }, [forum]);
+  }, [forum, token]);
 
   if (!forum) {
     return <div>Forum not found!</div>;

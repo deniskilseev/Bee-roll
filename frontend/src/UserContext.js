@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 const UserContext = createContext();
 
@@ -8,8 +9,19 @@ export const UserProvider = ({ children }) => {
     token: null
   });
 
+  useEffect(() => {
+    const storedToken = Cookies.get('beerollToken');
+    if (storedToken) {
+      setUser(prevUser => ({ ...prevUser, token: storedToken }));
+    }
+  }, []);
+
   const updateUser = (userData, token) => {
-    setUser(prevUser => ({ ...prevUser, userData, token }));
+    console.log("updateUser: Updating user with token:", token);
+    setUser(prevUser => {
+      const token = Cookies.get('beerollToken');
+      return { ...prevUser, userData, token };
+    });
   };
 
   const updateWatchlists = (newWatchlist) => {
@@ -24,6 +36,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const logout = () => {
+    localStorage.removeItem('beerollToken'); // Remove token from localStorage on logout
     setUser({ userData: null, token: null });
   };
 

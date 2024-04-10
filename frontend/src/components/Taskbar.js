@@ -21,6 +21,7 @@ const Taskbar = () => {
 
   const handleLogoutClick = () => {
     logout();
+    navigate('/');
   };
 
   useEffect(() => {
