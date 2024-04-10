@@ -13,6 +13,7 @@ const watchListRoute = require('./routes/watchlist');
 const movieRoute = require('./routes/movie');
 const reviewRoute = require('./routes/review');
 const predictRoute = require('./routes/predict');
+const commentRoute = require('./routes/comment');
 // Add more controllers as needed
 
 
@@ -52,5 +53,7 @@ app.use('/watchlists', watchListRoute);
 app.use('/movies', movieRoute);
 app.use('/reviews', reviewRoute);
 app.use('/predict', predictRoute);
+app.use('/comments', commentRoute);
+
 
 module.exports = app;

@@ -19,7 +19,8 @@ const userSchema = new Schema({
   profilePicture: {
     data: { type: Buffer, default: Buffer.from([]) },
     type: { type: String, default: '' }
-  }
+  },
+  commentIds: [Number]
 });
 
 const User = model('User', userSchema);

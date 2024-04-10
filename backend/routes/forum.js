@@ -11,7 +11,7 @@ router.get('/:title', forumController.getForum);
 router.post('/togglePrivate', verifyToken, forumController.togglePrivate);
 router.post('/addModerator', verifyToken, forumController.addModerator);
 router.post('/removeModerator', verifyToken, forumController.removeModerator);
-router.get('/', forumController.getAllForums);
+router.get('/forums', forumController.getAllForums);
 
 // Export the router
 module.exports = router;
