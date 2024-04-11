@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 
-const collectionList = ["counters", "users", "posts", "forums", "watchlists", 'comments'];
-
 module.exports = async () => {
+    const collectionList = await mongoose.connection.listCollections();
     for (collection of collectionList) {
-        await mongoose.connection.dropCollection(collection);
+        let name = collection.name;
+        if (name !== "movies") {
+            await mongoose.connection.dropCollection(name);
+        }
     }
     await mongoose.connection.close();
 };

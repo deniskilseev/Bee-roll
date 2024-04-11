@@ -18,6 +18,7 @@ router.post('/unfollowUser', verifyToken, userController.unfollowUser);
 router.get('/search/:query', userController.searchUsers);
 router.post('/uploadProfilePicture', verifyToken, upload.single('profile-picture'), userController.uploadProfilePicture);
 router.get('/getProfilePicture/:userLogin', userController.downloadProfilePicture);
+router.get('/getSelf', verifyToken, userController.getUserByToken);
 
 
 // Export the router

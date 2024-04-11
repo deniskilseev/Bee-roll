@@ -335,6 +335,34 @@ describe('getUser(byId/byLogin)', () => {
     });
 });
 
+describe('getUserByToken', () => {
+    test('should return correct user data on correct token', async() => {
+        const res1 = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"});
+
+        const token = 'Bee-roll ' + res1.body.token;
+
+        const res2 = await request(app)
+            .get('/users/getSelf')
+            .set({Authorization: token});
+
+        expect(res2.status).toBe(200);
+        expect(res2.body.data_by_username.uid).toBe(1);
+        expect(res2.body.data_by_username.password).toBe(undefined);
+    });
+
+    test('Incorrect token should return 500', async () => {
+        const token = "Bee-roll ASLDFMASLDFMASDLM"
+
+        const res = await request(app)
+            .get('/users/getSelf')
+            .set({Authorization: token});
+
+        expect(res.status).toBe(500);
+    });
+});
+
 describe('uploadUserImage', () => {
     test('should upload a profile picture', async () => {
 
