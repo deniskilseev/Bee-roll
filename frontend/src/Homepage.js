@@ -2,45 +2,52 @@ import React, { useEffect, useState } from 'react';
 import { useUser } from './UserContext';
 import axios from 'axios';
 
-const HomePage = ({ user:propUser }) => {
+const HomePage = () => {
     const { user } = useUser();
     const [posts, setPosts] = useState([]);
     const [postIds, setPostIds] = useState([]);
 
     useEffect(() => {
       const sendPostRequest = async () => {
+        if (user.userData) {
+          const token = user.token;
           try {
-              console.log('User:', user.data_by_username.login);
-              const response = await axios.post('http://localhost:3000/posts/getRecentPosts', {
-                  user_login: user.data_by_username.login
-              });
+            const headers = {
+              'Authorization': `Bee-roll ${token}`,
+              'Content-Type': 'application/json'
+            };
+            const response = await axios.post('http://localhost:3000/posts/getRecentPosts', {
+                user_login: user.userData.data_by_username.login
+            }, { headers });
 
-              setPostIds(response.data);
+            setPostIds(response.data);
+            console.log(postIds)
           } catch (error) {
-              console.error('Failed to retrieve posts:', error.message);
+            console.error('Failed to retrieve posts:', error.message);
           }
+        }
       };
 
       sendPostRequest();
-  }, [user]);
-
-  console.log(postIds);
+  }, [user, postIds]);
 
   useEffect(() => {
     const fetchPostData = async () => {
-      if (user && postIds.posts) { // Check if user and user.postsIds are not null
+      if (user.userData && postIds.posts) {
+        const token = user.token;
         try {
           const postsData = await Promise.all(
             postIds.posts.map(async (postId) => {
-              // Fetch post data
-              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`);
+              const headers = {
+                'Authorization': `Bee-roll ${token}`,
+                'Content-Type': 'application/json'
+              };
+              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
               const postData = postResponse.data.post_info;
-    
-              // Fetch user data for the post
+
               const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
               const userData = userResponse.data.user_info;
     
-              // Combine post data with user data
               return { ...postData, user: userData.login };
             })
           );
@@ -54,8 +61,6 @@ const HomePage = ({ user:propUser }) => {
     
     fetchPostData();
   }, [user, postIds]);
-    
-  console.log(posts);
 
   return (
     <div>

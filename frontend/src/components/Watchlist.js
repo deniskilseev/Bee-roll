@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AddMovieModal from './Modals/AddMovieModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { useUser } from '../UserContext';
 
 const Watchlist = ({ watchlist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -10,6 +11,8 @@ const Watchlist = ({ watchlist }) => {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const { user } = useUser();
+  const token = user.token;
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -39,10 +42,15 @@ const Watchlist = ({ watchlist }) => {
 
   const addToWatchlist = async (movieId) => {
     try {
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
       const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
         watchlist_id: watchlist.data_by_id.watchListId,
-        movie_id: movieId
-      });
+        movie_id: movieId,
+        //TODO: Fix Rating is not defined error
+      }, { headers });
       console.log('Added to watchlist:', response.data);
     } catch (error) {
       console.error('Error adding to watchlist:', error);
