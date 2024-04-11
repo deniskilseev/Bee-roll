@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
-const postSchema = new Schema({
-    postId: {
+const commentSchema = new Schema({
+    commentId: {
         type: Number,
         required: true
     },
@@ -11,23 +11,19 @@ const postSchema = new Schema({
         type: Number,
         required: true
     },
-    postTitle: {
-        type: String,
-        required: true
-    },
-    forumId: {
+    postId: {
         type: Number,
         required: true
     },
-    postText: {
+    commentText: {
         type: String,
         required: true
     },
-    commentIds: {
-        type: [Number],
-        required: false
+    postingDate: {
+        type: Date,
+        required: true
     }
 });
 
-const Post = model('Post', postSchema);
-module.exports = Post;
+const Comment = model('Comment', commentSchema);
+module.exports = Comment;
