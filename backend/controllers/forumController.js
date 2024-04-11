@@ -23,9 +23,9 @@ const forumController = {
             const existing_title = await Forum.findOne({forumTitle: forumTitle});
 
             if (existing_title) {
-                return res.status(400).json( {error: "Forum with such name exists"} );
+                return res.status(400).json({error: "Forum with such name exists"})
             }
-                        
+            
             const counter_fetch = await Counter.findOne({_id: "Forum"});
             const forum_counter_value = counter_fetch.collectionCounter;
             const forumId = counter_fetch.collectionCounter + 1;

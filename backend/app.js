@@ -13,6 +13,7 @@ const watchListRoute = require('./routes/watchlist');
 const movieRoute = require('./routes/movie');
 const reviewRoute = require('./routes/review');
 const predictRoute = require('./routes/predict');
+const commentRoute = require('./routes/comment');
 // Add more controllers as needed
 
 
@@ -38,7 +39,7 @@ const uri = `mongodb://${username}:${password}@${host}:${portMongo}/${dbName}`;
 // Connect to MongoDB
 mongoose.connect(uri, {
     useUnifiedTopology: true,
-    dbName: 'prodDatabase'
+    dbName: 'testDatabase'
   })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
@@ -52,5 +53,6 @@ app.use('/watchlists', watchListRoute);
 app.use('/movies', movieRoute);
 app.use('/reviews', reviewRoute);
 app.use('/predict', predictRoute);
+app.use('/comments', commentRoute);
 
 module.exports = app;
