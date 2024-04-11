@@ -1,34 +1,38 @@
 // CreateForumPage.js
 import React, { useState } from 'react';
+import { useUser } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CreateForumPage = ({ onForumCreate, user }) => {
+const CreateForumPage = () => {
   const navigate = useNavigate();
   const [forumTitle, setForumTitle] = useState('');
   const [forumDescription, setForumDescription] = useState('');
+  const { user } = useUser();
+  const token = user.token;
 
   const handleCreateForum = async () => {
+    // TODO: Forums not being created correctly
     const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
 
     console.log(user);
 
     const newForum = {
       forumTitle: forumTitle,
-      creatorId: user.id,
     };
 
     try {
-      const response = await axios.post('http://localhost:3000/forums/createForum', newForum);
-      const createdForum = response.data;
-  
-      onForumCreate(createdForum);
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
+
       navigate(`/forums/${forumName}`);
     } catch (error) {
       console.error('Error creating forum:', error);
     }
-
-    onForumCreate(newForum);
 
     navigate(`/forums/${forumName}`);
   };
@@ -36,7 +40,6 @@ const CreateForumPage = ({ onForumCreate, user }) => {
   const handleCancel = () => {
     navigate('/');
   };
-
   
   return (
     <div className="container mt-5">

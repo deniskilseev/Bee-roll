@@ -5,20 +5,33 @@ const Forum = require('../model/Forum.js')
 const User = require('../model/User.js')
 const Post = require('../model/Post.js')
 
+function checkAlias(string) {
+    const regexp = new RegExp("^[a-z0-9]+$");
+    return regexp.test(string);
+}
+
 const forumController = {
     async createForum(req, res) {
         try {
-            const {forumTitle, creatorId} = req.body;
-            
-            const existing_title = await Forum.findOne({forumTitle: forumTitle});
-            if (existing_title) {
-                return res.status(400).json({error: "Forum with such name exists"})
-            }
-            
-            const counter_fetch = await Counter.findOne({_id: "Forum"});
-            const forum_counter_value = counter_fetch.collectionCounter
-            const forumId = counter_fetch.collectionCounter + 1
+            const {forumTitle} = req.body;
+            const creator_login = req.user.login; 
 
+            if (!checkAlias(forumTitle)) {
+                return res.status(400).json( {error: "Invalid forum alias"} ); 
+            }
+ 
+            const existing_title = await Forum.findOne({forumTitle: forumTitle});
+
+            if (existing_title) {
+                return res.status(400).json( {error: "Forum with such name exists"} );
+            }
+                        
+            const counter_fetch = await Counter.findOne({_id: "Forum"});
+            const forum_counter_value = counter_fetch.collectionCounter;
+            const forumId = counter_fetch.collectionCounter + 1;
+
+            const creator = await User.findOne({login: creator_login});
+            const creatorId = creator.uid;
             const newForum = new Forum({
                 forumId: forumId,
                 forumTitle: forumTitle,
@@ -45,8 +58,9 @@ const forumController = {
 
     async joinForum(req, res) {
         try {
-            const {forumId, memberId} = req.body;
-
+            const {forumId} = req.body;
+            const user = await User.findOne({login: req.user.login});
+            const memberId = user.uid;
             const forum = await Forum.findOne({forumId: forumId});
             if (!forum) {
                 return res.status(400).json({error: "Forum with such name does not exists"})
@@ -84,15 +98,19 @@ const forumController = {
 
     async addModerator(req, res) {
         try {
-            const {to_add_id, who_adds_id, forum_id} = req.body;
-            
-            const forum_info = await Forum.findOne( {forumId: forum_id} );
+            const {userId, forumId} = req.body;
+
+            const user = await User.findOne({login: req.user.login});
+
+            const who_adds_id = user.uid;
+
+            const forum_info = await Forum.findOne( {forumId: forumId} );
 
             if (!forum_info) {
                 return res.status(400).json( {error: "Forum does not exist"} );
             }
 
-            const user_info = await User.findOne( {uid: to_add_id} );
+            const user_info = await User.findOne( {uid: userId} );
             
             if (!user_info) {
                 return res.status(400).json( {error: "The person who you are trying to add does not exist"} );
@@ -102,8 +120,8 @@ const forumController = {
             const moderator_index = moderator_list.indexOf(who_adds_id);
 
             if (forum_info.creatorId == who_adds_id || moderator_index != -1) {
-                moderator_list.push(to_add_id);
-                await Forum.findOneAndUpdate({forumId: forum_id}, {moderatorIds: moderator_list});
+                moderator_list.push(userId);
+                await Forum.findOneAndUpdate({forumId: forumId}, {moderatorIds: moderator_list});
                 return res.status(200).json( {message: "OK"});
             }
 
@@ -117,29 +135,33 @@ const forumController = {
 
     async removeModerator(req, res) {
         try {
-            const {to_remove_id, who_removes_id, forum_id} = req.body;
+            const {userId, forumId} = req.body;
+
+            const user = await User.findOne({login: req.user.login});
+
+            const who_removes_id = user.uid;
             
-            const forum_info = await Forum.findOne({forumId: forum_id});
+            const forum_info = await Forum.findOne({forumId: forumId});
 
             if (!forum_info) {
                 return res.status(400).json( {error: "Forum does not exist"} );
             }
 
-            const user_info = await User.findOne({uid: to_remove_id});
+            const user_info = await User.findOne({uid: userId});
             
             if (!user_info) {
                 return res.status(400).json( {error: "The person who you are trying remove does not exist"} );
             }
 
             const moderator_list = forum_info.moderatorIds;
-            const index = moderator_list.indexOf(to_remove_id);
+            const index = moderator_list.indexOf(userId);
 
             if (forum_info.creatorId == who_removes_id) {
                 if (index != -1) {
                    moderator_list.splice(index, 1); 
                 }
 
-                await Forum.findOneAndUpdate({forumId: forum_id}, {moderatorIds: moderator_list});
+                await Forum.findOneAndUpdate({forumId: forumId}, {moderatorIds: moderator_list});
 
                 return res.status(200).json( {message: "OK" });
             }
@@ -154,17 +176,21 @@ const forumController = {
     async togglePrivate(req, res) {
         try {
             const {forumId} = req.body;
-
+            
             const forum_info = await Forum.findOne( {forumId: forumId} );
-    
+
+            const user = await User.findOne({login: req.user.login});
+ 
             if(!forum_info) {
                 return res.status(400).json( {error: "Forum with such name does not exist"} );
             }
-            
-            const updated_private = !forum_info.isPrivate;
+            if (user.uid == forum_info.creatorId) {
+                const updated_private = !forum_info.isPrivate;
+                await Forum.findOneAndUpdate( {forumId: forumId}, {isPrivate: updated_private} );
+                return res.status(200).json( {message: "Changed Visibility of the forum"} );
+            }
 
-            await Forum.findOneAndUpdate( {forumId: forumId}, {isPrivate: updated_private} );
-            return res.status(200).json( {message: "Changed Visibility of the forum"} );
+            return res.status(403).json( {message: "Unauthorized"} );
         } catch (error) {
             console.error("Error in togglePrivate:", error);
             res.status(500).json({ error: "Internal server error" });
@@ -173,24 +199,25 @@ const forumController = {
 
     async banUser(req, res) {
         try {
-            const {modId, userId, forumId} = req.body;
-
+            const {userId, forumId} = req.body;
+            
+            const moderator = await User.findOne({login: req.user.login});
+    
+            const modId = moderator.uid;
             const forum = await Forum.findOne({forumId: forumId});
     
             if(!forum) {
                 return res.status(404).json( {error: "Forum with such ID does not exist"} );
             }
-    
-            const user = await User.findOne({uid: userId});
-    
-            if(!user) {
-                return res.status(404).json( {error: "User with such id does not exist"} );
+
+            if(!moderator || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
+                return res.status(404).json( {error: "Mod with such id does not exist"} );
             }
     
-            const mod = await User.findOne({uid: modId});
-    
-            if(!mod || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
-                return res.status(404).json( {error: "Mod with such id does not exist"} );
+            const user = await User.findOne({uid: userId});
+
+            if(!user) {
+                return res.status(404).json( {error: "User with such id does not exist"} );
             }
     
             forum.bannedUserIds.push(userId);
@@ -209,12 +236,19 @@ const forumController = {
 
     async unbanUser(req, res) {
         try {
-            const {modId, userId, forumId} = req.body;
+            const {userId, forumId} = req.body;
+            
+            const moderator = await User.findOne({login: req.user.login});
+            const modId = moderator.uid;
 
             const forum = await Forum.findOne({forumId: forumId});
     
             if(!forum) {
                 return res.status(404).json( {error: "Forum with such ID does not exist"} );
+            }
+
+            if(!moderator || !forum.moderatorIds.includes(modId) && forum.creatorId != modId) {
+                return res.status(404).json( {error: "Mod with such id does not exist"} );
             }
     
             const user = await User.findOne({uid: userId});
@@ -239,45 +273,56 @@ const forumController = {
     },
 
     async getAllForums(req, res) {
-        console.log("testing forums");
         try {
             const allForums = await Forum.find();
-            return res.status(200).json(allForums);
+            publicForums = []
+            for (const forum of allForums) {
+                if (!forum.isPrivate) {
+                    forum.moderatorIds = undefined;
+                    forum.__v = undefined;
+                    forum.bannedUserIds = undefined;
+                    publicForums.push(forum);
+                }
+            }
+            return res.status(200).json({publicForums});
         } catch (error) {
             console.error("Error in getAllForums:", error);
             res.status(500).json({ error: "Internal server error" });
         }
     },
-    
-    async deletePost(req, res) {
+
+    async putTitle(req, res) {
         try {
-            const { postId, userId } = req.body;
+            const {forumId, forumTitle} = req.body;
 
-            console.log("body: ", req.body);
-            // Find the post to be deleted
+            if (!checkAlias(forumTitle)) {
+                return res.status(400).json( {error: "Invalid forum alias"} ) ;
+            }
+
+            const user_info = await User.findOne( {login: req.user.login} );
+
+            const forum_info = await Forum.findOne( {forumId: forumId} );
             
-            const post = await Post.findOne( {postId: postId} );
-            if (!post) {
-                return res.status(404).json({ error: 'Post not found' });
+            if (!forum_info) {
+                return res.status(400).json( {error: "No forum with such ID"} );
             }
 
-            // Find the forum associated with the post
-            const forum = await Forum.findOne( {forumId: post.forumId});
-            if (!forum) {
-                return res.status(404).json({ error: 'Forum not found' });
+            const existing_title = await Forum.findOne( {forumTitle: forumTitle} );
+
+            if (existing_title) {
+                return res.status(400).json( {error: "Forum with such name exists"} );
             }
 
-            // Check if the user is a moderator for the forum
-            if (forum.moderatorIds.includes(userId)) {
-                // Delete the post
-                await Post.findOneAndDelete({ postId: post.postId});
-                return res.status(200).json({ message: 'Post deleted successfully' });
-            } else {
-                return res.status(403).json({ error: 'Unauthorized: User is not a moderator for this forum' });
+            if (forum_info.creatorId == user_info.uid) {
+                await Forum.findOneAndUpdate( {forumId: forumId}, {forumTitle: forumTitle} ); // Update the title
+                return res.status(200).json( {message: "OK"} );
             }
+            
+            return res.status(403).json( {error: "Unauthorized"} );
+
         } catch (error) {
-            console.error('Error in deletePost:', error);
-            res.status(500).json({ error: 'Internal server error' });
+                console.error("Error in changeAlias", error);
+                res.status(500).json( {error: "Internal server error"} );
         }
     }
 }

@@ -42,13 +42,15 @@ const predictController = {
 
     async predictUser(req, res) {
         try {
-            const {user_id} = req.params;
-
-            const user_info =  User.findOne( {uid: user_id} );
+            const user_info =  User.findOne( {login: req.user.login} );
 
             if (!user_info) {
                 return res.status(400).json( {error: "No user with such ID"} );
             }
+
+            const user_id = user_info.uid;
+
+            await updateUser(user_id); // Updating model before predicting
 
             const user_history = await Review.find( {userId: user_id} );
             const needed_user_history = { userId: user_id, reviews: [] };
@@ -88,13 +90,15 @@ const predictController = {
 
     async similarUser(req, res) {
         try {
-            const {user_id} = req.params;
-
-            const user_info = User.findOne( {uid: user_id} );
+            const user_info = User.findOne( {login: req.user.login} );
 
             if (!user_info) {
                 return res.status(400).json( {error: "No user with such ID"} );
             }
+
+            const user_id = user_info.uid;
+
+            await updateUser(user_id); // Updating model before predicting
 
             const uri = url + '/similarUsers?userId=' + user_id;
 

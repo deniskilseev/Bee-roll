@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 const express = require('express')
 const Counter = require('../model/Counter.js')
 const User = require('../model/User.js')
-
-
+const JWT_SECRET = require('../secrets/jwt')
+const jwt = require('jsonwebtoken')
 
 const userController = {
     async createUser(req, res) {
@@ -56,9 +56,10 @@ const userController = {
             }
 
             data_by_username.password = undefined; // delete password from data.
+    
+            const token = jwt.sign({ login: data_by_username.login }, JWT_SECRET, {expiresIn: '1hr'});
 
-            res.status(200).json({data_by_username});
-
+            return res.status(200).json({data_by_username, token: token});
         } catch (error) {
             console.error("Error in loginUser:", error);
             res.status(500).json({ error: "Internal server error" });
@@ -67,25 +68,23 @@ const userController = {
 
     async putUser(req, res) {
         try {
-            // const {username, password, email, date_of_birth} = req.body;
-            const {oldUser, username, email, date_of_birth} = req.body;
-            
+            const {username, email, password, date_of_birth} = req.body;
+            const oldUser = req.user.login;
             const user = await User.findOne({login: oldUser})
             
             if (!user) {
                 return res.status(404).json({error: "User wasn't found"})
             }
 
-            // user.password = password;
-
             const user_by_email = await User.findOne({email: email});
 
-            // if (user_by_email && user_by_email.login != username) {
-            //     return res.status(400).json({error: "User with such email exists!"})
-            // }
+            if (user_by_email && user_by_email.login != username) {
+                return res.status(400).json({error: "User with such email exists!"})
+            }
 
             user.login = username;
             user.email = email;
+            user.password = password;
             user.date_of_birth = date_of_birth;
 
             await user.save();
@@ -99,7 +98,8 @@ const userController = {
 
     async followUser(req, res) {
         try {
-            const {user_follower, user_followed} = req.body;
+            const {user_followed} = req.body;
+            const user_follower = req.user.login;
 
             const user_follower_profile = await User.findOne({login: user_follower});
             const user_followed_profile = await User.findOne({login: user_followed});
@@ -110,9 +110,11 @@ const userController = {
             
             follower_id = user_follower_profile.uid;
             followed_id = user_followed_profile.uid;
-
-            user_follower_profile.followsIds.push(followed_id);
-            user_followed_profile.followersIds.push(follower_id);
+            
+            if (!user_follower_profile.followsIds.includes(followed_id)) {
+                user_follower_profile.followsIds.push(followed_id);
+                user_followed_profile.followersIds.push(follower_id);
+            }
 
             await user_follower_profile.save();
             await user_followed_profile.save();
@@ -126,7 +128,8 @@ const userController = {
 
     async unfollowUser(req, res) {
         try {
-            const {user_follower, user_followed} = req.body;
+            const {user_followed} = req.body;
+            const user_follower = req.user.login; // id from token
 
             const user_follower_profile = await User.findOne({login: user_follower});
             const user_followed_profile = await User.findOne({login: user_followed});
@@ -201,7 +204,49 @@ const userController = {
           console.error('Error searching users:', error);
           res.status(500).json({ error: 'Internal server error' });
         }
-      }
+    },
+
+    async uploadProfilePicture(req, res) {
+        try {
+            const user_login = req.user.login;
+            // Check if the user exists
+            const user = await User.findOne({login: user_login});
+
+            if (!user) {
+              return res.status(404).json({ error: 'User not found' });
+            }
+
+            user.profilePicture.data = req.file.buffer;
+            user.profilePicture.type = req.file.mimetype;
+            await user.save();
+        
+            return res.status(200).json({ message: 'Profile picture uploaded successfully' });
+        } catch (error) {
+            console.error('Error uploading profile picture: ', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    async downloadProfilePicture(req, res) {
+        const user_login = req.params.userLogin;
+
+        try {
+          // Retrieve the user from MongoDB
+          const user = await User.findOne({login: user_login});
+      
+          if (!user || !user.profilePicture) {
+            return res.status(404).json({ error: 'User or profile picture not found' });
+          }
+      
+          // Set response headers
+          res.set('Content-Type', user.profilePicture.type);
+          res.send(user.profilePicture.data);
+          res.status(200);
+        } catch (err) {
+          console.error(err);
+          res.status(500).json({ error: 'Internal server error' });
+        }
+    }
 }
 
 module.exports = userController;
