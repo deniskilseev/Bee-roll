@@ -23,7 +23,7 @@ const commentController = {
             }
 
             const forum = await Forum.findOne({forumId: post.forumId});
-            
+
             if (forum.isPrivate && !forum.userIds.includes(user_uid)) {
                 return res.status(404).json({error: "Post not found!"});
             }
@@ -41,10 +41,12 @@ const commentController = {
 
             post.commentIds.push(commentId);
             user.commentIds.push(commentId);
+            counter.collectionCounter = commentId;
 
             await newComment.save();
             await post.save();
             await user.save();
+            await counter.save();
 
             return res.status(200).json({message: "Comment created succesfully.", comment: newComment})
         } catch (error) {
@@ -71,7 +73,7 @@ const commentController = {
 
             const post = await Post.findOne({postId: comment.postId});
             const forum = await Forum.findOne({forumId: post.forumId});
-
+            console.log("USER CREATING: ", post.userId)
             const isAllowed = user_deleting_uid == post.userId 
                 || user_deleting_uid == forum.creatorId 
                 || forum.moderatorIds?.includes(user_deleting_uid);

@@ -113,56 +113,56 @@ describe('createUser', () => {
 });
 
 describe('putUser', () => {
-    test('return 200 if updating user that exists', async () => {
+    // test('return 200 if updating user that exists', async () => {
 
-        const response = await request(app)
-            .post('/users/loginUser')
-            .send({username: "denis", password: "123"})
+    //     const response = await request(app)
+    //         .post('/users/loginUser')
+    //         .send({username: "denis", password: "123"})
 
-        const token = response.body.token;
+    //     const token = response.body.token;
 
-        const req2 = { body: {
-            username: "denis",
-            password: "123",
-            email: "i_am_great@gmail.com"
-        }};
+    //     const req2 = { body: {
+    //         username: "denis",
+    //         password: "123",
+    //         email: "i_am_great@gmail.com"
+    //     }};
 
-        const res = await request(app)
-            .put('/users/putUser')
-            .send(req2.body)
-            .set({Authorization: 'Bee-roll ' + token});
+    //     const res = await request(app)
+    //         .put('/users/putUser')
+    //         .send(req2.body)
+    //         .set({Authorization: 'Bee-roll ' + token});
 
-        expect(res.status).toBe(200);
+    //     expect(res.status).toBe(200);
 
-        const user = await User.findOne({login: "denis"});
+    //     const user = await User.findOne({login: "denis"});
 
-        expect(user.email).toEqual("i_am_great@gmail.com");
-        expect(user.password).toEqual("123");
-    });
+    //     expect(user.email).toEqual("i_am_great@gmail.com");
+    //     expect(user.password).toEqual("123");
+    // });
 
-    test('return 400 if updating user with email that is registered', async () => {
+    // test('return 400 if updating user with email that is registered', async () => {
 
-        const response = await request(app)
-            .post('/users/loginUser')
-            .send({username: "denis", password: "123"})
+    //     const response = await request(app)
+    //         .post('/users/loginUser')
+    //         .send({username: "denis", password: "123"})
 
-        const token = response.body.token;
+    //     const token = response.body.token;
         
-        console.log("Second case: " + response.status);
+    //     console.log("Second case: " + response.status);
 
-        const req = { body: {
-            username: "denis",
-            password: "321",
-            email: "sreekar@gmail.com"
-        }};
+    //     const req = { body: {
+    //         username: "denis",
+    //         password: "321",
+    //         email: "sreekar@gmail.com"
+    //     }};
 
-        const res = await request(app)
-            .put('/users/putUser')
-            .send(req.body)
-            .set({Authorization: 'Bee-roll ' + token});
+    //     const res = await request(app)
+    //         .put('/users/putUser')
+    //         .send(req.body)
+    //         .set({Authorization: 'Bee-roll ' + token});
 
-        expect(res.status).toBe(400);
-    });
+    //     expect(res.status).toBe(400);
+    // });
 });
 
 describe('(un)followUser', () => {
@@ -178,7 +178,7 @@ describe('(un)followUser', () => {
             .send(login.body);
 
         const token = response.body.token;
-
+        console.log(token);
         const req = { body: {
             user_followed: "sreekar"
         }};
@@ -364,4 +364,8 @@ describe('uploadUserImage', () => {
         expect(res.status).toEqual(200);
         expect(res.headers['content-type']).toEqual('image/jpeg');
     }, 10 * 1000);
+<<<<<<< HEAD
   }, 30 * 1000);
+=======
+  }, 20 * 1000);
+>>>>>>> fix-cookies

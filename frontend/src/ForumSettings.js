@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import './styles/forumSettings.css'; // Import your CSS file for styling
+import './styles/forumSettings.css';
+import { useUser } from './UserContext';
 
-const ForumSettings = ({ user }) => {
+const ForumSettings = () => {
     const { forumName } = useParams();
     const [moderators, setModerators] = useState([]);
     const [forum, setForum] = useState(null);
     const [newModerator, setNewModerator] = useState('');
-    const [isPublic, setIsPublic] = useState(true); // Default to public
+    const [isPublic, setIsPublic] = useState(true);
+    const { user } = useUser();
+    const token = user.token;
 
     const handleAddModerator = async () => {
         if (newModerator && !moderators.includes(newModerator)) {
             try {
-                // Send GET request to validate the user exists
                 const userResponse = await axios.get(`http://localhost:3000/users/getUserByUsername/${newModerator}`);
                 const userToAdd = userResponse.data.user_info;
 
-                // If user exists, add moderator
                 if (userToAdd) {
-                    // Send POST request to add moderator
                     const moderatorData = {
-                        to_add_id: userToAdd.uid,
-                        who_adds_id: user.id,
-                        forum_id: forum.forumId
+                        userId: userToAdd.uid,
+                        forumId: forum.forumId
                     };
-                    await axios.post('http://localhost:3000/forums/addModerator', moderatorData);
+
+                    const headers = {
+                        'Authorization': `Bee-roll ${token}`,
+                        'Content-Type': 'application/json'
+                    };
+
+                    await axios.post('http://localhost:3000/forums/addModerator', moderatorData, { headers });
                     setModerators([...moderators, newModerator]);
                     setNewModerator('');
                 } else {
@@ -39,10 +44,15 @@ const ForumSettings = ({ user }) => {
 
     const handleTogglePrivacy = () => {
         setIsPublic(prevState => !prevState);
-        // Send POST request to toggle forum privacy
+
+        const headers = {
+            'Authorization': `Bee-roll ${token}`,
+            'Content-Type': 'application/json'
+        };
+
         axios.post('http://localhost:3000/forums/togglePrivate', {
             forumId: forum.forumId,
-        })
+        }, { headers })
         .then(response => {
             console.log('Privacy toggled successfully');
         })
@@ -81,11 +91,15 @@ const ForumSettings = ({ user }) => {
 
         console.log('Forum:', forum.forumId);
 
+        const headers = {
+            'Authorization': `Bee-roll ${token}`,
+            'Content-Type': 'application/json'
+        };
+
         axios.post('http://localhost:3000/forums/removeModerator', {
-            to_remove_id: userResponse.data.user_info.uid,
-            who_removes_id: user.id,
-            forum_id: forum.forumId,
-        })
+            userId: userResponse.data.user_info.uid,
+            forumId: forum.forumId,
+        }, { headers })
         .then(response => {
             setModerators(prevModerators => prevModerators.filter(m => m !== moderator));
             console.log('Moderator Deleted Successfully');

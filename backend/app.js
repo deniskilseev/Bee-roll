@@ -55,5 +55,4 @@ app.use('/reviews', reviewRoute);
 app.use('/predict', predictRoute);
 app.use('/comments', commentRoute);
 
-
 module.exports = app;

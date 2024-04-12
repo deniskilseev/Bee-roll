@@ -1,13 +1,27 @@
-import React, { createContext, useContext, useState } from 'react';
-
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({
+    userData: null,
+    token: null
+  });
 
-  const updateUser = (userData) => {
-    setUser((prevUser) => ({ ...prevUser, ...userData }));
+  useEffect(() => {
+    const storedToken = Cookies.get('beerollToken');
+    if (storedToken) {
+      setUser(prevUser => ({ ...prevUser, token: storedToken }));
+    }
+  }, []);
+
+  const updateUser = (userData, newToken) => {
+    console.log("updateUser: Updating user with token:", newToken);
+    setUser(prevUser => {
+      const token = Cookies.get('beerollToken');
+      return { ...prevUser, userData, token: newToken };
+    });
   };
 
   const updateWatchlists = (newWatchlist) => {
@@ -22,7 +36,8 @@ export const UserProvider = ({ children }) => {
   };
 
   const logout = () => {
-    setUser(null);
+    localStorage.removeItem('beerollToken'); // Remove token from localStorage on logout
+    setUser({ userData: null, token: null });
   };
 
   return (

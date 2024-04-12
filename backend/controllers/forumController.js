@@ -5,12 +5,23 @@ const Forum = require('../model/Forum.js')
 const User = require('../model/User.js')
 const Post = require('../model/Post.js')
 
+function checkAlias(string) {
+    const regexp = new RegExp("^[a-z0-9]+$");
+    return regexp.test(string);
+}
+
 const forumController = {
     async createForum(req, res) {
         try {
             const {forumTitle} = req.body;
             const creator_login = req.user.login; 
+
+            if (!checkAlias(forumTitle)) {
+                return res.status(400).json( {error: "Invalid forum alias"} ); 
+            }
+ 
             const existing_title = await Forum.findOne({forumTitle: forumTitle});
+
             if (existing_title) {
                 return res.status(400).json({error: "Forum with such name exists"})
             }
@@ -277,6 +288,41 @@ const forumController = {
         } catch (error) {
             console.error("Error in getAllForums:", error);
             res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
+    async putTitle(req, res) {
+        try {
+            const {forumId, forumTitle} = req.body;
+
+            if (!checkAlias(forumTitle)) {
+                return res.status(400).json( {error: "Invalid forum alias"} ) ;
+            }
+
+            const user_info = await User.findOne( {login: req.user.login} );
+
+            const forum_info = await Forum.findOne( {forumId: forumId} );
+            
+            if (!forum_info) {
+                return res.status(400).json( {error: "No forum with such ID"} );
+            }
+
+            const existing_title = await Forum.findOne( {forumTitle: forumTitle} );
+
+            if (existing_title) {
+                return res.status(400).json( {error: "Forum with such name exists"} );
+            }
+
+            if (forum_info.creatorId == user_info.uid) {
+                await Forum.findOneAndUpdate( {forumId: forumId}, {forumTitle: forumTitle} ); // Update the title
+                return res.status(200).json( {message: "OK"} );
+            }
+            
+            return res.status(403).json( {error: "Unauthorized"} );
+
+        } catch (error) {
+                console.error("Error in changeAlias", error);
+                res.status(500).json( {error: "Internal server error"} );
         }
     }
 }

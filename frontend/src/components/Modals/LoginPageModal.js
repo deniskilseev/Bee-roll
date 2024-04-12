@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
 import { useUser } from '../../UserContext';
-import { useNavigate } from 'react-router-dom'; // Ensure this import is correct
+import Cookies from 'js-cookie';
 
 const LoginPageModal = ({ showModal, onClose }) => {
   const { updateUser } = useUser();
-  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: '',
@@ -67,18 +66,14 @@ const LoginPageModal = ({ showModal, onClose }) => {
 
       if (response.ok) {
         const userData = await response.json();
-        console.log('Login successful');
 
-        updateUser(userData);
-        navigate('/users/profile/${formData.username}'); // Redirect to the profile page
-        
+        updateUser(userData, userData.token);
+        Cookies.set('beerollToken', userData.token, { expires: 7, secure: true });
       } else {
         console.error('Login failed');
-        // Handle failed login scenarios
       }
     } catch (error) {
       console.error('Error:', error);
-      // Handle network or other errors
     }
 
     handleClose();

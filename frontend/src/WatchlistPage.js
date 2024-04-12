@@ -2,29 +2,30 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Watchlist from './components/Watchlist';
 import { useUser } from './UserContext';
-// import watchlists from './dummyWatchlistData';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const WatchlistsPage = ({ user }) => {
+const WatchlistsPage = () => {
   const [watchlists, setWatchlists] = useState([]);
   const { updateWatchlists } = useUser();
+  const { user } = useUser();
+  const token = user.token;
 
   const createWatchlist = async () => {
+    //TODO: Fix create watchlist
     try {
-      const response = await fetch('http://localhost:3000/watchlists/createWatchlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: user.username,
-          is_public: false,
-          watchlist_title: 'New Watchlist',
-        }),
-      });
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json',
+      };
+  
+      const response = await axios.post('http://localhost:3000/watchlists/createWatchlist', {
+        isPublic: false,
+        watchlistTitle: 'New Watchlist 3',
+      }, { headers });
 
-      if (response.ok) {
-        const watchlistData = await response.json();
+      if (response.status === 201) {
+        const watchlistData = await response.data;
         
         const createdWatchlist = await fetchWatchlist(watchlistData.newId);
         updateWatchlists(createdWatchlist);
@@ -38,18 +39,21 @@ const WatchlistsPage = ({ user }) => {
 
   const fetchWatchlist = useCallback(async (watchListId) => {
     try {
-      if (watchlists.some((watchlist) => watchlist.data_by_id.watchListId === watchListId)) {
+      if (watchlists.some((watchlist) => watchlist.watchListId === watchListId)) {
         return;
       }
 
-      const response = await fetch(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
-        method: 'GET',
+      const response = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
+        headers: {
+          'Authorization': `Bee-roll ${token}`,
+          'Content-Type': 'application/json',
+        }
       });
 
-      if (response.ok) {
-        const watchlistData = await response.json();
+      if (response.status === 200) {
+        const watchlistData = await response.data.watchlist_data;
         setWatchlists((prevWatchlists) => {
-          if (!prevWatchlists.some((watchlist) => watchlist.data_by_id.watchListId === watchListId)) {
+          if (!prevWatchlists.some((watchlist) => watchlist.watchListId === watchListId)) {
             return [...prevWatchlists, watchlistData];
           } else {
             return prevWatchlists;
@@ -62,25 +66,23 @@ const WatchlistsPage = ({ user }) => {
     } catch (error) {
       console.error(`Error fetching watchlist: ${watchListId}`, error);
     }
-  }, [watchlists]);
+  }, [watchlists, token]);
 
   useEffect(() => {
-    // Fetch initial watchlists when the component mounts
     const fetchInitialWatchlists = async () => {
-      for (const watchListId of user.watchlists) {
+      for (const watchListId of user.userData.data_by_username.watchListsIds) {
         await fetchWatchlist(watchListId);
       }
     };
 
     fetchInitialWatchlists();
-  }, [user.watchlists, fetchWatchlist]);
-  
+  }, [user.watchlists, fetchWatchlist, user.userData.data_by_username.watchListsIds]);
 
   return (
     <div className="container mt-5">
       {watchlists.length > 0 ? (
         watchlists.map((watchlist) => (
-          <Watchlist key={watchlist.data_by_id.watchListId} watchlist={watchlist} />
+          <Watchlist key={watchlist.watchListId} watchlist={watchlist} />
         ))
       ) : (
         <p>No watchlists found.</p>

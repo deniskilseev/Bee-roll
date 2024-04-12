@@ -1,42 +1,50 @@
 // CreateForumPage.js
 import React, { useState } from 'react';
+import { useUser } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CreateForumPage = ({ onForumCreate, user }) => {
+const CreateForumPage = () => {
   const navigate = useNavigate();
   const [forumTitle, setForumTitle] = useState('');
   const [forumDescription, setForumDescription] = useState('');
+  const { user } = useUser();
+  const token = user.token;
 
   const handleCreateForum = async () => {
-    const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
-
-    console.log(user);
-
-    const newForum = {
-      forumTitle: forumTitle,
-      creatorId: user.id,
-    };
-
     try {
-      const response = await axios.post('http://localhost:3000/forums/createForum', newForum);
-      const createdForum = response.data;
-  
-      onForumCreate(createdForum);
-      navigate(`/forums/${forumName}`);
+        // TODO: Forums not being created correctly
+        const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
+
+        // Check if forumTitle contains special characters or spaces
+        if (/[^a-zA-Z0-9-]/.test(forumTitle)) {
+            throw new Error('Forum title should not contain special characters or spaces');
+        }
+
+        console.log(user);
+
+        const newForum = {
+            forumTitle: forumTitle,
+        };
+
+        const headers = {
+            'Authorization': `Bee-roll ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
+
+        navigate(`/forums/${forumName}`);
     } catch (error) {
-      console.error('Error creating forum:', error);
+        console.error('Error creating forum:', error);
+        // Show a message to the user
+        alert('Error creating forum: Forum title should not contain special characters or spaces');
     }
-
-    onForumCreate(newForum);
-
-    navigate(`/forums/${forumName}`);
   };
 
   const handleCancel = () => {
     navigate('/');
   };
-
   
   return (
     <div className="container mt-5">
