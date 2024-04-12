@@ -100,12 +100,21 @@ describe('getWatchList', () => {
         expect(res.status).toBe(200);
     });
 
-    test('403 when the watchlist is private and not the owner', async () => {
+    test('200 when following the watchlist is private and not the owner', async () => {
         const res = await request(app)
             .get('/watchlists/getWatchlist/2')
             .set({Authorization: token});
 
+        expect(res.status).toBe(200);
+    });
+
+    test('403 when not following the watchlist and is private', async () => {
+        const res = await request(app)
+            .get('/watchlists/getWatchlist/7')
+            .set({Authorization: token});
+
         expect(res.status).toBe(403);
+
     });
 
     test('200 when the watchlist is private and the owner', async () => {
