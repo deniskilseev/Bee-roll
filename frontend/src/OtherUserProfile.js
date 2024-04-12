@@ -1,10 +1,10 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import profileIcon from './assets/blank profile pic.jpg';
 import axios from 'axios';
+import OtherUserWatchlist from './components/OtherUserWatchlist';
 import { useUser } from './UserContext';
 
 
@@ -12,12 +12,73 @@ const OtherUserProfile = () => {
   const { username } = useParams(); // Extract uid parameter from URL
   const [otherUser, setOtherUser] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [watchlists, setWatchlists] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const { user } = useUser();
+  const [activeTab, setActiveTab] = useState('posts');
   const token = user.token;
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+  const fetchWatchlist = useCallback(async (watchListId) => {
+    try {
+      if (watchlists.some((watchlist) => watchlist.watchListId === watchListId)) {
+        return;
+      }
+
+      const response = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
+        headers: {
+          'Authorization': `Bee-roll ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.status === 200) {
+        const watchlistData = await response.data.watchlist_data;
+        setWatchlists((prevWatchlists) => {
+          if (!prevWatchlists.some((watchlist) => watchlist.watchListId === watchListId)) {
+            return [...prevWatchlists, watchlistData];
+          } else {
+            return prevWatchlists;
+          }
+        });
+        return watchlistData;
+      } else {
+        console.error(`Failed to fetch watchlist: ${watchListId}`);
+      }
+    } catch (error) {
+      console.error(`Error fetching watchlist: ${watchListId}`, error);
+    }
+  }, [watchlists, token]);
+
   useEffect(() => {
-    // Fetch user profile data using username
+    const fetchInitialWatchlists = async () => {
+      for (const watchListId of otherUser.watchListsIds) {
+        try {
+          const watchlistData = await fetchWatchlist(watchListId);
+          if (watchlistData && watchlistData.isPublic) {
+            // Only add the watchlist to the array if it's public
+            setWatchlists((prevWatchlists) => {
+              if (!prevWatchlists.some((watchlist) => watchlist.watchListId === watchListId)) {
+                return [...prevWatchlists, watchlistData];
+              } else {
+                return prevWatchlists;
+              }
+            });
+          }
+        } catch (error) {
+          console.error(`Error fetching watchlist: ${watchListId}`, error);
+        }
+      }
+    };
+
+    if (otherUser) {
+      fetchInitialWatchlists();
+    }
+  }, [otherUser, fetchWatchlist]);
+
+  useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/users/getUserByUsername/${username}`);
@@ -44,21 +105,18 @@ const OtherUserProfile = () => {
               return response.data.post_info;
             })
           );
-          
+
           setPosts(postsData);
         } catch (error) {
           console.error('Error fetching posts:', error);
         }
       }
     };
-    
+
     fetchPostData();
   }, [otherUser, token]);
 
   const handleFollow = async () => {
-    console.log('Current User:', user);
-    console.log('User followed/unfollowed:', otherUser);
-
     try {
       const endpoint = isFollowing ? '/users/unfollowUser' : '/users/followUser';
       const headers = {
@@ -113,18 +171,41 @@ const OtherUserProfile = () => {
                   </Link>
                 </div>
               </div>
-            </div>
-            <div className="card-footer">
-              <h3 className="font-weight-bold">Posts</h3>
-              {posts.map((post) => (
-                <div key={post.postId} className="card mb-3">
-                  <div className="card-body">
-                    <h5 className="card-title">{post.postTitle}</h5>
-                    <p className="card-text">{post.postText}</p>
-                    <p className="card-text">Posted By: {otherUser.login}</p>
+            </div><div className="card-footer">
+              <ul className="nav nav-tabs">
+                <li className="nav-item">
+                  <button className={`nav-link ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => handleTabChange('posts')}>Posts</button>
+                </li>
+                <li className="nav-item">
+                  <button className={`nav-link ${activeTab === 'watchlists' ? 'active' : ''}`} onClick={() => handleTabChange('watchlists')}>Watchlists</button>
+                </li>
+              </ul>
+              <div className="tab-content">
+                {activeTab === 'posts' && (
+                  <div className="tab-pane active" id="posts">
+                    {posts.map((post) => (
+                      <div key={post.postId} className="card mb-3">
+                        <div className="card-body">
+                          <h5 className="card-title">{post.postTitle}</h5>
+                          <p className="card-text">{post.postText}</p>
+                          <p className="card-text">Posted By: {otherUser.login}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))}
+                )}
+                {activeTab === 'watchlists' && (
+                  <div className="tab-pane active" id="watchlists">
+                    {watchlists.length > 0 ? (
+                      watchlists.map((watchlist) => (
+                        <OtherUserWatchlist key={watchlist.watchListId} watchlist={watchlist} />
+                      ))
+                    ) : (
+                      <p>No watchlists found.</p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

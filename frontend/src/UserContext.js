@@ -18,10 +18,7 @@ export const UserProvider = ({ children }) => {
 
   const updateUser = (userData, newToken) => {
     console.log("updateUser: Updating user with token:", newToken);
-    setUser(prevUser => {
-      const token = Cookies.get('beerollToken');
-      return { ...prevUser, userData, token: newToken };
-    });
+    setUser({ userData, token: newToken });
   };
 
   const updateWatchlists = (newWatchlist) => {
