@@ -30,7 +30,7 @@ app.use(express.json()); // Parse JSON bodies
 const dbName = '';
 const username = 'denis';
 const password = 'kilseev';
-const host = '3.144.154.13';
+const host = '18.189.22.191';
 const portMongo = '28018';
 
 // Connection URI
