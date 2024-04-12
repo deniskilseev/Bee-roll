@@ -80,7 +80,6 @@ const Watchlist = ({ watchlist }) => {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
-      console.log('Adding to watchlist:', watchlist.watchListId, movieId);
       const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
         watchlistId: watchlist.watchListId,
         movieId: movieId
@@ -92,12 +91,9 @@ const Watchlist = ({ watchlist }) => {
         }
       });
 
-      console.log('Updated watchlist:', updatedWatchlistResponse.data.watchlist_data.movieIds);
-      console.log('movies info:', moviesInfo);
       if (updatedWatchlistResponse.data) {
         watchlist.movieIds = updatedWatchlistResponse.data.watchlist_data.movieIds;
       }
-      console.log('Added to watchlist:', response.data);
     } catch (error) {
       console.error('Error adding to watchlist:', error);
     }
@@ -105,9 +101,6 @@ const Watchlist = ({ watchlist }) => {
 
   const deleteFromWatchlist = async (movieId) => { 
     try {
-
-      console.log('Deleting from watchlist:', watchlist.watchListId, movieId);
-
       const headers = {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
@@ -128,7 +121,6 @@ const Watchlist = ({ watchlist }) => {
         watchlist.movieIds = updatedWatchlistResponse.data.watchlist_data.movieIds;
         setMoviesInfo([]);
       }
-      console.log('Deleted from watchlist:', response.data);
     } catch (error) {
       console.error('Error deleting from watchlist:', error);
     }
@@ -141,7 +133,6 @@ const Watchlist = ({ watchlist }) => {
         const promises = watchlist.movieIds.map(async (movieId) => {
           try {
             const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
-            console.log('Response for movieId', movieId, response);
     
             if (response.ok) {
               const movieInfo = await response.json();
@@ -166,10 +157,8 @@ const Watchlist = ({ watchlist }) => {
     
     fetchMovieInfo();
   }, [isExpanded, watchlist.movieIds]);
-  
 
-  console.log('Watchlist:', watchlist);
-
+  console.log('moviesInfo', moviesInfo);
   return (
     <div className="card mt-3">
       <div className="card-body">

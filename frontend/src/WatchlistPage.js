@@ -12,7 +12,6 @@ const WatchlistsPage = () => {
   const token = user.token;
 
   const createWatchlist = async () => {
-    //TODO: Fix create watchlist
     try {
       const headers = {
         'Authorization': `Bee-roll ${token}`,
