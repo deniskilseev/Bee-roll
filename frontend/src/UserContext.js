@@ -16,11 +16,11 @@ export const UserProvider = ({ children }) => {
     }
   }, []);
 
-  const updateUser = (userData, token) => {
-    console.log("updateUser: Updating user with token:", token);
+  const updateUser = (userData, newToken) => {
+    console.log("updateUser: Updating user with token:", newToken);
     setUser(prevUser => {
       const token = Cookies.get('beerollToken');
-      return { ...prevUser, userData, token };
+      return { ...prevUser, userData, token: newToken };
     });
   };
 

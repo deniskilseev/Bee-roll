@@ -66,20 +66,14 @@ const LoginPageModal = ({ showModal, onClose }) => {
 
       if (response.ok) {
         const userData = await response.json();
-        console.log('Login successful');
-        console.log('User data:', userData);
 
-        updateUser(userData);
-        console.log(userData.token);
+        updateUser(userData, userData.token);
         Cookies.set('beerollToken', userData.token, { expires: 7, secure: true });
-        console.log('Cookie saved:', Cookies.get('beerollToken'));
       } else {
         console.error('Login failed');
-        // Handle failed login scenarios
       }
     } catch (error) {
       console.error('Error:', error);
-      // Handle network or other errors
     }
 
     handleClose();

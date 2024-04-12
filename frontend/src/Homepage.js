@@ -21,7 +21,6 @@ const HomePage = () => {
             }, { headers });
 
             setPostIds(response.data);
-            console.log(postIds)
           } catch (error) {
             console.error('Failed to retrieve posts:', error.message);
           }
@@ -29,7 +28,7 @@ const HomePage = () => {
       };
 
       sendPostRequest();
-  }, [user, postIds]);
+  }, [user]);
 
   useEffect(() => {
     const fetchPostData = async () => {

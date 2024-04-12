@@ -5,6 +5,7 @@ import LoginPageModal from './Modals/LoginPageModal';
 import RegisterPageModal from './Modals/RegisterPageModal';
 import { useUser } from '../UserContext';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const Taskbar = () => {
   const { user, logout } = useUser();
@@ -21,6 +22,7 @@ const Taskbar = () => {
 
   const handleLogoutClick = () => {
     logout();
+    Cookies.remove('beerollToken');
     navigate('/');
   };
 
@@ -58,11 +60,8 @@ const Taskbar = () => {
 
   const handleSearchResultClick = async (movieId) => {
     try {
-      console.log(movieId);
       const response = await axios.get(`http://localhost:3000/movies/getInfo/${movieId}`);
       
-      console.log('Movie info:', response.data);
-
       navigate(`/movies/${movieId}`, { state: { movieInfo: response.data } });
     } catch (error) {
       console.error('Error fetching movie info:', error);
