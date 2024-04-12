@@ -20,7 +20,8 @@ const userSchema = new Schema({
     data: { type: Buffer, default: Buffer.from([]) },
     type: { type: String, default: '' }
   },
-  commentIds: [Number]
+  commentIds: [Number],
+  followedWatchListsIds: [Number],
 });
 
 const User = model('User', userSchema);
