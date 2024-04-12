@@ -28,21 +28,28 @@ app.use(express.json()); // Parse JSON bodies
 
 // Should conceal this somehow.
 const dbName = '';
-const username = 'denis';
-const password = 'kilseev';
-const host = '3.144.154.13';
+const username = 'stiruchunapally';
+const password = 'tObzoG9HOxrxNYEt';
+const host = '65.175.28.225';
 const portMongo = '28018';
 
 // Connection URI
-const uri = `mongodb://${username}:${password}@${host}:${portMongo}/${dbName}`;
+const uri = "mongodb+srv://stiruchunapally:tObzoG9HOxrxNYEt@bee-roll.gvynfb9.mongodb.net/?retryWrites=true&w=majority&appName=bee-roll";
 
 // Connect to MongoDB
+
 mongoose.connect(uri, {
     useUnifiedTopology: true,
-    dbName: 'testDatabase'
+    dbName: 'prodDatabase'
   })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
+// mongoose.connect(uri, {
+//     useUnifiedTopology: true,
+//     dbName: 'testDatabase'
+//   })
+//   .then(() => console.log('MongoDB connected'))
+//   .catch(err => console.error('Error connecting to MongoDB:', err));
 
 // Routes.
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

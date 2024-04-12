@@ -11,6 +11,8 @@ const Watchlist = ({ watchlist }) => {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(watchlist.watchListTitle);
   const { user } = useUser();
   const token = user.token;
 
@@ -23,6 +25,15 @@ const Watchlist = ({ watchlist }) => {
 
   const closePopup = () => {
     setIsPopupOpen(false);
+  };
+
+  const toggleEditMode = () => {
+    setIsEditMode(!isEditMode);
+  };
+
+  const handleTitleChange = (event) => {
+    // implement logic to handle title change
+    // setEditedTitle(event.target.value);
   };
 
   const handleSearchChange = (event) => {
@@ -68,11 +79,42 @@ const Watchlist = ({ watchlist }) => {
       console.error('Error adding to watchlist:', error);
     }
   };
-  
+
+  const deleteFromWatchlist = async (movieId) => { 
+    try {
+
+      console.log('Deleting from watchlist:', watchlist.watchListId, movieId);
+
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const response = await axios.post(`http://localhost:3000/watchlists/removeMovie`, {
+        watchlistId: watchlist.watchListId,
+        movieId: movieId
+      }, { headers });
+
+      const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
+        headers: {
+          'Authorization': `Bee-roll ${token}`
+        }
+      });
+
+      if (updatedWatchlistResponse.data) {
+        watchlist.movieIds = updatedWatchlistResponse.data.watchlist_data.movieIds;
+        setMoviesInfo([]);
+      }
+      console.log('Deleted from watchlist:', response.data);
+    } catch (error) {
+      console.error('Error deleting from watchlist:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchMovieInfo = async () => {
       if (isExpanded && watchlist.movieIds && watchlist.movieIds.length > 0) {
-        setMoviesInfo([]); // Clear existing movie info
+        setMoviesInfo([]);
         const promises = watchlist.movieIds.map(async (movieId) => {
           try {
             const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
@@ -108,9 +150,25 @@ const Watchlist = ({ watchlist }) => {
   return (
     <div className="card mt-3">
       <div className="card-body">
-        <h5 className="card-title" onClick={toggleExpand}>
-          {watchlist.watchListTitle}
-        </h5>
+        <div className="d-flex justify-content-between align-items-center">
+          <h5 className="card-title" onClick={toggleExpand}>
+            {isEditMode ? (
+              <input
+                type="text"
+                className="form-control"
+                value={editedTitle}
+                onChange={handleTitleChange}
+              />
+            ) : (
+              watchlist.watchListTitle
+            )}
+          </h5>
+          <div>
+            <button className="btn btn-sm btn-primary mx-2" onClick={toggleEditMode}>
+              {isEditMode ? 'Save' : 'Edit'}
+            </button>
+          </div>
+        </div>
         {isExpanded && (
           <div>
             <div className="bg-light p-3 mt-2">
@@ -118,6 +176,11 @@ const Watchlist = ({ watchlist }) => {
                 {moviesInfo.map((movieInfo) => (
                   <li key={movieInfo.movie_data.movieId} className="list-group-item">
                     {movieInfo.movie_data.title}
+                    {isEditMode && (
+                      <button className="btn btn-sm btn-danger ms-2" onClick={() => deleteFromWatchlist(movieInfo.movie_data.movieId)}>
+                        Delete
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
