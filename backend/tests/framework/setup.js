@@ -4,6 +4,7 @@ const Counter = require('../../model/Counter')
 const Forum = require('../../model/Forum')
 const Post = require('../../model/Post')
 const WatchList = require('../../model/WatchList')
+const Review = require('../../model/Review')
 // const jest = require('jest');
 
 module.exports = async () => {
@@ -16,6 +17,7 @@ module.exports = async () => {
             {_id: "Post", collectionCounter: 6},
             {_id: "Comment", collectionCounter: 1},
             {_id: "WatchList", collectionCounter: 7},
+            {_id: "Review", collectionCounter: 3},
         ];
 
         const users = [
@@ -58,11 +60,18 @@ module.exports = async () => {
             {watchListId: 7, watchListTitle: "Cringe", userId: 3, isPublic: false, movieIds: [1, 2], followerIds: []},
         ];
 
+        const reviews = [
+            {reviewId: 1, userId: 1, movieId: 3, review: 5},
+            {reviewId: 2, userId: 2, movieId: 3, review: 4},
+            {reviewId: 3, userId: 2, movieId: 1, review: 1},
+        ];
+
         await User.insertMany(users);
         await Counter.insertMany(counters);
         await Forum.insertMany(forums);
         await Post.insertMany(posts);
         await WatchList.insertMany(watchlists);
+        await Review.insertMany(reviews);
 
     } catch (error) {
         console.error('Error populating fields in tests/framework/setup.js', error);

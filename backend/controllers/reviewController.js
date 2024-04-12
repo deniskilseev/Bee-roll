@@ -155,6 +155,37 @@ const reviewController = {
             return res.status(500).json( {error: "Internal server error"} );
         }
     },
+
+    async averageRating(req, res) {
+        try {
+            const {movieId} = req.params;
+
+            const movie_data = await Movie.findOne( {movieId: movieId} );
+
+            if (!movie_data) {
+                return res.status(400).json( {error: "movieId does not exist"} );
+            }
+
+            const reviews = await Review.find( {movieId: movieId} );
+
+            let sum = 0;
+
+            for (review of reviews) {
+                sum = sum + review.review;
+            }
+
+            if (reviews.length == 0) {
+                return res.status(200).json( {average: -1} );
+            }
+
+            const average = sum / reviews.length;
+
+            return res.status(200).json( {average: average} );
+        } catch (error) {
+            console.error("Error in averageRating:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
 }
 
 module.exports = reviewController;
