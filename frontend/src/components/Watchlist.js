@@ -46,45 +46,62 @@ const Watchlist = ({ watchlist }) => {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
+      console.log('Adding to watchlist:', watchlist.watchListId, movieId);
       const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
-        watchlist_id: watchlist.watchListId,
-        movie_id: movieId,
-        //TODO: Fix Rating is not defined error
+        watchlistId: watchlist.watchListId,
+        movieId: movieId
       }, { headers });
+
+      const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
+        headers: {
+          'Authorization': `Bee-roll ${token}`
+        }
+      });
+
+      console.log('Updated watchlist:', updatedWatchlistResponse.data.watchlist_data.movieIds);
+      console.log('movies info:', moviesInfo);
+      if (updatedWatchlistResponse.data) {
+        watchlist.movieIds = updatedWatchlistResponse.data.watchlist_data.movieIds;
+      }
       console.log('Added to watchlist:', response.data);
     } catch (error) {
       console.error('Error adding to watchlist:', error);
     }
   };
-
+  
   useEffect(() => {
     const fetchMovieInfo = async () => {
-      const promises = watchlist.movieIds.map(async (movieId) => {
-        try {
-          const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
-          console.log('Response for movieId', movieId, response);
-  
-          if (response.ok) {
-            const movieInfo = await response.json();
-            return movieInfo;
-          } else {
-            console.error(`Failed to fetch movie info for ID: ${movieId}`);
+      if (isExpanded && watchlist.movieIds && watchlist.movieIds.length > 0) {
+        setMoviesInfo([]); // Clear existing movie info
+        const promises = watchlist.movieIds.map(async (movieId) => {
+          try {
+            const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
+            console.log('Response for movieId', movieId, response);
+    
+            if (response.ok) {
+              const movieInfo = await response.json();
+              return movieInfo;
+            } else {
+              console.error(`Failed to fetch movie info for ID: ${movieId}`);
+              return null;
+            }
+          } catch (error) {
+            console.error(`Error fetching movie info for ID: ${movieId}`, error);
             return null;
           }
-        } catch (error) {
-          console.error(`Error fetching movie info for ID: ${movieId}`, error);
-          return null;
-        }
-      });
-  
-      const movieInfoArray = await Promise.all(promises);
-      setMoviesInfo(movieInfoArray.filter((info) => info !== null));
+        });
+    
+        const movieInfoArray = await Promise.all(promises);
+        setMoviesInfo(prevMoviesInfo => [
+          ...prevMoviesInfo,
+          ...movieInfoArray.filter(info => info !== null)
+        ]);
+      }
     };
-  
-    if (isExpanded && watchlist.movieIds && watchlist.movieIds.length > 0) {
-      fetchMovieInfo();
-    }
+    
+    fetchMovieInfo();
   }, [isExpanded, watchlist.movieIds]);
+  
 
   console.log('Watchlist:', watchlist);
 
