@@ -22,6 +22,10 @@ const watchListSchema = new Schema({
     movieIds: {
         type: [Number],
         require: false
+    },
+    followerIds: {
+        type: [Number],
+        require: false
     }
 });
 

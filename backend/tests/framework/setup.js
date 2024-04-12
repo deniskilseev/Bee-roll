@@ -15,14 +15,21 @@ module.exports = async () => {
             {_id: "Forum", collectionCounter: 3},
             {_id: "Post", collectionCounter: 6},
             {_id: "Comment", collectionCounter: 1},
-            {_id: "WatchList", collectionCounter: 5},
+            {_id: "WatchList", collectionCounter: 7},
         ];
 
         const users = [
-            {uid: 1, login: 'denis', password: '123', email: 'denis@gmail.com', followersIds: [3], postsIds: [1, 2], forumIds: [1], watctListsIds: [2],},
-            {uid: 2, login: 'artemii', password: '321', email: 'artemii@gmail.com', followersIds: [3], postsIds: [3, 4], forumIds: [1], wathcListsIds: [1, 4, 5],},
-            {uid: 3, login: 'aarna', password: 'qwerty', email: 'aarna@gmail.com', followsIds: [1, 2], postsIds: [5], watchListsIds: [3],},
-            {uid: 4, login: 'sreekar', password: 'ytrewq', email: 'sreekar@gmail.com'}
+            {uid: 1, login: 'denis', password: '123', email: 'denis@gmail.com', followersIds: [3], 
+                postsIds: [1, 2], forumIds: [1], watctListsIds: [2], followedWatchListsIds: [1, 3], },
+
+            {uid: 2, login: 'artemii', password: '321', email: 'artemii@gmail.com', followersIds: [3], 
+                postsIds: [3, 4], forumIds: [1], wathcListsIds: [1, 4, 5], followedWatchListsIds: [2, 3], },
+
+            {uid: 3, login: 'aarna', password: 'qwerty', email: 'aarna@gmail.com', followsIds: [1, 2], 
+                postsIds: [5], forumIds:[], watchListsIds: [3], followedWatchListsIds: [1, 2], },
+
+            {uid: 4, login: 'sreekar', password: 'ytrewq', email: 'sreekar@gmail.com', followsIds: [],
+                postIds: [], forumIds:[], watchListsIds: [], followedWatchListsIds: [], }
         ];
 
         const posts = [
@@ -42,11 +49,13 @@ module.exports = async () => {
         ];
 
         const watchlists = [
-            {watchListId: 1, watchListTitle: "GMOAT", userId: 2, isPublic: false, movieIds: [1, 2, 3, 4]},
-            {watchListId: 2, watchListTitle: "Comedies", userId: 1, isPublic: false, movieIds: [1, 2, 3]},
-            {watchListId: 3, watchListTitle: "Drammas", userId: 3, isPublic: true, movieIds: [5, 6]},
-            {watchListId: 4, watchListTitle: "Le funny", userId: 2, isPublic: false, movieIds: [7, 8]},
-            {watchListId: 5, watchListTitle: "Le sad", userId: 2, isPublic: true, movieIds: [10, 11]},
+            {watchListId: 1, watchListTitle: "GMOAT", userId: 2, isPublic: false, movieIds: [1, 2, 3, 4], followerIds: [1, 3],},
+            {watchListId: 2, watchListTitle: "Comedies", userId: 1, isPublic: false, movieIds: [1, 2, 3], followerIds: [2, 3],},
+            {watchListId: 3, watchListTitle: "Drammas", userId: 3, isPublic: true, movieIds: [5, 6], followerIds: [1, 2],},
+            {watchListId: 4, watchListTitle: "Le funny", userId: 2, isPublic: false, movieIds: [7, 8], followerIds: [],},
+            {watchListId: 5, watchListTitle: "Le sad", userId: 2, isPublic: true, movieIds: [10, 11], followerIds: [],},
+            {watchListId: 6, watchListTitle: "Bruh", userId: 1, isPublic: true, movieIds: [25, 65], followerIds: []},
+            {watchListId: 7, watchListTitle: "Cringe", userId: 3, isPublic: false, movieIds: [1, 2], followerIds: []},
         ];
 
         await User.insertMany(users);

@@ -327,4 +327,82 @@ describe('togglePublic', () => {
 
         expect(res.status).toBe(400);
     });
-})
+});
+
+describe('follow a watchlist', () => {
+    test('200 when everything is correct', async () => {
+        req = { body : {
+            watchlistId: 6,
+        }};
+
+        const res = await request(app)
+            .post('/watchlists/followWatchlist')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const user_data = await User.findOne({login: "artemii"});
+
+        const watchlist_data = await WatchList.findOne({watchListId: 6});
+
+        expect(user_data.followedWatchListsIds).toContain(6);
+        expect(watchlist_data.followerIds).toContain(user_data.uid);
+    });
+
+    test('403 when the watchlist is private', async () => {
+        req = { body: {
+            watchlistId: 7,
+        }};
+
+        const res = await request(app)
+            .post('/watchlists/followWatchlist')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(403);
+    });
+});
+
+describe('unfollowWatchlist', () => {
+    test('200 when everything is correct', async () => {
+        req = { body: {
+            watchlistId: 3,
+        }};
+
+         const res = await request(app)
+            .post('/watchlists/unfollowWatchlist')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const user_data = await User.findOne({login: "artemii"});
+
+        const watchlist_data = await WatchList.findOne({watchListId: 3});
+
+        expect(user_data.followedWatchListsIds).not.toContain(3);
+        expect(watchlist_data.followerIds).not.toContain(user_data.uid);
+    });
+
+    test('200 when the watchlist is private', async () => {
+        req = { body: {
+            watchlistId: 2,
+        }};
+
+         const res = await request(app)
+            .post('/watchlists/unfollowWatchlist')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const user_data = await User.findOne({login: "artemii"});
+
+        const watchlist_data = await WatchList.findOne({watchListId: 2});
+
+        expect(user_data.followedWatchListsIds).not.toContain(2);
+        expect(watchlist_data.followerIds).not.toContain(user_data.uid);
+
+    });
+});
