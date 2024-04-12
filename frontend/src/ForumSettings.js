@@ -18,14 +18,11 @@ const ForumSettings = () => {
             try {
                 const userResponse = await axios.get(`http://localhost:3000/users/getUserByUsername/${newModerator}`);
                 const userToAdd = userResponse.data.user_info;
-                console.log('Forum:', forum)
-                console.log('User:', user)
 
                 if (userToAdd) {
                     const moderatorData = {
-                        to_add_id: userToAdd.uid,
-                        who_adds_id: user.id,
-                        forum_id: forum.forumId
+                        userId: userToAdd.uid,
+                        forumId: forum.forumId
                     };
 
                     const headers = {
@@ -100,9 +97,8 @@ const ForumSettings = () => {
         };
 
         axios.post('http://localhost:3000/forums/removeModerator', {
-            to_remove_id: userResponse.data.user_info.uid,
-            who_removes_id: user.id,
-            forum_id: forum.forumId,
+            userId: userResponse.data.user_info.uid,
+            forumId: forum.forumId,
         }, { headers })
         .then(response => {
             setModerators(prevModerators => prevModerators.filter(m => m !== moderator));
