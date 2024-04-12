@@ -3,6 +3,7 @@ import AddMovieModal from './Modals/AddMovieModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { useUser } from '../UserContext';
+import '../styles/watchlistCard.css';
 
 const Watchlist = ({ watchlist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -12,6 +13,7 @@ const Watchlist = ({ watchlist }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isPublic, setIsPublic] = useState(watchlist.isPublic);
   const [editedTitle, setEditedTitle] = useState(watchlist.watchListTitle);
   const { user } = useUser();
   const token = user.token;
@@ -29,6 +31,27 @@ const Watchlist = ({ watchlist }) => {
 
   const toggleEditMode = () => {
     setIsEditMode(!isEditMode);
+  };
+
+  const toggleVisibility = async () => {
+    try {
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
+  
+      const response = await axios.post(`http://localhost:3000/watchlists/togglePublic`, {
+        watchlistId: watchlist.watchListId
+      }, {
+        headers
+      });
+
+      if (response.status === 200) {
+        setIsPublic(!isPublic);
+      }
+    } catch (error) {
+      console.error('Error toggling watchlist visibility:', error);
+    }
   };
 
   const handleTitleChange = (event) => {
@@ -163,8 +186,19 @@ const Watchlist = ({ watchlist }) => {
               watchlist.watchListTitle
             )}
           </h5>
-          <div>
-            <button className="btn btn-sm btn-primary mx-2" onClick={toggleEditMode}>
+          <div className="d-flex align-items-center">
+            <div className="privacy-section me-3">
+              <label className="privacy-label">
+                <input
+                  type="checkbox"
+                  checked={isPublic}
+                  onChange={toggleVisibility}
+                />
+                <span className="privacy-slider"></span>
+              </label>
+              <span className="privacy-text">{isPublic ? 'Public' : 'Private'}</span>
+            </div>
+            <button className="btn btn-sm btn-primary" onClick={toggleEditMode}>
               {isEditMode ? 'Save' : 'Edit'}
             </button>
           </div>
