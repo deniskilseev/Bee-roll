@@ -76,7 +76,7 @@ const watchListController = {
 
             const user_data = await User.findOne( {login: req.user.login} );
 
-            if (user_data.uid == watchlist_data.userId) {
+            if (user_data.uid == watchlist_data.userId || watchlist_data.followerIds.includes(user_data.uid)) {
                 return res.status(200).json({watchlist_data});
             }
 
