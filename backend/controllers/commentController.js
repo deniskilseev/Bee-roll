@@ -76,7 +76,7 @@ const commentController = {
             console.log("USER CREATING: ", post.userId)
             const isAllowed = user_deleting_uid == post.userId 
                 || user_deleting_uid == forum.creatorId 
-                || forum.moderatorIds?.includes(user_deleting_uid);
+                || forum.moderatorIds.includes(user_deleting_uid);
             if (!isAllowed) {
                 return res.status(403).json({error: "You have no rights"});
             }

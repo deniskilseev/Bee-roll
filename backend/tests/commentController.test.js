@@ -62,7 +62,7 @@ describe('createComment', () => {
     test('return 404 for private forums', async () => {
         const req = { body: {
             commentText: "You suck",
-            postId: 2
+            postId: 7
         }};
 
         const res = await request(app)

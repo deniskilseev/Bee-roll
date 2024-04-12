@@ -262,7 +262,7 @@ describe('togglePrivate', () => {
 
      test('400 when the forum is inexisting', async () => {
         const req = { body: {
-            forumId: 6
+            forumId: 1000000
         }};
 
          const res = await request(app)

@@ -13,8 +13,8 @@ module.exports = async () => {
         // jest.setTimeout(10000);
         const counters = [
             {_id: "User", collectionCounter: 4},
-            {_id: "Forum", collectionCounter: 3},
-            {_id: "Post", collectionCounter: 6},
+            {_id: "Forum", collectionCounter: 5},
+            {_id: "Post", collectionCounter: 7},
             {_id: "Comment", collectionCounter: 1},
             {_id: "WatchList", collectionCounter: 7},
             {_id: "Review", collectionCounter: 3},
@@ -22,16 +22,16 @@ module.exports = async () => {
 
         const users = [
             {uid: 1, login: 'denis', password: '123', email: 'denis@gmail.com', followersIds: [3], 
-                postsIds: [1, 2], forumIds: [1], watctListsIds: [2], followedWatchListsIds: [1, 3], },
+                postsIds: [1, 2], forumIds: [1, 4], watctListsIds: [2], followedWatchListsIds: [1, 3], },
 
             {uid: 2, login: 'artemii', password: '321', email: 'artemii@gmail.com', followersIds: [3], 
-                postsIds: [3, 4], forumIds: [1], wathcListsIds: [1, 4, 5], followedWatchListsIds: [2, 3], },
+                postsIds: [3, 4], forumIds: [1, 2], wathcListsIds: [1, 4, 5], followedWatchListsIds: [2, 3], },
 
             {uid: 3, login: 'aarna', password: 'qwerty', email: 'aarna@gmail.com', followsIds: [1, 2], 
-                postsIds: [5], forumIds:[], watchListsIds: [3], followedWatchListsIds: [1, 2], },
+                postsIds: [5], forumIds:[3], watchListsIds: [3], followedWatchListsIds: [1, 2], },
 
             {uid: 4, login: 'sreekar', password: 'ytrewq', email: 'sreekar@gmail.com', followsIds: [],
-                postIds: [], forumIds:[], watchListsIds: [], followedWatchListsIds: [], }
+                postIds: [6, 7], forumIds:[4, 5], watchListsIds: [4, 5], followedWatchListsIds: [], }
         ];
 
         const posts = [
@@ -41,13 +41,15 @@ module.exports = async () => {
             {postId: 4, userId: 2, postTitle: "Small apples", forumId: 1, postText: "Maybe hate small apples."},
             {postId: 5, userId: 3, postTitle: "PINEAPPLES", forumId: 3, postText: "Pineapples >> apples"},
             {postId: 6, userId: 4, postTitle: "Welcome", forumId: 4, postText: "Welcome to forum"},
+            {postId: 7, userId: 4, postTitle: "lol", forumId:5, postText: "funny, haha"},
         ];
 
         const forums = [
             {forumId: 1, forumTitle: 'apples', creatorId: 1, userIds: [1, 2], postIds: [3, 4], isPrivate: false},
             {forumId: 2, forumTitle: 'cars', creatorId: 2, userIds: [2], postIds: [1, 2], isPrivate: true},
             {forumId: 3, forumTitle: 'pineapples', creatorId: 3, userIds: [3], postIds: [5], isPrivate: false},
-            {forumId: 4, forumTitle: 'highboys', creatorId: 4, userIds: [4, 1], postIds: [6], isPrivate: true}
+            {forumId: 4, forumTitle: 'highboys', creatorId: 4, userIds: [4, 1], postIds: [6], isPrivate: true},
+            {forumId: 5, forumTitle: "bruh", creatorId: 4, userIds: [4], postIds: [7], isPrivate: true},
         ];
 
         const watchlists = [
