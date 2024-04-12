@@ -12,29 +12,34 @@ const CreateForumPage = () => {
   const token = user.token;
 
   const handleCreateForum = async () => {
-    // TODO: Forums not being created correctly
-    const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
-
-    console.log(user);
-
-    const newForum = {
-      forumTitle: forumTitle,
-    };
-
     try {
-      const headers = {
-        'Authorization': `Bee-roll ${token}`,
-        'Content-Type': 'application/json'
-      };
+        // TODO: Forums not being created correctly
+        const forumName = forumTitle.replace(/\s+/g, '-').toLowerCase();
 
-      await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
+        // Check if forumTitle contains special characters or spaces
+        if (/[^a-zA-Z0-9-]/.test(forumTitle)) {
+            throw new Error('Forum title should not contain special characters or spaces');
+        }
 
-      navigate(`/forums/${forumName}`);
+        console.log(user);
+
+        const newForum = {
+            forumTitle: forumTitle,
+        };
+
+        const headers = {
+            'Authorization': `Bee-roll ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
+
+        navigate(`/forums/${forumName}`);
     } catch (error) {
-      console.error('Error creating forum:', error);
+        console.error('Error creating forum:', error);
+        // Show a message to the user
+        alert('Error creating forum: Forum title should not contain special characters or spaces');
     }
-
-    navigate(`/forums/${forumName}`);
   };
 
   const handleCancel = () => {

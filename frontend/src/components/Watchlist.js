@@ -47,7 +47,7 @@ const Watchlist = ({ watchlist }) => {
         'Content-Type': 'application/json'
       };
       const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
-        watchlist_id: watchlist.data_by_id.watchListId,
+        watchlist_id: watchlist.watchListId,
         movie_id: movieId,
         //TODO: Fix Rating is not defined error
       }, { headers });
@@ -59,7 +59,7 @@ const Watchlist = ({ watchlist }) => {
 
   useEffect(() => {
     const fetchMovieInfo = async () => {
-      const promises = watchlist.data_by_id.movieIds.map(async (movieId) => {
+      const promises = watchlist.movieIds.map(async (movieId) => {
         try {
           const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
           console.log('Response for movieId', movieId, response);
@@ -81,16 +81,18 @@ const Watchlist = ({ watchlist }) => {
       setMoviesInfo(movieInfoArray.filter((info) => info !== null));
     };
   
-    if (isExpanded && watchlist.data_by_id.movieIds && watchlist.data_by_id.movieIds.length > 0) {
+    if (isExpanded && watchlist.movieIds && watchlist.movieIds.length > 0) {
       fetchMovieInfo();
     }
-  }, [isExpanded, watchlist.data_by_id.movieIds]);
+  }, [isExpanded, watchlist.movieIds]);
+
+  console.log('Watchlist:', watchlist);
 
   return (
     <div className="card mt-3">
       <div className="card-body">
         <h5 className="card-title" onClick={toggleExpand}>
-          {watchlist.data_by_id.watchListTitle}
+          {watchlist.watchListTitle}
         </h5>
         {isExpanded && (
           <div>
@@ -103,7 +105,7 @@ const Watchlist = ({ watchlist }) => {
                 ))}
               </ul>
             </div>
-            <h7>Add Movie</h7>
+            <h6>Add Movie</h6>
             {showSearchBar && (
               <div className="input-group mt-2">
                 <input
