@@ -197,9 +197,17 @@ const userController = {
     async searchUsers (req, res) {
         try {
           const query = req.params.query;
-          // Assuming User model has a field called 'username' for searching
-          const users = await User.find({ username: { $regex: query, $options: 'i' } }).limit(10);
-          res.json({ users });
+
+          const users = await User.find({ login: { $regex: query, $options: 'i' } }).limit(10);
+          if (users.length === 0) {
+            return res.status(404).json({error: 'No users found!'})
+          }
+
+          const users_uids = [];
+          for (const user of users) {
+            users_uids.push(user.uid);
+          }
+          res.status(200).json({ users_uids });
         } catch (error) {
           console.error('Error searching users:', error);
           res.status(500).json({ error: 'Internal server error' });
