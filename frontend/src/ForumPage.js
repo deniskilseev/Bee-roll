@@ -68,6 +68,19 @@ const ForumPage = () => {
   if (!forum) {
     return <div>Forum not found!</div>;
   }
+  const followForum = () => {
+    const headers = {
+      'Authorization': `Bee-roll ${token}`,
+      'Content-Type': 'application/json'
+    };
+    axios.post('http://localhost:3000/forums/joinForum', { forumId: forum.forumId }, { headers })
+      .then(response => {
+        console.log('Forum followed successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error following forum:', error);
+      });
+  };
 
   const handlePinClick = (postId) => {
     const headers = {
