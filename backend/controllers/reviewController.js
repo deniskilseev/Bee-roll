@@ -30,7 +30,7 @@ const reviewController = {
                 return res.status(400).json( {error: "Review should be between 0 and 5"} );
             }
 
-            const review_data = Review.findOne( {userId: user_id, movieId: movie_id});
+            const review_data = await Review.findOne( {userId: user_id, movieId: movie_id});
             if(review_data) {
                 return res.status(400).json( {error: "Review already exists"} );
             }
@@ -88,6 +88,8 @@ const reviewController = {
     async updateReview(req, res) {
         try {
             const {review_id, review} = req.body;
+
+            console.log(req.user.login);
 
             const user_data = await User.findOne( {login: req.user.login} );
             
