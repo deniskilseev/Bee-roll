@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './styles/forumSettings.css';
 import { useUser } from './UserContext';
+
+function checkAlias(string) {
+    const regexp = new RegExp("^[a-z0-9]+$");
+    return regexp.test(string);
+}
 
 const ForumSettings = () => {
     const { forumName } = useParams();
     const [moderators, setModerators] = useState([]);
     const [forum, setForum] = useState(null);
     const [newModerator, setNewModerator] = useState('');
+    const [newAlias, setNewAlias] = useState('');
     const [isPublic, setIsPublic] = useState(true);
     const { user } = useUser();
     const token = user.token;
+    const navigate = useNavigate();
 
     const handleAddModerator = async () => {
         if (newModerator && !moderators.includes(newModerator)) {
@@ -41,6 +48,43 @@ const ForumSettings = () => {
             }
         }
     };
+
+    const handleChangeAlias = async () => {
+        try {
+            if (newAlias && newAlias !== forumName) {
+                if (checkAlias(newAlias)) {
+                    const aliasData = {
+                        forumId: forum.forumId,
+                        forumTitle: newAlias
+                    }
+
+                    const headers = {
+                        'Authorization': `Bee-roll ${token}`,
+                        'Content-Type': 'application/json'
+                    };
+
+                    const serverResponse = await axios.put('http://localhost:3000/forums/changeTitle', aliasData, { headers });
+
+                    if (serverResponse.status === 200) {
+                        //forumName = newAlias;
+                        console.log("Changed the name to", newAlias);
+                        //fetchForumData();
+                        navigate(`/forums/${newAlias}`);
+                        setNewAlias('');
+                    } else {
+                        console.log('Another forum has such alias');
+                    }
+                } else {
+                    console.log('Invalid Alias');
+                }
+            } else {
+                console.log('Invalid Alias');
+            }
+            setNewAlias('');
+        } catch (error) {
+            console.error('Error in changing alias:', error);
+        }
+    }
 
     const handleTogglePrivacy = () => {
         setIsPublic(prevState => !prevState);
@@ -113,6 +157,17 @@ const ForumSettings = () => {
         <div className="forum-settings-container">
         <h2>Forum Settings</h2>
             <div>
+            <div className="alias-section">
+                <div className="input-group">
+                    <input
+                        type="text"
+                        value={newAlias}
+                        onChange={(e) => setNewAlias(e.target.value)}
+                        placeholder="Enter new alias for the Forum"
+                    />
+                    <button className="btn btn-success" onClick={handleChangeAlias}>Change Alias</button>
+                </div>
+            </div>
             <div className="moderators-section">
                 <h3>Moderators:</h3>
                 <ul>

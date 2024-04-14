@@ -7,12 +7,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const WatchlistsPage = () => {
   const [watchlists, setWatchlists] = useState([]);
-  const { updateWatchlists } = useUser();
+  const { updateWatchlists, updateUser } = useUser();
   const { user } = useUser();
   const token = user.token;
 
   const createWatchlist = async () => {
-    //TODO: Fix create watchlist
     try {
       const headers = {
         'Authorization': `Bee-roll ${token}`,
@@ -21,13 +20,22 @@ const WatchlistsPage = () => {
   
       const response = await axios.post('http://localhost:3000/watchlists/createWatchlist', {
         isPublic: false,
-        watchlistTitle: 'New Watchlist 3',
+        watchlistTitle: 'New Watchlist 8',
       }, { headers });
 
       if (response.status === 201) {
-        const watchlistData = await response.data;
+        const userResponse = await axios.get('http://localhost:3000/users/getSelf', {
+          headers: {
+            'Authorization': `Bee-roll ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (userResponse.status === 200) {
+          updateUser(userResponse.data, userResponse.data.token);
+        }
+        const createdWatchlist = await fetchWatchlist(user.userData.data_by_username.watchListsIds[user.userData.data_by_username.watchListsIds.length - 1]);
         
-        const createdWatchlist = await fetchWatchlist(watchlistData.newId);
         updateWatchlists(createdWatchlist);
       } else {
         console.error('Failed to create watchlist.');

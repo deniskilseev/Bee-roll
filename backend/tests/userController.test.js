@@ -335,6 +335,58 @@ describe('getUser(byId/byLogin)', () => {
     });
 });
 
+describe('getUserByToken', () => {
+    test('should return correct user data on correct token', async() => {
+        const res1 = await request(app)
+            .post('/users/loginUser')
+            .send({username: "denis", password: "123"});
+
+        const token = 'Bee-roll ' + res1.body.token;
+
+        const res2 = await request(app)
+            .get('/users/getSelf')
+            .set({Authorization: token});
+
+        expect(res2.status).toBe(200);
+        expect(res2.body.data_by_username.uid).toBe(1);
+        expect(res2.body.data_by_username.password).toBe(undefined);
+    });
+
+    test('Incorrect token should return 500', async () => {
+        const token = "Bee-roll ASLDFMASLDFMASDLM"
+
+        const res = await request(app)
+            .get('/users/getSelf')
+            .set({Authorization: token});
+
+        expect(res.status).toBe(500);
+    });
+});
+
+describe('searchUsers', () => {
+    test('returns 200 and list of 1 user', async() => {
+        const res1 = await request(app)
+            .get('/users/search/deni');
+        console.log(res1.body);
+        
+        expect(res1.status).toBe(200);
+        expect(res1.body.users_uids).toContain(1);
+    });
+    test('returns 200 and list of 3 userы', async() => {
+        const res1 = await request(app)
+            .get('/users/search/a');
+        console.log(res1.body);
+        
+        expect(res1.status).toBe(200);
+        expect(res1.body.users_uids).toEqual([2, 3, 4]);
+    });
+    test('returns 404 on inexisting user', async() => {
+        const res1 = await request(app)
+            .get('/users/search/OLEGPAPA');
+        expect(res1.status).toBe(404);
+    });
+});
+
 describe('uploadUserImage', () => {
     test('should upload a profile picture', async () => {
 
@@ -368,4 +420,3 @@ describe('uploadUserImage', () => {
   }, 30 * 1000);
 =======
   }, 20 * 1000);
->>>>>>> fix-cookies

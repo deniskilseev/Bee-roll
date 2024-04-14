@@ -255,7 +255,27 @@ const userController = {
           console.error(err);
           res.status(500).json({ error: 'Internal server error' });
         }
-    }
+    },
+
+    async getUserByToken(req, res) {
+        try {
+            const login = req.user.login;
+            const data_by_username = await User.findOne( {login: login} );
+            if (!data_by_username) {
+                return res.status(401).json( {error: "Access denied."} );
+            }
+
+            data_by_username.password = undefined;
+
+            const token = jwt.sign({ login: data_by_username.login }, JWT_SECRET, {expiresIn: '1hr'});
+
+            return res.status(200).json({data_by_username, token: token});
+
+        } catch (error) {
+            console.error("Error in getUserByToken:", error);
+            res.status(500).json( {error: "Internal Server Error"} );
+        }
+    },
 }
 
 module.exports = userController;

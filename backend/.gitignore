@@ -1,6 +1,2 @@
-node_modules/*
-<<<<<<< HEAD
-coverage/*
-=======
-coverage/*
->>>>>>> fix-cookies
+/node_modules/*
+/coverage/

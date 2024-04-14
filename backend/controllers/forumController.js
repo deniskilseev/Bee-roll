@@ -315,6 +315,7 @@ const forumController = {
 
             if (forum_info.creatorId == user_info.uid) {
                 await Forum.findOneAndUpdate( {forumId: forumId}, {forumTitle: forumTitle} ); // Update the title
+                console.log("Changed the title to ", forumTitle);
                 return res.status(200).json( {message: "OK"} );
             }
             

@@ -86,7 +86,7 @@ describe('createPost', () => {
 
     test('Creating a post on non-existent forum returns 400', async() => {
         const req = { body: {
-            forumId: 5,
+            forumId: 1000000,
             postTitle: "Dogs.",
             postText: "I love dogs!"
         }};

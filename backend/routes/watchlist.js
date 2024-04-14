@@ -8,6 +8,8 @@ router.post('/addMovie', verifyToken, watchListController.addMovie);
 router.post('/removeMovie', verifyToken, watchListController.removeMovie);
 router.get('/getWatchlist/:watchlistId', verifyToken, watchListController.getWatchList);
 router.post('/togglePublic', verifyToken, watchListController.togglePublic);
+router.post('/followWatchlist', verifyToken, watchListController.followWatchlist);
+router.post('/unfollowWatchlist', verifyToken, watchListController.unfollowWatchlist);
 router.delete('/deleteWatchlist/:watchlistId', verifyToken, watchListController.deleteWatchList);
 
 // Export the router
