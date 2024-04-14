@@ -56,7 +56,7 @@ const App = () => {
           <Route path="/forums/:forumName" element={<ForumPage currentUser={dummyUser} />}/>
           <Route path="/followers/:username" element={<FollowersPage />} />
           <Route path="/following/:username" element={<FollowingPage />} />
-          <Route path="/movies/:movieId" element={<MoviePage />} />
+          <Route path="/movies" element={<MoviePage />} />
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage />} />
           <Route path="/forums/:forumName/settings" element={<ForumSettingsPage />} />
         </Routes>

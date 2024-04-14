@@ -5,6 +5,9 @@ const User = require('../model/User.js')
 const JWT_SECRET = require('../secrets/jwt')
 const jwt = require('jsonwebtoken')
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
 const userController = {
     async createUser(req, res) {
         try {
@@ -46,6 +49,7 @@ const userController = {
     async loginUser(req, res) {
         try {
             const {username, password} = req.body;
+            console.log("body: ", req.body);
 
             data_by_username = await User.findOne({login: username});
             const verified_password = data_by_username.password == password;
@@ -196,9 +200,14 @@ const userController = {
 
     async searchUsers (req, res) {
         try {
-          const query = req.params.query;
+            const {query} = req.params;
+
+            const regex = new RegExp(escapeRegExp(query), "gi");
+
+            const users = await User.find( {login: regex} );
+
           // Assuming User model has a field called 'username' for searching
-          const users = await User.find({ username: { $regex: query, $options: 'i' } }).limit(10);
+          //const users = await User.find({ username: { $regex: query, $options: 'i' } }).limit(1);
           res.json({ users });
         } catch (error) {
           console.error('Error searching users:', error);

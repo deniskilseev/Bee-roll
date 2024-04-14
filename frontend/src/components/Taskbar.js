@@ -16,6 +16,10 @@ const Taskbar = () => {
   const [searchResults, setSearchResults] = useState([]);
   const navigate = useNavigate();
 
+  const [showUserSearch, setShowUserSearch] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userSearchResults, setUserSearchResults] = useState([]);
+
   const handleLoginClick = () => {
     setShowLoginModal(true);
   };
@@ -42,10 +46,20 @@ const Taskbar = () => {
     setShowSearchBar(!showSearchBar);
   };
 
+  const toggleUserSearchBar = () => {
+    setShowUserSearch(!showUserSearch);
+  };
+
   const handleSearchChange = (event) => {
     const query = event.target.value;
     setSearchQuery(query);
     fetchSearchResults(query);
+  };
+
+  const handleUserSearchChange = (event) => {
+    const query = event.target.value;
+    setUserSearchQuery(query);
+    fetchUserSearchResults(query);
   };
 
   const fetchSearchResults = async (query) => {
@@ -68,6 +82,27 @@ const Taskbar = () => {
     }
   };
 
+  const fetchUserSearchResults = async (query) => {
+    try {
+      console.log(`Sending request to: http://localhost:3000/users/search/${query}`);
+      const response = await axios.get(`http://localhost:3000/users/search/${query}`);
+      console.log('Search results:', response.data);
+      setUserSearchResults(response.data.users.slice(0, 2));
+    } catch (error) {
+      console.error('Error fetching user search results:', error);
+    }
+  };
+
+  const handleUserSearchResultClick = async (uid) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/users/getUser/${uid}`);
+      
+      navigate(`/users/${uid}`, { state: { userData: response.data } });
+    } catch (error) {
+      console.error('Error fetching movie info:', error);
+    }
+  };
+
   return (
     <header className={`navbar navbar-dark bg-dark ${showLoginModal ? 'overlay' : ''}`}>
       <div className="container d-flex justify-content-between align-items-center">
@@ -79,8 +114,14 @@ const Taskbar = () => {
               <button className="btn btn-outline-light ml-2" onClick={toggleSearchBar}>
                 <span className="d-inline-block text-center">{showSearchBar ? 'Hide Search' : 'Search'}</span>
               </button>
+              <button className="btn btn-outline-light ml-2" onClick={toggleUserSearchBar}>
+                <span className="d-inline-block text-center">{showUserSearch ? 'Hide Search' : 'Search Users'}</span>
+              </button>
               <Link to="/createforum" className="btn btn-outline-light mr-2">
                   <span className="d-inline-block text-center">Create Forum</span>
+              </Link>
+              <Link to="/movies" className="btn btn-outline-light mr-2"> {/* Add Link for Movies button */}
+                <span className="d-inline-block text-center">Movies</span>
               </Link>
               <Link to="/profile" className="btn btn-outline-light mr-2">
                 <span className="d-inline-block text-center">Profile</span>
@@ -111,6 +152,31 @@ const Taskbar = () => {
               <button className="btn btn-outline-light" type="button">Search</button>
             </div>
           </div>
+        )}
+
+        {showUserSearch && (
+          <div className="input-group ml-2">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search Users..."
+              value={userSearchQuery}
+              onChange={handleUserSearchChange}
+            />
+            <div className="input-group-append">
+              <button className="btn btn-outline-light" type="button">Search Users</button>
+            </div>
+          </div>
+        )}
+
+        {showUserSearch && userSearchResults.length > 0 && (
+          <ul className="list-group mt-2">
+            {userSearchResults.map((user, index) => (
+              <li key={index} className="list-group-item" onClick={() => handleUserSearchResultClick(user.uid)}>
+                {user.login}
+              </li>
+            ))}
+          </ul>
         )}
 
         {showSearchBar && searchResults.length > 0 && (
