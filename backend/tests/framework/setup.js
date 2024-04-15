@@ -35,13 +35,13 @@ module.exports = async () => {
         ];
 
         const posts = [
-            {postId: 1, userId: 1, postTitle: "Mercedes", forumId: 2, postText: "Love mercedes."},
-            {postId: 2, userId: 1, postTitle: "BMW", forumId: 2, postText: "Maybe love BMW."},
-            {postId: 3, userId: 2, postTitle: "Big apples", forumId: 1, postText: "Hate big apples"},
-            {postId: 4, userId: 2, postTitle: "Small apples", forumId: 1, postText: "Maybe hate small apples."},
-            {postId: 5, userId: 3, postTitle: "PINEAPPLES", forumId: 3, postText: "Pineapples >> apples"},
-            {postId: 6, userId: 4, postTitle: "Welcome", forumId: 4, postText: "Welcome to forum"},
-            {postId: 7, userId: 4, postTitle: "lol", forumId:5, postText: "funny, haha"},
+            {postId: 1, userId: 1, postTitle: "Mercedes", forumId: 2, postText: "Love mercedes.", containsSpoilers: false},
+            {postId: 2, userId: 1, postTitle: "BMW", forumId: 2, postText: "Maybe love BMW.", containsSpoilers: false},
+            {postId: 3, userId: 2, postTitle: "Big apples", forumId: 1, postText: "Hate big apples", containsSpoilers: false},
+            {postId: 4, userId: 2, postTitle: "Small apples", forumId: 1, postText: "Maybe hate small apples.", containsSpoilers: false},
+            {postId: 5, userId: 3, postTitle: "PINEAPPLES", forumId: 3, postText: "Pineapples >> apples", containsSpoilers: false},
+            {postId: 6, userId: 4, postTitle: "Welcome", forumId: 4, postText: "Welcome to forum", containsSpoilers: false},
+            {postId: 7, userId: 4, postTitle: "lol", forumId:5, postText: "funny, haha", containsSpoilers: false},
         ];
 
         const forums = [

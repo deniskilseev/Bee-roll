@@ -58,13 +58,14 @@ describe('createPost', () => {
         const req = { body: {
             forumId: 3,
             postTitle: "Pineapples.",
-            postText: "Love Pineapples."
+            postText: "Love Pineapples.",
+            containsSpoilers: false
         }};
         
         const res = await request(app)
-        .post('/posts/createPost')
-        .send(req.body)
-        .set({Authorization: token});
+            .post('/posts/createPost')
+            .send(req.body)
+            .set({Authorization: token});
         
 
         expect(res.status).toBe(201);
@@ -88,16 +89,34 @@ describe('createPost', () => {
         const req = { body: {
             forumId: 1000000,
             postTitle: "Dogs.",
-            postText: "I love dogs!"
+            postText: "I love dogs!",
+            containsSpoilers: false
         }};
 
         const res = await request(app)
-        .post('/posts/createPost')
-        .send(req.body)
-        .set({Authorization: token});
+            .post('/posts/createPost')
+            .send(req.body)
+            .set({Authorization: token});
 
         expect(res.status).toBe(400);
-    }); 
+    });
+
+    test('Invalid spoilers value returns 400', async() => {
+        const req = { body: {
+            forumId: 3,
+            postTitle: "stuff, lol",
+            postText: "more stuff",
+            containsSpoilers: "Banana"
+        }};
+
+        const res = await request(app)
+            .post('/posts/createPost')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(400);
+
+    });
 });
 
 describe('pinPost', () => {

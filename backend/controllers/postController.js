@@ -8,7 +8,7 @@ const Post = require('../model/Post.js')
 const postController = {
     async createPost(req, res) {
         try {
-            const {forumId, postTitle, postText} = req.body;
+            const {forumId, postTitle, postText, containsSpoilers} = req.body;
 
             const creator_info = await User.findOne( {login: req.user.login} );
 
@@ -20,6 +20,10 @@ const postController = {
                 return res.status(400).json( {error: "Forum with such ID does not exist"} );
             }
 
+            if (typeof containsSpoilers !== "boolean") {
+                return res.status(400).json( {error: "containsSpoilers should be boolean"} );
+            }
+
             const counter_fetch = await Counter.findOne({_id: "Post"});
             const post_counter_value = counter_fetch.collectionCounter
             const post_number = post_counter_value + 1
@@ -28,7 +32,8 @@ const postController = {
                 userId: creatorId,
                 forumId: forumId,
                 postTitle: postTitle,
-                postText: postText
+                postText: postText,
+                containsSpoilers: containsSpoilers
             });
 
             await newPost.save()
