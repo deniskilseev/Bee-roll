@@ -96,8 +96,11 @@ const Taskbar = () => {
   const handleUserSearchResultClick = async (uid) => {
     try {
       const response = await axios.get(`http://localhost:3000/users/getUser/${uid}`);
+      const userData = response.data;
+      const username = response.data.user_info.login;
+      console.log("username: ", userData);
       
-      navigate(`/users/${uid}`, { state: { userData: response.data } });
+      navigate(`/user/profile/${username}`, { state: { userData: response.data } });
     } catch (error) {
       console.error('Error fetching movie info:', error);
     }
