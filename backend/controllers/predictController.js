@@ -10,7 +10,7 @@ const predictController = {
     async similarMovie(req, res) {
         try {
             const {movie_id} = req.params;
-            const movie_info = Movie.findOne({movieId: movie_id});
+            const movie_info = await Movie.findOne({movieId: movie_id});
 
             if (!movie_info) {
                 return res.status(400).json( {error: "No movie with such ID"} );
@@ -42,7 +42,7 @@ const predictController = {
 
     async predictUser(req, res) {
         try {
-            const user_info =  User.findOne( {login: req.user.login} );
+            const user_info = await User.findOne( {login: req.user.login} );
 
             if (!user_info) {
                 return res.status(400).json( {error: "No user with such ID"} );
@@ -50,7 +50,7 @@ const predictController = {
 
             const user_id = user_info.uid;
 
-            await updateUser(user_id); // Updating model before predicting
+            await predictController.updateUser(user_id); // Updating model before predicting
 
             const user_history = await Review.find( {userId: user_id} );
             const needed_user_history = { userId: user_id, reviews: [] };
@@ -82,7 +82,7 @@ const predictController = {
             return res.status(500).json( {error: "Internal server error"} );
 
 
-        } catch {
+        } catch (error) {
             console.error("Error in predictUser:", error);
             return res.status(500).json( {error: "Internal server error"} );
         }
@@ -90,7 +90,7 @@ const predictController = {
 
     async similarUser(req, res) {
         try {
-            const user_info = User.findOne( {login: req.user.login} );
+            const user_info = await User.findOne( {login: req.user.login} );
 
             if (!user_info) {
                 return res.status(400).json( {error: "No user with such ID"} );
@@ -98,7 +98,7 @@ const predictController = {
 
             const user_id = user_info.uid;
 
-            await updateUser(user_id); // Updating model before predicting
+            await predictController.updateUser(user_id); // Updating model before predicting
 
             const uri = url + '/similarUsers?userId=' + user_id;
 
