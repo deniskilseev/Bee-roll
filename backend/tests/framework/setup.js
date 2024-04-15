@@ -64,9 +64,9 @@ module.exports = async () => {
         ];
 
         const reviews = [
-            {reviewId: 1, userId: 1, movieId: 3, review: 5},
-            {reviewId: 2, userId: 2, movieId: 3, review: 4},
-            {reviewId: 3, userId: 2, movieId: 1, review: 1},
+            {reviewId: 1, userId: 1, movieId: 3, review: 5, postId: 1},
+            {reviewId: 2, userId: 2, movieId: 3, review: 4, postId: 4},
+            {reviewId: 3, userId: 2, movieId: 1, review: 1, postId: 4},
         ];
 
         const comments = [

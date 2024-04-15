@@ -83,3 +83,39 @@ describe('averageRating', () => {
         expect(res.status).toBe(400);
     });
 });
+
+describe('reviewsByPost', () => {
+    test('2 reviews', async () => {
+        const res = await request(app)
+            .get('/reviews/getpostreviews/4');
+
+        expect(res.status).toBe(200);
+
+        expect(res.body.review_list.length).toBe(2);
+    });
+
+    test('1 review', async () => {
+        const res = await request(app)
+            .get('/reviews/getPostReviews/1');
+
+        expect(res.status).toBe(200);
+
+        expect(res.body.review_list.length).toBe(1);
+    });
+
+    test('0 reviews', async () => {
+        const res = await request(app)
+            .get('/reviews/getpostreviews/3');
+
+        expect(res.status).toBe(200);
+
+        expect(res.body.review_list.length).toBe(0);
+    });
+
+    test('invalid post ID', async () => {
+        const res = await request(app)
+            .get('/reviews/getpostreviews/10000000');
+
+        expect(res.status).toBe(400);
+    });
+});
