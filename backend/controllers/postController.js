@@ -47,7 +47,7 @@ const postController = {
             );
 
             console.log("Post created successfully: ", postTitle)
-            return res.status(201).json({message: "Post created successfully"})
+            return res.status(201).json({message: "Post created successfully", postId: post_number});
         } catch (error) {
             console.error("Error in createPost:", error);
             res.status(500).json({ error: "Internal server error" });

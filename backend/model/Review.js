@@ -18,7 +18,11 @@ const reviewSchema = new Schema({
     review: {
         type: Number,
         require: true
-    }
+    },
+    postId: {
+        type: Number,
+        require: true
+    },
 });
 
 const Review = model('Review', reviewSchema);
