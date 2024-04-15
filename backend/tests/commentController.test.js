@@ -106,7 +106,7 @@ describe('createComment', () => {
 describe('deleteComment', () => {
     test('return 200 on success', async () => {
         const req = { body: {
-            commentId: 2
+            commentId: 3
         }};
 
         const comment = await Comment.findOne({commentId: req.body.commentId});
@@ -141,5 +141,36 @@ describe('deleteComment', () => {
             .set({Authorization: token});
 
         expect(res.status).toEqual(404);
+    });
+});
+
+describe('getComment', () => {
+    test('return 404 on inexisting comment', async () => {
+        const commentId = -1;
+
+        const res = await request(app)
+            .get('/comments/' + commentId);
+
+        expect(res.status).toEqual(404);
+    });
+    test('return 200 on existing comment', async () => {
+        const commentId = 4;
+
+        const all_comm = await Comment.find();
+
+        const res = await request(app)
+            .get('/comments/' + commentId);
+
+        expect(res.status).toEqual(200);
+        expect(res.body.comment).toBeTruthy();
+    });
+    test('return 200 on existing comment', async () => {
+        const commentId = 4;
+
+        const res = await request(app)
+            .get('/comments/' + commentId);
+
+        expect(res.status).toEqual(200);
+        expect(res.body.comment).toBeTruthy();
     });
 });
