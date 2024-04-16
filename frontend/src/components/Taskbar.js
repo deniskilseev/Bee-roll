@@ -85,6 +85,9 @@ const Taskbar = () => {
               <Link to="/profile" className="btn btn-outline-light mr-2">
                 <span className="d-inline-block text-center">Profile</span>
               </Link>
+              <Link to="/forumlist" className="btn btn-outline-light mr-2">
+                <span className="d-inline-block text-center">Forum List</span>
+              </Link>
               <button className="btn btn-outline-light" onClick={handleLogoutClick}>
                 <span className="d-inline-block text-center">Logout</span>
               </button>
