@@ -8,6 +8,7 @@ const MoviePage = () => {
   const { movieId } = useParams();
   const [movieInfo, setMovieInfo] = useState(null);
   const [cast, setCast] = useState([]);
+  const [directors, setDirectors] = useState([]);
   const [streamingServices, setStreamingServices] = useState([]);
   const [groupedServices, setGroupedServices] = useState({});
   const rating = 3.5; // Dummy rating value
@@ -94,6 +95,8 @@ const MoviePage = () => {
         const response = await axios.request(options);
         console.log('Response:', response.data);
         setStreamingServices(response.data.result.streamingInfo.us);
+        setCast(response.data.result.cast);
+        setDirectors(response.data.result.directors);
       } catch (error) {
         console.error('Error fetching streaming services:', error);
       }
@@ -123,6 +126,22 @@ const MoviePage = () => {
           <h2>{movieInfo.title}</h2>
           <p><strong>Genres:</strong> {movieInfo.genres.join(', ')}</p>
           <p><strong>Rating:</strong> <Rating value={rating} /></p> {/* Display the rating */}
+          <div>
+            <strong>Cast:</strong>
+            <ul>
+              {cast.map((actor, index) => (
+                <li key={index}>{actor}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <strong>Directors:</strong>
+            <ul>
+              {directors.map((director, index) => (
+                <li key={index}>{director}</li>
+              ))}
+            </ul>
+          </div>
           <div>
             <strong>Streaming Services:</strong>
             <ul>
