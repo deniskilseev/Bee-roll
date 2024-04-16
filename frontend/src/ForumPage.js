@@ -145,6 +145,12 @@ const ForumPage = () => {
         <Link to={`/forums/${forum.forumId}/createpost`} className="btn btn-primary">Create Post</Link>
       </div>
 
+      {!isOwner && (
+        <div className="mb-3">
+          <button className="btn btn-primary" onClick={followForum}>Follow</button>
+        </div>
+      )}
+
       <h2>Posts</h2>
       {/* Currently does not show username or profile picture */}
       {reorderPosts(posts, forum.pinnedPost).map((post) => (
