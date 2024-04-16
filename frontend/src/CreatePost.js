@@ -8,12 +8,11 @@ const CreatePost = () => {
     const { forumName } = useParams()
     const [postTitle, setPostTitle] = useState('');
     const [postText, setPostText] = useState('');
+    const [containsSpoilers, setContainsSpoilers] = useState(false);
     const { user } = useUser();
-    console.log('user:', user)
     const userId = user.id;
     const token = user.token;
 
-    // console.log('forumId:', params)
 
     const handleCreatePost = async () => {
         try {
@@ -22,10 +21,10 @@ const CreatePost = () => {
                 forumId: forumName,
                 postTitle: postTitle,
                 postText: postText,
+                containsSpoilers: containsSpoilers
             };
             console.log('New post:', newPost);
 
-            // Send post data to the backend
             const headers = {
               'Authorization': `Bee-roll ${token}`,
               'Content-Type': 'application/json'
@@ -33,19 +32,16 @@ const CreatePost = () => {
 
             await axios.post('http://localhost:3000/posts/createPost', newPost, { headers });
 
-            // Optionally, you can redirect the user to the forum page after post creation
-            // navigate(`/forums/${forumId}`);
-
-            // Clear input fields after successful post creation
             setPostTitle('');
             setPostText('');
+            setContainsSpoilers(false);
+            navigate(-1);
             } catch (error) {
             console.error('Error creating post:', error);
             }
         };
 
   const handleCancel = () => {
-    // Go back to the previous page
     navigate(-1);
   };
 
@@ -60,6 +56,10 @@ const CreatePost = () => {
         <div className="mb-3">
           <label htmlFor="postText" className="form-label">Post Text:</label>
           <textarea className="form-control" id="postText" value={postText} onChange={(e) => setPostText(e.target.value)} />
+        </div>
+        <div className="mb-3 form-check">
+          <input type="checkbox" className="form-check-input" id="containsSpoilers" checked={containsSpoilers} onChange={(e) => setContainsSpoilers(e.target.checked)} />
+          <label className="form-check-label" htmlFor="containsSpoilers">Contains Spoilers</label>
         </div>
         <div className="mb-3">
           <button type="button" className="btn btn-primary mr-2" onClick={handleCreatePost}>Create Post</button>

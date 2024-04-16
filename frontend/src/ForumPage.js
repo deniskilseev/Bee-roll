@@ -11,6 +11,7 @@ const ForumPage = () => {
   const [forum, setForum] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [showSpoilersMap, setShowSpoilersMap] = useState({});
 
   const { user } = useUser();
   console.log('ForumName:', forum)
@@ -128,6 +129,13 @@ const ForumPage = () => {
     const pinnedPost = posts.splice(pinnedPostIndex, 1)[0];
     return [pinnedPost, ...posts];
   };
+
+  const handleShowSpoilers = (postId) => {
+    setShowSpoilersMap(prevState => ({
+      ...prevState,
+      [postId]: true
+    }));
+  };
   
   return (
     <div className="container mt-5">
@@ -157,16 +165,20 @@ const ForumPage = () => {
         <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title">{post.post_info.postTitle}</h5>
-            <p className="card-text">{post.post_info.postText}</p>
+            {showSpoilersMap[post.post_info.postId] || !post.post_info.containsSpoilers ? (
+              <p className="card-text">{post.post_info.postText}</p>
+            ) : (
+              <button className="btn btn-primary mb-2" onClick={() => handleShowSpoilers(post.post_info.postId)}>Show spoilers</button>
+            )}
             <Link to={{ pathname: `/user/profile/${post.user.user_info.login}` }}>
               {post.user && <p>Posted by: {post.user.user_info.login}</p>}
             </Link>
-              {isOwner && (
-                <>
-                  <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
-                  <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
-                </>
-              )}
+            {isOwner && (
+              <>
+                <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
+                <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
+              </>
+            )}
           </div>
         </div>
       ))}
