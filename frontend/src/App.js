@@ -13,6 +13,7 @@ import CreatePostPage from './CreatePost';
 import OtherUserProfile from './OtherUserProfile';
 import ForumSettingsPage from './ForumSettings';
 import MoviePage from './MoviePage';
+import ForumList from './ForumList';
 import { useUser } from './UserContext';
 
 const App = () => {
@@ -59,6 +60,7 @@ const App = () => {
           <Route path="/movies/:movieId" element={<MoviePage />} />
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage />} />
           <Route path="/forums/:forumName/settings" element={<ForumSettingsPage />} />
+          <Route path="/forumlist" element={<ForumList />}/>
         </Routes>
       </div>
     </Router>
