@@ -3,6 +3,7 @@ import AddMovieModal from './Modals/AddMovieModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { useUser } from '../UserContext';
+import '../styles/watchlistCard.css';
 
 const Watchlist = ({ watchlist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -11,6 +12,9 @@ const Watchlist = ({ watchlist }) => {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isPublic, setIsPublic] = useState(watchlist.isPublic);
+  const [editedTitle, setEditedTitle] = useState(watchlist.watchListTitle);
   const { user } = useUser();
   const token = user.token;
 
@@ -23,6 +27,36 @@ const Watchlist = ({ watchlist }) => {
 
   const closePopup = () => {
     setIsPopupOpen(false);
+  };
+
+  const toggleEditMode = () => {
+    setIsEditMode(!isEditMode);
+  };
+
+  const toggleVisibility = async () => {
+    try {
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
+  
+      const response = await axios.post(`http://localhost:3000/watchlists/togglePublic`, {
+        watchlistId: watchlist.watchListId
+      }, {
+        headers
+      });
+
+      if (response.status === 200) {
+        setIsPublic(!isPublic);
+      }
+    } catch (error) {
+      console.error('Error toggling watchlist visibility:', error);
+    }
+  };
+
+  const handleTitleChange = (event) => {
+    // implement logic to handle title change
+    // setEditedTitle(event.target.value);
   };
 
   const handleSearchChange = (event) => {
@@ -47,53 +81,128 @@ const Watchlist = ({ watchlist }) => {
         'Content-Type': 'application/json'
       };
       const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
-        watchlist_id: watchlist.watchListId,
-        movie_id: movieId,
-        //TODO: Fix Rating is not defined error
+        watchlistId: watchlist.watchListId,
+        movieId: movieId
       }, { headers });
-      console.log('Added to watchlist:', response.data);
+
+      if (response.status === 200) {
+        console.log('Successfully added to watchlist');
+      } else {
+        console.error(`Failed to add to watchlist`);
+      }
+
+      const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
+        headers: {
+          'Authorization': `Bee-roll ${token}`
+        }
+      });
+
+      if (updatedWatchlistResponse.data) {
+        watchlist.movieIds = updatedWatchlistResponse.data.watchlist_data.movieIds;
+      }
     } catch (error) {
       console.error('Error adding to watchlist:', error);
     }
   };
 
-  useEffect(() => {
-    const fetchMovieInfo = async () => {
-      const promises = watchlist.movieIds.map(async (movieId) => {
-        try {
-          const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
-          console.log('Response for movieId', movieId, response);
-  
-          if (response.ok) {
-            const movieInfo = await response.json();
-            return movieInfo;
-          } else {
-            console.error(`Failed to fetch movie info for ID: ${movieId}`);
-            return null;
-          }
-        } catch (error) {
-          console.error(`Error fetching movie info for ID: ${movieId}`, error);
-          return null;
+  const deleteFromWatchlist = async (movieId) => { 
+    try {
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const response = await axios.post(`http://localhost:3000/watchlists/removeMovie`, {
+        watchlistId: watchlist.watchListId,
+        movieId: movieId
+      }, { headers });
+
+      if (response.status === 200) {
+        console.log('Successfully removed from watchlist');
+      } else {
+        console.error(`Failed to remove from watchlist`);
+      }
+
+      const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
+        headers: {
+          'Authorization': `Bee-roll ${token}`
         }
       });
-  
-      const movieInfoArray = await Promise.all(promises);
-      setMoviesInfo(movieInfoArray.filter((info) => info !== null));
-    };
-  
-    if (isExpanded && watchlist.movieIds && watchlist.movieIds.length > 0) {
-      fetchMovieInfo();
-    }
-  }, [isExpanded, watchlist.movieIds]);
 
-  console.log('Watchlist:', watchlist);
+      if (updatedWatchlistResponse.data) {
+        watchlist.movieIds = updatedWatchlistResponse.data.watchlist_data.movieIds;
+        setMoviesInfo([]);
+      }
+    } catch (error) {
+      console.error('Error deleting from watchlist:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchMovieInfo = async () => {
+      if (isExpanded && watchlist.movieIds && watchlist.movieIds.length > 0) {
+        setMoviesInfo([]);
+        const promises = watchlist.movieIds.map(async (movieId) => {
+          try {
+            const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
+    
+            if (response.ok) {
+              const movieInfo = await response.json();
+              return movieInfo;
+            } else {
+              console.error(`Failed to fetch movie info for ID: ${movieId}`);
+              return null;
+            }
+          } catch (error) {
+            console.error(`Error fetching movie info for ID: ${movieId}`, error);
+            return null;
+          }
+        });
+    
+        const movieInfoArray = await Promise.all(promises);
+        setMoviesInfo(prevMoviesInfo => [
+          ...prevMoviesInfo,
+          ...movieInfoArray.filter(info => info !== null)
+        ]);
+      }
+    };
+    
+    fetchMovieInfo();
+  }, [isExpanded, watchlist.movieIds]);
 
   return (
     <div className="card mt-3">
       <div className="card-body">
-        <h5 className="card-title" onClick={toggleExpand}>
-          {watchlist.watchListTitle}
-        </h5>
+        <div className="d-flex justify-content-between align-items-center">
+          <h5 className="card-title" onClick={toggleExpand}>
+            {isEditMode ? (
+              <input
+                type="text"
+                className="form-control"
+                value={editedTitle}
+                onChange={handleTitleChange}
+              />
+            ) : (
+              watchlist.watchListTitle
+            )}
+          </h5>
+          <div className="d-flex align-items-center">
+            <div className="privacy-section me-3">
+              <label className="privacy-label">
+                <input
+                  type="checkbox"
+                  checked={isPublic}
+                  onChange={toggleVisibility}
+                />
+                <span className="privacy-slider"></span>
+              </label>
+              <span className="privacy-text">{isPublic ? 'Public' : 'Private'}</span>
+            </div>
+            <button className="btn btn-sm btn-primary" onClick={toggleEditMode}>
+              {isEditMode ? 'Save' : 'Edit'}
+            </button>
+          </div>
+        </div>
         {isExpanded && (
           <div>
             <div className="bg-light p-3 mt-2">
@@ -101,6 +210,11 @@ const Watchlist = ({ watchlist }) => {
                 {moviesInfo.map((movieInfo) => (
                   <li key={movieInfo.movie_data.movieId} className="list-group-item">
                     {movieInfo.movie_data.title}
+                    {isEditMode && (
+                      <button className="btn btn-sm btn-danger ms-2" onClick={() => deleteFromWatchlist(movieInfo.movie_data.movieId)}>
+                        Delete
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -5,6 +5,7 @@ const Forum = require('../../model/Forum')
 const Post = require('../../model/Post')
 const WatchList = require('../../model/WatchList')
 const Review = require('../../model/Review')
+const Comment = require('../../model/Comment')
 // const jest = require('jest');
 
 module.exports = async () => {
@@ -15,7 +16,7 @@ module.exports = async () => {
             {_id: "User", collectionCounter: 4},
             {_id: "Forum", collectionCounter: 5},
             {_id: "Post", collectionCounter: 7},
-            {_id: "Comment", collectionCounter: 1},
+            {_id: "Comment", collectionCounter: 2},
             {_id: "WatchList", collectionCounter: 7},
             {_id: "Review", collectionCounter: 3},
         ];
@@ -68,12 +69,18 @@ module.exports = async () => {
             {reviewId: 3, userId: 2, movieId: 1, review: 1, postId: 4},
         ];
 
+        const comments = [
+            {commentId: 1, userId: 1, postId: 3, commentText: "True my man", postingDate: Date.now()},
+            {commentId: 2, userId: 2, postId: 3, commentText: "False my man", postingDate: Date.now()}
+        ]
+
         await User.insertMany(users);
         await Counter.insertMany(counters);
         await Forum.insertMany(forums);
         await Post.insertMany(posts);
         await WatchList.insertMany(watchlists);
         await Review.insertMany(reviews);
+        await Comment.insertMany(comments);
 
     } catch (error) {
         console.error('Error populating fields in tests/framework/setup.js', error);

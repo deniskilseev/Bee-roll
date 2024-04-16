@@ -68,6 +68,19 @@ const ForumPage = () => {
   if (!forum) {
     return <div>Forum not found!</div>;
   }
+  const followForum = () => {
+    const headers = {
+      'Authorization': `Bee-roll ${token}`,
+      'Content-Type': 'application/json'
+    };
+    axios.post('http://localhost:3000/forums/joinForum', { forumId: forum.forumId }, { headers })
+      .then(response => {
+        console.log('Forum followed successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error following forum:', error);
+      });
+  };
 
   const handlePinClick = (postId) => {
     const headers = {
@@ -131,6 +144,12 @@ const ForumPage = () => {
       <div className="mb-3">
         <Link to={`/forums/${forum.forumId}/createpost`} className="btn btn-primary">Create Post</Link>
       </div>
+
+      {!isOwner && (
+        <div className="mb-3">
+          <button className="btn btn-primary" onClick={followForum}>Follow</button>
+        </div>
+      )}
 
       <h2>Posts</h2>
       {/* Currently does not show username or profile picture */}

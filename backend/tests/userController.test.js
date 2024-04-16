@@ -363,6 +363,30 @@ describe('getUserByToken', () => {
     });
 });
 
+describe('searchUsers', () => {
+    test('returns 200 and list of 1 user', async() => {
+        const res1 = await request(app)
+            .get('/users/search/deni');
+        console.log(res1.body);
+        
+        expect(res1.status).toBe(200);
+        expect(res1.body.users_uids).toContain(1);
+    });
+    test('returns 200 and list of 3 userы', async() => {
+        const res1 = await request(app)
+            .get('/users/search/a');
+        console.log(res1.body);
+        
+        expect(res1.status).toBe(200);
+        expect(res1.body.users_uids).toEqual([2, 3, 4]);
+    });
+    test('returns 404 on inexisting user', async() => {
+        const res1 = await request(app)
+            .get('/users/search/OLEGPAPA');
+        expect(res1.status).toBe(404);
+    });
+});
+
 describe('uploadUserImage', () => {
     test('should upload a profile picture', async () => {
 

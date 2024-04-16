@@ -14,6 +14,7 @@ const Profile = () => {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
   const { updateUser } = useUser();
+  const { loading } = useUser();
   
   const handleEditClick = () => {
     setEditing(true);
@@ -116,6 +117,12 @@ const Profile = () => {
     fetchPostData();
   }, [user, token]);
 
+  console.log('edited:', editedUser);
+  console.log('user:', user);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="container mt-4">
       <div className="row">
@@ -146,7 +153,7 @@ const Profile = () => {
                   />
                 </label>
               )}
-              {!isEditing && (
+              {!isEditing && editedUser.userData?.data_by_username?.profilePicture && (
                 <img src={editedUser.userData.data_by_username.profilePicture} alt="User Avatar" className="avatar img-fluid" />
               )}
               <h2 className="username mt-3">
@@ -159,7 +166,7 @@ const Profile = () => {
                     className="form-control text-center"
                   />
                 ) : (
-                  editedUser.userData.data_by_username.login
+                  editedUser.userData?.data_by_username?.login
                 )}
               </h2>
               <p className="bio text-center">
@@ -172,7 +179,7 @@ const Profile = () => {
                     className="form-control"
                   />
                 ) : (
-                  editedUser.userData.data_by_username.bio || 'No bio available'
+                  editedUser.userData?.data_by_username?.bio || 'No bio available'
                 )}
               </p>
               {isEditing && (
@@ -200,23 +207,23 @@ const Profile = () => {
               <div className="row">
                 <div className="col-md-6 text-center">
                   <Link
-                      to={`/followers/${editedUser.userData.data_by_username.username}`}
+                      to={`/followers/${editedUser.userData?.data_by_username?.username}`}
                       style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
                     >
                       <div className='bio-follow-header'>
                         <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
-                        <p className='bio-follows'>{editedUser.userData.data_by_username.followersIds.length}</p>
+                        <p className='bio-follows'>{editedUser.userData?.data_by_username?.followersIds.length}</p>
                       </div>
                   </Link>
                 </div>
                 <div className="col-md-6 text-center">
                     <Link
-                        to={`/following/${editedUser.userData.data_by_username.username}`}
+                        to={`/following/${editedUser.userData?.data_by_username?.username}`}
                         style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
                       >
                         <div className='bio-follow-header'>
                           <h3 style={{ fontSize: 'inherit' }}>Following</h3>
-                          <p className='bio-follows'>{editedUser.userData.data_by_username.followsIds.length}</p>
+                          <p className='bio-follows'>{editedUser.userData?.data_by_username?.followsIds.length}</p>
                         </div>
                     </Link>
                 </div>
