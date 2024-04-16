@@ -32,82 +32,82 @@ const HomePage = () => {
       sendPostRequest();
   }, [user]);
 
+
   useEffect(() => {
+      const fetchUserPosts = async () => {
+        if (user.userData && postIds.posts) {
+          const token = user.token;
+          try {
+            const postsData = await Promise.all(
+              postIds.posts.map(async (postId) => {
+                const headers = {
+                  'Authorization': `Bee-roll ${token}`,
+                  'Content-Type': 'application/json'
+                };
+                const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+                const postData = postResponse.data.post_info;
+
+                const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
+                const userData = userResponse.data.user_info;
+      
+                return { ...postData, user: userData.login };
+              })
+            );
+            
+            setPosts(postsData);
+          } catch (error) {
+            console.error('Error fetching posts:', error);
+          }
+        }
+    };
+
+    const fetchForumPosts = async () => {
+      if (user.userData) {
+          const token = user.token;
+          try {
+            const headers = {
+                'Authorization': `Bee-roll ${token}`,
+                'Content-Type': 'application/json'
+            };
+            const forumsResponse = await axios.get('http://localhost:3000/forums/', { headers });
+            const allForums = forumsResponse.data;
+
+            const userForumIds = user.userData.data_by_username.forumIds;
+
+            const followedForums = allForums.publicForums.filter(forum => userForumIds.includes(forum.forumId));
+
+            const forumPostIds = followedForums.reduce((acc, forum) => {
+              acc.push(...forum.postIds);
+              return acc;
+            }, []);
+
+            const postsData = await Promise.all(
+              forumPostIds.map(async (postId) => {
+                const headers = {
+                  'Authorization': `Bee-roll ${token}`,
+                  'Content-Type': 'application/json'
+                };
+                const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+                const postData = postResponse.data.post_info;
+
+                const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
+                const userData = userResponse.data.user_info;
+      
+                return { ...postData, user: userData.login };
+              }))
+              
+              setForumPosts(postsData);
+          } catch (error) {
+              console.error('Error fetching forum posts:', error);
+          }
+      }
+    };
     if (activeTab === 'posts') {
         fetchUserPosts();
     } else if (activeTab === 'forums') {
         fetchForumPosts();
     }
   }, [activeTab, user, postIds]);
-
-  const fetchUserPosts = async () => {
-      if (user.userData && postIds.posts) {
-        const token = user.token;
-        try {
-          const postsData = await Promise.all(
-            postIds.posts.map(async (postId) => {
-              const headers = {
-                'Authorization': `Bee-roll ${token}`,
-                'Content-Type': 'application/json'
-              };
-              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
-              const postData = postResponse.data.post_info;
-
-              const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
-              const userData = userResponse.data.user_info;
-    
-              return { ...postData, user: userData.login };
-            })
-          );
-          
-          setPosts(postsData);
-        } catch (error) {
-          console.error('Error fetching posts:', error);
-        }
-      }
-  };
-
-  const fetchForumPosts = async () => {
-    if (user.userData) {
-        const token = user.token;
-        try {
-          const headers = {
-              'Authorization': `Bee-roll ${token}`,
-              'Content-Type': 'application/json'
-          };
-          const forumsResponse = await axios.get('http://localhost:3000/forums/', { headers });
-          const allForums = forumsResponse.data;
-
-          const userForumIds = user.userData.data_by_username.forumIds;
-
-          const followedForums = allForums.publicForums.filter(forum => userForumIds.includes(forum.forumId));
-
-          const forumPostIds = followedForums.reduce((acc, forum) => {
-            acc.push(...forum.postIds);
-            return acc;
-          }, []);
-
-          const postsData = await Promise.all(
-            forumPostIds.map(async (postId) => {
-              const headers = {
-                'Authorization': `Bee-roll ${token}`,
-                'Content-Type': 'application/json'
-              };
-              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
-              const postData = postResponse.data.post_info;
-
-              const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
-              const userData = userResponse.data.user_info;
-    
-              return { ...postData, user: userData.login };
-            }))
-            
-            setForumPosts(postsData);
-        } catch (error) {
-            console.error('Error fetching forum posts:', error);
-        }
-    }
-  };
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
