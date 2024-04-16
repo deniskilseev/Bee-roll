@@ -174,12 +174,13 @@ const ForumPage = () => {
             <Link to={{ pathname: `/user/profile/${post.user.user_info.login}` }}>
               {post.user && <p>Posted by: {post.user.user_info.login}</p>}
             </Link>
-              {isOwner && (
-                <>
-                  <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
-                  <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
-                </>
-              )}
+            {isOwner && (
+              <>
+                <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
+                <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
+              </>
+            )}
+            <div style={{ marginBottom: '10px' }}></div>
             <CommentSection commentIds = {post.post_info.commentIds} postId = {post.post_info.postId}/>
           </div>
         </div>

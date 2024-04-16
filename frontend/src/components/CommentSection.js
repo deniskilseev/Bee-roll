@@ -39,13 +39,18 @@ function CommentWindow(props) {
 
     return (
       <div>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleChange}
-          placeholder="Write a comment here"
-        />
-        <button className="btn btn-outline-primary mr-2" onClick={() => handleCommentClick(postId)}>Comment</button>
+        <div className="input-group mb-3">
+          <input
+            type="text"
+            className="form-control"
+            value={inputValue}
+            onChange={handleChange}
+            placeholder="Write a comment here"
+          />
+          <div className="input-group-append">
+            <button className="btn btn-outline-primary" onClick={() => handleCommentClick(postId)}>Comment</button>
+          </div>
+        </div>
       </div>
     );
   }

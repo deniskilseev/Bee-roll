@@ -30,6 +30,7 @@ export const UserProvider = ({ children }) => {
       .catch(error => {
         // If the token is invalid, remove the token from cookies and reset user state
         Cookies.remove('beerollToken');
+        alert('Your session has expired. Please log in again.');
         setUser({ userData: null, token: null });
         setLoading(false);
       });
