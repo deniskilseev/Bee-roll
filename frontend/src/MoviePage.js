@@ -11,28 +11,24 @@ const MoviePage = () => {
   const [directors, setDirectors] = useState([]);
   const [streamingServices, setStreamingServices] = useState([]);
   const [groupedServices, setGroupedServices] = useState({});
+  const [posterUrl, setPosterUrl] = useState('');
   const rating = 3.5; // Dummy rating value
 
   useEffect(() => {
-    // Group streaming services by service name
     const newGroupedServices = {};
   
     streamingServices.forEach(service => {
-      // Check if the service exists in newGroupedServices
       if (!newGroupedServices[service.service]) {
-        // If not, initialize it with an object containing streaming types array and service link
         newGroupedServices[service.service] = {
           link: service.link,
           types: []
         };
       }
   
-      // Check if the streaming type doesn't already exist in the array
       const existingService = newGroupedServices[service.service].types.find(
         item => item.type === service.streamingType
       );
-  
-      // If streaming type doesn't exist, add it to the types array
+
       if (!existingService) {
         newGroupedServices[service.service].types.push({
           type: service.streamingType
@@ -107,6 +103,28 @@ const MoviePage = () => {
     }
   }, [movieInfo]);
 
+  useEffect(() => {
+    const fetchPosterImage = async () => {
+      try {
+        const response = await axios.get(`https://api.themoviedb.org/3/find/tt0${movieInfo.imdbId}?api_key=343ba297dc6c3267eaeada790beadd96&external_source=imdb_id`);
+        console.log('Poster image response:', response.data);
+        if (response.data && response.data.movie_results && response.data.movie_results.length > 0) {
+          const posterPath = response.data.movie_results[0].poster_path;
+          if (posterPath) {
+            setPosterUrl(`https://image.tmdb.org/t/p/original/${posterPath}`);
+            console.log('Poster URL:', `https://image.tmdb.org/t/p/original/${posterPath}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching poster image:', error);
+      }
+    };
+
+    if (movieInfo && movieInfo.imdbId) {
+      fetchPosterImage();
+    }
+  }, [movieInfo]);
+
   if (!movieInfo) {
     return <div className="container mt-5">Loading...</div>;
   }  
@@ -116,16 +134,15 @@ const MoviePage = () => {
       <div className="row">
         <div className="col-md-4">
           <img
-            src="https://via.placeholder.com/200x300"
+            src={posterUrl || "https://via.placeholder.com/200x300"}
             alt="Movie Poster"
             className="img-fluid rounded"
-            style={{ marginBottom: '10px' }} // Added inline style for reducing spacing
           />
         </div>
         <div className="col-md-8">
           <h2>{movieInfo.title}</h2>
           <p><strong>Genres:</strong> {movieInfo.genres.join(', ')}</p>
-          <p><strong>Rating:</strong> <Rating value={rating} /></p> {/* Display the rating */}
+          <p><strong>Rating:</strong> <Rating value={rating} /></p>
           <div>
             <strong>Cast:</strong>
             <ul>
