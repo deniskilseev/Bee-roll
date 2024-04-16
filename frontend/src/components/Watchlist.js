@@ -85,6 +85,12 @@ const Watchlist = ({ watchlist }) => {
         movieId: movieId
       }, { headers });
 
+      if (response.status === 200) {
+        console.log('Successfully added to watchlist');
+      } else {
+        console.error(`Failed to add to watchlist`);
+      }
+
       const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
         headers: {
           'Authorization': `Bee-roll ${token}`
@@ -110,6 +116,12 @@ const Watchlist = ({ watchlist }) => {
         watchlistId: watchlist.watchListId,
         movieId: movieId
       }, { headers });
+
+      if (response.status === 200) {
+        console.log('Successfully removed from watchlist');
+      } else {
+        console.error(`Failed to remove from watchlist`);
+      }
 
       const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
         headers: {
@@ -158,7 +170,6 @@ const Watchlist = ({ watchlist }) => {
     fetchMovieInfo();
   }, [isExpanded, watchlist.movieIds]);
 
-  console.log('moviesInfo', moviesInfo);
   return (
     <div className="card mt-3">
       <div className="card-body">

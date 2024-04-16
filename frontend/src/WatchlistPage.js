@@ -1,12 +1,15 @@
 // WatchlistsPage.js
 import React, { useState, useEffect, useCallback } from 'react';
 import Watchlist from './components/Watchlist';
+import OtherUserWatchlist from './components/OtherUserWatchlist';
 import { useUser } from './UserContext';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const WatchlistsPage = () => {
+  const [activeTab, setActiveTab] = useState('watchlists');
   const [watchlists, setWatchlists] = useState([]);
+  const [followedWatchlists, setFollowedWatchlists] = useState([]);
   const { updateWatchlists, updateUser } = useUser();
   const { user } = useUser();
   const token = user.token;
@@ -76,6 +79,28 @@ const WatchlistsPage = () => {
     }
   }, [watchlists, token]);
 
+  const fetchFollowedWatchlists = useCallback(async () => {
+    try {
+      const followedWatchlistsData = [];
+      for (const watchListId of user.userData.data_by_username.followedWatchListsIds) {
+        const response = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
+          headers: {
+            'Authorization': `Bee-roll ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
+        if (response.status === 200) {
+          followedWatchlistsData.push(response.data.watchlist_data);
+        } else {
+          console.error(`Failed to fetch followed watchlist: ${watchListId}`);
+        }
+      }
+      setFollowedWatchlists(followedWatchlistsData);
+    } catch (error) {
+      console.error('Error fetching followed watchlists:', error);
+    }
+  }, [user.userData.data_by_username.followedWatchListsIds, token]);
+
   useEffect(() => {
     const fetchInitialWatchlists = async () => {
       for (const watchListId of user.userData.data_by_username.watchListsIds) {
@@ -86,20 +111,62 @@ const WatchlistsPage = () => {
     fetchInitialWatchlists();
   }, [user.watchlists, fetchWatchlist, user.userData.data_by_username.watchListsIds]);
 
+  useEffect(() => {
+    // Fetch followed watchlists when user switches to the "Followed Watchlists" tab
+    if (activeTab === 'followedWatchlists') {
+      fetchFollowedWatchlists();
+    }
+  }, [activeTab, fetchFollowedWatchlists]);
+
   return (
     <div className="container mt-5">
-      {watchlists.length > 0 ? (
-        watchlists.map((watchlist) => (
-          <Watchlist key={watchlist.watchListId} watchlist={watchlist} />
-        ))
-      ) : (
-        <p>No watchlists found.</p>
+      <ul className="nav nav-tabs mb-3">
+        <li className="nav-item">
+          <button
+            className={`nav-link ${activeTab === 'watchlists' ? 'active' : ''}`}
+            onClick={() => setActiveTab('watchlists')}
+          >
+            Watchlists
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link ${activeTab === 'followedWatchlists' ? 'active' : ''}`}
+            onClick={() => setActiveTab('followedWatchlists')}
+          >
+            Followed Watchlists
+          </button>
+        </li>
+      </ul>
+
+      {activeTab === 'watchlists' && (
+        <div>
+          {watchlists.length > 0 ? (
+            watchlists.map((watchlist) => (
+              <Watchlist key={watchlist.watchListId} watchlist={watchlist} />
+            ))
+          ) : (
+            <p>No watchlists found.</p>
+          )}
+          <button className="btn btn-primary mt-3" onClick={createWatchlist}>
+            Create Watchlist
+          </button>
+        </div>
       )}
-      <button className="btn btn-primary mt-3" onClick={createWatchlist}>
-          Create Watchlist
-        </button>
+      {activeTab === 'followedWatchlists' && (
+        <div>
+          {followedWatchlists.length > 0 ? (
+            followedWatchlists.map((watchlist) => (
+              <OtherUserWatchlist key={watchlist.watchListId} watchlist={watchlist} />
+            ))
+          ) : (
+            <p>No followed watchlists found.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
+
 
 export default WatchlistsPage;
