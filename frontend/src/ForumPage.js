@@ -12,6 +12,7 @@ const ForumPage = () => {
   const [forum, setForum] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [showSpoilersMap, setShowSpoilersMap] = useState({});
 
   const { user } = useUser();
   console.log('ForumName:', forum)
@@ -69,6 +70,19 @@ const ForumPage = () => {
   if (!forum) {
     return <div>Forum not found!</div>;
   }
+  const followForum = () => {
+    const headers = {
+      'Authorization': `Bee-roll ${token}`,
+      'Content-Type': 'application/json'
+    };
+    axios.post('http://localhost:3000/forums/joinForum', { forumId: forum.forumId }, { headers })
+      .then(response => {
+        console.log('Forum followed successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error following forum:', error);
+      });
+  };
 
   const handlePinClick = (postId) => {
     const headers = {
@@ -116,6 +130,13 @@ const ForumPage = () => {
     const pinnedPost = posts.splice(pinnedPostIndex, 1)[0];
     return [pinnedPost, ...posts];
   };
+
+  const handleShowSpoilers = (postId) => {
+    setShowSpoilersMap(prevState => ({
+      ...prevState,
+      [postId]: true
+    }));
+  };
   
   return (
     <div className="container mt-5">
@@ -133,13 +154,23 @@ const ForumPage = () => {
         <Link to={`/forums/${forum.forumId}/createpost`} className="btn btn-primary">Create Post</Link>
       </div>
 
+      {!isOwner && (
+        <div className="mb-3">
+          <button className="btn btn-primary" onClick={followForum}>Follow</button>
+        </div>
+      )}
+
       <h2>Posts</h2>
       {/* Currently does not show username or profile picture */}
       {reorderPosts(posts, forum.pinnedPost).map((post) => (
         <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title">{post.post_info.postTitle}</h5>
-            <p className="card-text">{post.post_info.postText}</p>
+            {showSpoilersMap[post.post_info.postId] || !post.post_info.containsSpoilers ? (
+              <p className="card-text">{post.post_info.postText}</p>
+            ) : (
+              <button className="btn btn-primary mb-2" onClick={() => handleShowSpoilers(post.post_info.postId)}>Show spoilers</button>
+            )}
             <Link to={{ pathname: `/user/profile/${post.user.user_info.login}` }}>
               {post.user && <p>Posted by: {post.user.user_info.login}</p>}
             </Link>

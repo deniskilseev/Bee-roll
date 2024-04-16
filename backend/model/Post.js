@@ -15,6 +15,11 @@ const postSchema = new Schema({
         type: String,
         required: true
     },
+    containsSpoilers: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     forumId: {
         type: Number,
         required: true
