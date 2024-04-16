@@ -8,29 +8,31 @@ const HomePage = () => {
     const [posts, setPosts] = useState([]);
     const [postIds, setPostIds] = useState([]);
     const [forumPosts, setForumPosts] = useState([]);
+    const [showHomepage, setShowHomepage] = useState(false);
 
     useEffect(() => {
-      const sendPostRequest = async () => {
-        if (user.userData) {
-          const token = user.token;
-          try {
-            const headers = {
-              'Authorization': `Bee-roll ${token}`,
-              'Content-Type': 'application/json'
-            };
-            const response = await axios.post('http://localhost:3000/posts/getRecentPosts', {
-                user_login: user.userData.data_by_username.login
-            }, { headers });
-
-            setPostIds(response.data);
-          } catch (error) {
-            console.error('Failed to retrieve posts:', error.message);
-          }
-        }
-      };
-
-      sendPostRequest();
-  }, [user]);
+      if (!user.userData) {
+          setShowHomepage(true);
+      } else {
+          setShowHomepage(false);
+          const sendPostRequest = async () => {
+              const token = user.token;
+              try {
+                  const headers = {
+                      'Authorization': `Bee-roll ${token}`,
+                      'Content-Type': 'application/json'
+                  };
+                  const response = await axios.post('http://localhost:3000/posts/getRecentPosts', {
+                      user_login: user.userData.data_by_username.login
+                  }, { headers });
+                  setPostIds(response.data);
+              } catch (error) {
+                  console.error('Failed to retrieve posts:', error.message);
+              }
+          };
+          sendPostRequest();
+      }
+    }, [user]);
 
 
   useEffect(() => {
@@ -114,51 +116,65 @@ const HomePage = () => {
   };
 
   return (
-    <div>
-        <ul className="nav nav-tabs">
-          <li className="nav-item">
-              <button className={`nav-link ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => handleTabChange('posts')}>
-                  Posts
-              </button>
-          </li>
-          <li className="nav-item">
-              <button className={`nav-link ${activeTab === 'forums' ? 'active' : ''}`} onClick={() => handleTabChange('forums')}>
-                  Forums
-              </button>
-          </li>
-        </ul>
-        <div className="tab-content">
-            {activeTab === 'posts' && (
-                <div className="card-footer">
-                    <h3 className="font-weight-bold">Posts</h3>
-                    {posts.map((post) => (
-                        <div key={post.postId} className="card mb-3">
-                            <div className="card-body">
-                                <h5 className="card-title">{post.postTitle}</h5>
-                                <p className="card-text">{post.postText}</p>
-                                <p className="card-text">Posted By: {post.user}</p>
-                            </div>
-                        </div>
-                    ))}
+    <div className="container">
+        {showHomepage ? (
+            <div className="homepage">
+                <div className="row justify-content-center">
+                    <div className="col-md-8 text-center">
+                        <h1>Welcome to Bee-Roll</h1>
+                        <p>This website is a space for movie enthusiasts to discuss their favorite films, share viewing experiences, and connect with other movie lovers.</p>
+                        <p>Please log in to start exploring and participating in the discussions!</p>
+                    </div>
                 </div>
-            )}
-            {activeTab === 'forums' && (
-                <div className="card-footer">
-                    <h3 className="font-weight-bold">Forum Posts</h3>
-                    {forumPosts.map((forumPost) => (
-                        <div key={forumPost.postId} className="card mb-3">
-                            <div className="card-body">
-                                <h5 className="card-title">{forumPost.postTitle}</h5>
-                                <p className="card-text">{forumPost.postText}</p>
-                                <p className="card-text">Posted By: {forumPost.user}</p>
-                            </div>
+            </div>
+        ) : (
+            <div>
+                <ul className="nav nav-tabs">
+                    <li className="nav-item">
+                        <button className={`nav-link ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => handleTabChange('posts')}>
+                            Posts
+                        </button>
+                    </li>
+                    <li className="nav-item">
+                        <button className={`nav-link ${activeTab === 'forums' ? 'active' : ''}`} onClick={() => handleTabChange('forums')}>
+                            Forums
+                        </button>
+                    </li>
+                </ul>
+                <div className="tab-content">
+                    {activeTab === 'posts' && (
+                        <div className="card-footer">
+                            <h3 className="font-weight-bold">Posts</h3>
+                            {posts.map((post) => (
+                                <div key={post.postId} className="card mb-3">
+                                    <div className="card-body">
+                                        <h5 className="card-title">{post.postTitle}</h5>
+                                        <p className="card-text">{post.postText}</p>
+                                        <p className="card-text">Posted By: {post.user}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    )}
+                    {activeTab === 'forums' && (
+                        <div className="card-footer">
+                            <h3 className="font-weight-bold">Forum Posts</h3>
+                            {forumPosts.map((forumPost) => (
+                                <div key={forumPost.postId} className="card mb-3">
+                                    <div className="card-body">
+                                        <h5 className="card-title">{forumPost.postTitle}</h5>
+                                        <p className="card-text">{forumPost.postText}</p>
+                                        <p className="card-text">Posted By: {forumPost.user}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
-            )}
-        </div>
+            </div>
+        )}
     </div>
-  );
+);
 };
 
 export default HomePage;
