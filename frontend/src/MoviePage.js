@@ -12,6 +12,7 @@ const MoviePage = () => {
   const [streamingServices, setStreamingServices] = useState([]);
   const [groupedServices, setGroupedServices] = useState({});
   const [posterUrl, setPosterUrl] = useState('');
+  const [synopsis, setSynopsis] = useState('');
   const rating = 3.5; // Dummy rating value
 
   useEffect(() => {
@@ -110,9 +111,12 @@ const MoviePage = () => {
         console.log('Poster image response:', response.data);
         if (response.data && response.data.movie_results && response.data.movie_results.length > 0) {
           const posterPath = response.data.movie_results[0].poster_path;
+          const overview = response.data.movie_results[0].overview;
           if (posterPath) {
             setPosterUrl(`https://image.tmdb.org/t/p/original/${posterPath}`);
-            console.log('Poster URL:', `https://image.tmdb.org/t/p/original/${posterPath}`);
+          }
+          if (overview) {
+            setSynopsis(overview);
           }
         }
       } catch (error) {
@@ -141,6 +145,7 @@ const MoviePage = () => {
         </div>
         <div className="col-md-8">
           <h2>{movieInfo.title}</h2>
+          <p><strong>Synopsis:</strong> {synopsis} </p>
           <p><strong>Genres:</strong> {movieInfo.genres.join(', ')}</p>
           <p><strong>Rating:</strong> <Rating value={rating} /></p>
           <div>
