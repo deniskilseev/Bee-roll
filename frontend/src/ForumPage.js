@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from './UserContext';
+import CommentSection from './components/CommentSection'
 
 
 const ForumPage = () => {
@@ -148,6 +149,7 @@ const ForumPage = () => {
                   <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
                 </>
               )}
+            <CommentSection commentIds = {post.post_info.commentIds} postId = {post.post_info.postId}/>
           </div>
         </div>
       ))}

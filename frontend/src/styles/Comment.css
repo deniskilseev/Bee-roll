@@ -1,0 +1,26 @@
+/* Comment.css */
+.comment-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .comment-text {
+    margin-bottom: 5px;
+  }
+  
+  .comment-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+  }
+  
+  .comment-user {
+    font-weight: bold;
+  }
+  
+  .comment-date {
+    color: #666;
+  }
+  
