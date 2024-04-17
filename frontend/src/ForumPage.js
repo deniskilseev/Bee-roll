@@ -11,6 +11,7 @@ const ForumPage = () => {
 
   const [forum, setForum] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
   const [posts, setPosts] = useState([]);
   const [showSpoilersMap, setShowSpoilersMap] = useState({});
 
@@ -30,6 +31,8 @@ const ForumPage = () => {
         const fetchedForum = response.data;
         setForum(fetchedForum);
         setIsOwner(user.userData.data_by_username.uid === fetchedForum.creatorId);
+        const isUserModerator = fetchedForum.moderatorIds.includes(user.userData.data_by_username.uid);
+        setIsModerator(isUserModerator);
       } catch (error) {
         console.error('Error fetching forum:', error);
       }
@@ -174,7 +177,7 @@ const ForumPage = () => {
             <Link to={{ pathname: `/user/profile/${post.user.user_info.login}` }}>
               {post.user && <p>Posted by: {post.user.user_info.login}</p>}
             </Link>
-            {isOwner && (
+            {(isOwner || isModerator) && (
               <>
                 <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
                 <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
