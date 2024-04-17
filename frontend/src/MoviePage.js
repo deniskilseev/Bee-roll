@@ -13,7 +13,7 @@ const MoviePage = () => {
   const [groupedServices, setGroupedServices] = useState({});
   const [posterUrl, setPosterUrl] = useState('');
   const [synopsis, setSynopsis] = useState('');
-  const rating = 3.5; // Dummy rating value
+  const [rating, setRating] = useState(null);
 
   useEffect(() => {
     const newGroupedServices = {};
@@ -42,6 +42,10 @@ const MoviePage = () => {
   }, [streamingServices]);
 
   const Rating = ({ value }) => {
+    if (value === -1) {
+      return <span>Not rated</span>;
+    }
+    
     const fullStars = Math.floor(value);
     const hasHalfStar = value % 1 !== 0;
   
@@ -62,9 +66,14 @@ const MoviePage = () => {
   useEffect(() => {
     const fetchMovieInfo = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/movies/getInfo/${movieId}`);
-        console.log('Movie info:', response.data);
-        setMovieInfo(response.data.movie_data);
+        const [movieResponse, ratingResponse] = await Promise.all([
+          axios.get(`http://localhost:3000/movies/getInfo/${movieId}`),
+          axios.get(`http://localhost:3000/reviews/getAverage/${movieId}`)
+        ]);
+        console.log('Movie info:', movieResponse.data);
+        setMovieInfo(movieResponse.data.movie_data);
+        setRating(ratingResponse.data.average);
+        console.log('Rating response:', ratingResponse.data.average);
       } catch (error) {
         console.error('Error fetching movie info:', error);
       }
