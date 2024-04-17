@@ -162,6 +162,22 @@ const ForumPage = () => {
     }));
   };
 
+  const handleViolateClick = (postId) => {
+    const headers = {
+      'Authorization': `Bee-roll ${token}`,
+      'Content-Type': 'application/json'
+    };
+    
+    axios.post('http://localhost:3000/posts/toggleViolate', { postId: postId }, { headers })
+      .then(response => {
+        console.log('Post flagged successfully:', response.data);
+      })
+      .catch(error => {
+        console.error('Error flagging Post:', error);
+      });
+
+  }
+  
   return (
     <div className="container mt-5">
       <h1>{forum.title}</h1>
@@ -186,7 +202,9 @@ const ForumPage = () => {
 
       <h2>Posts</h2>
       {/* Currently does not show username or profile picture */}
-      {reorderPosts(posts, forum.pinnedPost).map((post) => (
+      {reorderPosts(posts, forum.pinnedPost).map((post) => {
+          if (isOwner || isModerator || !post.post_info.isViolating) {
+              return (
         <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title"><strong>{post.post_info.postTitle}</strong></h5>
@@ -209,13 +227,23 @@ const ForumPage = () => {
               <>
                 <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
                 <button className="btn btn-outline-danger" onClick={() => handleDeleteClick(post.post_info.postId)}>Delete</button>
+                <button className="btn btn-outline-danger" onClick={() => handleViolateClick(post.post_info.postId)}>{post.post_info.isViolating ? 'Unflag' : 'Flag'}</button>
               </>
             )}
             <div style={{ marginBottom: '10px' }}></div>
             <CommentSection commentIds={post.post_info.commentIds} postId={post.post_info.postId} />
           </div>
-        </div>
-      ))}
+        </div> 
+      
+          );
+          }
+          else {
+            return (
+                <>
+                </>
+            );
+          }
+      })}
     </div>
   );
 };
