@@ -30,10 +30,6 @@ const CreatePost = () => {
         containsSpoilers: containsSpoilers
       };
 
-      if (createReview && movieId && rating) {
-        newPost.postText = `${postText}\n\nMovie: ${searchQuery}\nRating: ${rating}`;
-      }
-
       console.log('New post:', newPost);
 
       const headers = {
