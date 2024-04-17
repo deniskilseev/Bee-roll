@@ -10,9 +10,9 @@ const CreatePost = () => {
   const [postTitle, setPostTitle] = useState('');
   const [postText, setPostText] = useState('');
   const [containsSpoilers, setContainsSpoilers] = useState(false);
-  const [createReview, setCreateReview] = useState(false); // New state for the "Create review" checkbox
+  const [createReview, setCreateReview] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]); // State to store movie search query
+  const [searchResults, setSearchResults] = useState([]);
   const [movieId, setMovieId] = useState(null);
   const [rating, setRating] = useState(null);
   const [hover, setHover] = useState(null);
@@ -22,7 +22,6 @@ const CreatePost = () => {
 
   const handleCreatePost = async () => {
     try {
-      // If creating a review, add movie and rating to post
       const newPost = {
         creatorId: userId,
         forumId: forumName,
@@ -64,7 +63,7 @@ const CreatePost = () => {
       setPostTitle('');
       setPostText('');
       setContainsSpoilers(false);
-      setCreateReview(false); // Reset createReview state
+      setCreateReview(false);
       setSearchQuery('');
       setRating(null);
       navigate(-1);
@@ -93,7 +92,7 @@ const CreatePost = () => {
     try {
       const response = await axios.get(`http://localhost:3000/movies/getInfo/${movieId}`);
       console.log('Movie info:', response.data);
-      setSearchQuery(title); // Set the clicked movie's title in the search bar
+      setSearchQuery(title);
       setMovieId(movieId);
       setSearchResults([]);
     } catch (error) {
