@@ -16,14 +16,13 @@ const ForumPage = () => {
   const [showSpoilersMap, setShowSpoilersMap] = useState({});
 
   const { user } = useUser();
-  console.log('ForumName:', forum)
   const token = user.token;
 
   const handleSettingsClick = () => {
     // Navigate to forum settings page when settings button is clicked
     navigate(`/forums/${forumName}/settings`);
   };
-  
+
   useEffect(() => {
     const fetchForumData = async () => {
       try {
@@ -36,7 +35,7 @@ const ForumPage = () => {
       } catch (error) {
         console.error('Error fetching forum:', error);
       }
-  };
+    };
 
     fetchForumData();
   }, [forumName, user]);
@@ -45,28 +44,50 @@ const ForumPage = () => {
     if (!forum) return;
 
     const fetchPostData = async () => {
-    try {
-      const postsData = await Promise.all(
-        forum.postIds.map(async (postId) => {
-          const headers = {
-            'Authorization': `Bee-roll ${token}`,
-            'Content-Type': 'application/json'
-          };
+      try {
+        const postsData = await Promise.all(
+          forum.postIds.map(async (postId) => {
+            const headers = {
+              'Authorization': `Bee-roll ${token}`,
+              'Content-Type': 'application/json'
+            };
 
-          const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
-          const postData = response.data;
-          const userResponse = await axios.get(`http://localhost:3000/users/getuser/${postData.post_info.userId}`);
-          const userData = userResponse.data;
-          return { ...postData, user: userData };
-        })
-      );
-      
-      setPosts(postsData);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    }
-  };
-  
+            const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+            const postData = response.data;
+
+            const reviewsResponse = await axios.get(`http://localhost:3000/reviews/getPostReviews/${postId}`);
+            const reviewsData = reviewsResponse.data;
+
+            const combinedData = { ...postData, reviews: reviewsData.review_list[0] };
+
+            const userResponse = await axios.get(`http://localhost:3000/users/getuser/${postData.post_info.userId}`);
+            const userData = userResponse.data;
+            return { ...combinedData, user: userData };
+          })
+        );
+
+        const movieTitlePromises = postsData.map(async (post) => {
+          if (post.reviews) {
+            try {
+              const response = await axios.get(`http://localhost:3000/movies/getInfo/${post.reviews.movieId}`);
+              const movieTitle = response.data.movie_data.title;
+              return { ...post, movieTitle: movieTitle };
+            } catch (error) {
+              console.error(`Error fetching movie title for postId ${post.post_info.postId}:`, error);
+              return { ...post, movieTitle: 'Error: Title not found' };
+            }
+          } else {
+            return { ...post, movieTitle: null };
+          }
+        });
+
+        const postsWithData = await Promise.all(movieTitlePromises);
+        setPosts(postsWithData);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
     fetchPostData();
   }, [forum, token]);
 
@@ -124,12 +145,12 @@ const ForumPage = () => {
     if (!pinnedPostId || !posts || posts.length === 0) {
       return posts;
     }
-    
+
     const pinnedPostIndex = posts.findIndex(post => post.post_info.postId === pinnedPostId);
     if (pinnedPostIndex === -1) {
       return posts;
     }
-    
+
     const pinnedPost = posts.splice(pinnedPostIndex, 1)[0];
     return [pinnedPost, ...posts];
   };
@@ -140,7 +161,7 @@ const ForumPage = () => {
       [postId]: true
     }));
   };
-  
+
   return (
     <div className="container mt-5">
       <h1>{forum.title}</h1>
@@ -168,7 +189,7 @@ const ForumPage = () => {
       {reorderPosts(posts, forum.pinnedPost).map((post) => (
         <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
-            <h5 className="card-title">{post.post_info.postTitle}</h5>
+            <h5 className="card-title"><strong>{post.post_info.postTitle}</strong></h5>
             {showSpoilersMap[post.post_info.postId] || !post.post_info.containsSpoilers ? (
               <p className="card-text">{post.post_info.postText}</p>
             ) : (
@@ -177,6 +198,13 @@ const ForumPage = () => {
             <Link to={{ pathname: `/user/profile/${post.user.user_info.login}` }}>
               {post.user && <p>Posted by: {post.user.user_info.login}</p>}
             </Link>
+            {post.reviews && (
+              <div>
+                <strong>Review:</strong>
+                <p>Movie Title: {post.movieTitle}</p>
+                <p>Rating: {post.reviews.review}</p>
+              </div>
+            )}
             {(isOwner || isModerator) && (
               <>
                 <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>
@@ -184,7 +212,7 @@ const ForumPage = () => {
               </>
             )}
             <div style={{ marginBottom: '10px' }}></div>
-            <CommentSection commentIds = {post.post_info.commentIds} postId = {post.post_info.postId}/>
+            <CommentSection commentIds={post.post_info.commentIds} postId={post.post_info.postId} />
           </div>
         </div>
       ))}
