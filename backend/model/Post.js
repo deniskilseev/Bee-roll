@@ -36,6 +36,11 @@ const postSchema = new Schema({
         type: Boolean,
         required: false,
         default: false
+    },
+    repostId: {
+        type: Number,
+        required: false,
+        default: -1
     }
 });
 
