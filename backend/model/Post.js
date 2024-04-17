@@ -31,6 +31,11 @@ const postSchema = new Schema({
     commentIds: {
         type: [Number],
         required: false
+    },
+    isViolating: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 });
 

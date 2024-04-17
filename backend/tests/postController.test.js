@@ -213,3 +213,46 @@ describe('deletePost', () => {
  
     });
 });
+
+describe('Violating TOS', () => {
+    test('Valid request returns 200', async () => {
+        const req = { body :{
+            postId: 8
+        }};
+        const res = await request(app)
+            .post('/posts/toggleViolate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const post_info = await Post.findOne( {postId: req.body.postId} );
+
+        expect(post_info.isViolating).toBe(true);
+    });
+
+    test('Inexistent post id returns 400', async () => {
+        const req = { body :{
+            postId: 1000000
+        }};
+        const res = await request(app)
+            .post('/posts/toggleViolate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(400);
+    });
+
+    test('Not a mod returns 403', async () => {
+        const req = { body :{
+            postId: 4
+        }};
+        const res = await request(app)
+            .post('/posts/toggleViolate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(403);
+    });
+
+});

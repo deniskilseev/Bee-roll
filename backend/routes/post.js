@@ -8,6 +8,7 @@ router.post('/pinPost', verifyToken, postController.pinPost);
 router.get('/getPost/:post_id', verifyToken, postController.getPostInfo);
 router.delete('/deletePost/:post_id', verifyToken, postController.deletePost);
 router.post('/getRecentPosts', verifyToken, postController.getRecentPosts);
+router.post('/toggleViolate', verifyToken, postController.toggleViolate);
 
 
 // Export the router
