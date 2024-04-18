@@ -16,6 +16,7 @@ const userSchema = new Schema({
   reviewIds: [Number],
   followsIds: [Number],
   followersIds: [Number],
+  isTest: [Boolean],
   profilePicture: {
     data: { type: Buffer, default: Buffer.from([]) },
     type: { type: String, default: '' }
@@ -23,7 +24,8 @@ const userSchema = new Schema({
   commentIds: [Number],
   followedWatchListsIds: [Number],
   upvotedPosts: [Number],
-  downvotedPosts: [Number]
+  downvotedPosts: [Number],
+  isAdmin: [Boolean]
 });
 
 const User = model('User', userSchema);

@@ -152,8 +152,6 @@ const MoviePage = () => {
             alt="Movie Poster"
             className="img-fluid rounded"
           />
-          <p><strong>Cast:</strong> {imdbInfo.s}</p>
-          <p><strong>Synopsis:</strong> {imdbInfo.l}</p> 
         </div>
         <div className="col-md-8">
           <h2>{movieInfo.title}</h2>
