@@ -180,6 +180,11 @@ const OtherUserProfile = () => {
               <img src={otherUser.profilePicture || profileIcon} alt="User Avatar" className="avatar img-fluid" />
               <h2 className="username mt-3">{otherUser.login}</h2>
               <p className="bio text-center">{otherUser.bio || 'No bio available'}</p>
+              {otherUser.warnings > 0 && (
+                <div className="warning-level">
+                  <p>Warning Level: {otherUser.warnings}</p>
+                </div>
+              )}
               <div className="text-center mt-3">
               {console.log("isAdmin: ", isAdmin)}
               {isAdmin && (

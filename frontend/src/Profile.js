@@ -182,6 +182,11 @@ const Profile = () => {
                   editedUser.userData?.data_by_username?.bio || 'No bio available'
                 )}
               </p>
+              {editedUser.userData.data_by_username.warnings > 0 && (
+                <div className="warning-level">
+                  <p>Warning Level: {editedUser.userData.data_by_username.warnings}</p>
+                </div>
+              )}
               {isEditing && (
                 <div className="d-flex justify-content-center">
                   <button onClick={handleSaveClick} style={{ marginRight: '5px' }} className="btn btn-primary mr-2">
