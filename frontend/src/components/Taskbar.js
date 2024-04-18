@@ -106,6 +106,16 @@ const Taskbar = () => {
     }
   };
 
+  const handleWarnUser = async (userId) => {
+    try {
+      // Send a request to your backend to warn the user
+      await axios.post(`http://localhost:3000/users/warn/${userId}`);
+      //fetchWarnedUsers();
+    } catch (error) {
+      console.error('Error warning user:', error);
+    }
+  };
+
   return (
     <header className={`navbar navbar-dark bg-dark ${showLoginModal ? 'overlay' : ''}`}>
       <div className="container d-flex justify-content-between align-items-center">
@@ -114,6 +124,11 @@ const Taskbar = () => {
         <div className="btn-group mr-2">
           {user.userData ? (
             <div>
+              {user.isAdmin && (
+                <button onClick={() => handleWarnUser(user.uid)} className="btn btn-outline-light">
+                  Warn User
+                </button>
+              )}
               <button className="btn btn-outline-light ml-2" onClick={toggleSearchBar}>
                 <span className="d-inline-block text-center">{showSearchBar ? 'Hide Search' : 'Search'}</span>
               </button>

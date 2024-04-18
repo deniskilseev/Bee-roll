@@ -182,7 +182,6 @@ const userController = {
         try {
             const { username } = req.params;
     
-            // Find the user based on the UID
             const user_info = await User.findOne({ login: username });
     
             if (!user_info) {
@@ -274,6 +273,30 @@ const userController = {
         } catch (error) {
             console.error("Error in getUserByToken:", error);
             res.status(500).json( {error: "Internal Server Error"} );
+        }
+    },
+
+    async warnUser(req, res) {
+        try {
+            const { userId } = req.params;
+
+            // Find the user based on the UID
+            const user_info = await User.findOne({ uid: user_id });
+
+            if (!user_info) {
+                return res.status(404).json({ error: "User not found" });
+            }
+
+            user.warnings++;
+
+            // Save the updated user document
+            await user.save();
+
+
+            res.status(200).json({ message: "User warned successfully" });
+        } catch (error) {
+            console.error("Error in warnUser:", error);
+            res.status(500).json({ error: "Internal server error" });
         }
     },
 }

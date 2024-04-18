@@ -15,6 +15,7 @@ import ForumSettingsPage from './ForumSettings';
 import MoviePage from './MoviePage';
 import ForumList from './ForumList';
 import ReccommendationPage from './ReccommendationPage';
+import WarnedUsersPage from './WarnedUsersPage';
 import { useUser } from './UserContext';
 
 const App = () => {
@@ -63,6 +64,8 @@ const App = () => {
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage />} />
           <Route path="/forums/:forumName/settings" element={<ForumSettingsPage />} />
           <Route path="/forumlist" element={<ForumList />}/>
+          <Route path="/admin/warned-users" component={<WarnedUsersPage />} />
+
         </Routes>
       </div>
     </Router>
