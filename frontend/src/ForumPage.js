@@ -109,6 +109,11 @@ const ForumPage = () => {
       });
   };
 
+  const handleRepost = (postId) => {
+    console.log('Reposting post:', postId);
+    navigate(`/forums/${forum.forumId}/createpost/${postId}`);
+  };
+
   const handlePinClick = (postId) => {
     const headers = {
       'Authorization': `Bee-roll ${token}`,
@@ -209,7 +214,6 @@ const ForumPage = () => {
         <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title"><strong>{post.post_info.postTitle}</strong></h5>
-            <UpvoteDownvoteButton postId = {post.post_info.postId}/>
             {showSpoilersMap[post.post_info.postId] || !post.post_info.containsSpoilers ? (
               <p className="card-text">{post.post_info.postText}</p>
             ) : (
@@ -225,6 +229,11 @@ const ForumPage = () => {
                 <p>Rating: {post.reviews.review}</p>
               </div>
             )}
+            <div className="mb-3">
+              {/* UpvoteDownvoteButton component */}
+              <UpvoteDownvoteButton postId={post.post_info.postId} />
+              <button className="btn btn-outline-primary mr-2" onClick={() => handleRepost(post.post_info.postId)}>Repost</button>
+            </div>
             {(isOwner || isModerator) && (
               <>
                 <button className="btn btn-outline-primary mr-2" onClick={() => handlePinClick(post.post_info.postId)}>Pin</button>

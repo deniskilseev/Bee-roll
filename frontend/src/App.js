@@ -59,6 +59,7 @@ const App = () => {
           <Route path="/following/:username" element={<FollowingPage />} />
           <Route path="/movies/:movieId" element={<MoviePage />} />
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage />} />
+          <Route path="/forums/:forumName/createpost/:postId" element={<CreatePostPage />} />
           <Route path="/forums/:forumName/settings" element={<ForumSettingsPage />} />
           <Route path="/forumlist" element={<ForumList />}/>
         </Routes>

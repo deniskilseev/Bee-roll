@@ -38,23 +38,23 @@ const UpvoteDownvoteButton = (props) => {
       }
     };
     fetchPostData();
-  }, []);
+  }, [postId, user_data]);
 
   // Function to handle upvote
   const handleUpvote = async () => {
     try {
       if (voted === 'up') {
-        const res = await axios.put(`http://localhost:3000/posts/revoke/${postId}`,[] ,{headers});
+        await axios.put(`http://localhost:3000/posts/revoke/${postId}`,[] ,{headers});
         setVotes(votes - 1);
         setVoted(null);
       }
       else if (voted === 'down') {
-        const res = await axios.put(`http://localhost:3000/posts/upvote/${postId}`,[] ,{headers});
+        await axios.put(`http://localhost:3000/posts/upvote/${postId}`,[] ,{headers});
         setVotes(votes + 2);
         setVoted('up');
       }
       else if (voted === null) {
-        const res = await axios.put(`http://localhost:3000/posts/upvote/${postId}`,[] ,{headers});
+        await axios.put(`http://localhost:3000/posts/upvote/${postId}`,[] ,{headers});
         setVotes(votes + 1);
         setVoted('up');
       }
@@ -67,17 +67,17 @@ const UpvoteDownvoteButton = (props) => {
   const handleDownvote = async () => {
     try {
       if (voted === 'down') {
-        const res = await axios.put(`http://localhost:3000/posts/revoke/${postId}`,[] , {headers});
+        await axios.put(`http://localhost:3000/posts/revoke/${postId}`,[] , {headers});
         setVotes(votes + 1);
         setVoted(null);
       }
       if (voted === 'up') {
-        const res = await axios.put(`http://localhost:3000/posts/downvote/${postId}`,[] , {headers});
+        await axios.put(`http://localhost:3000/posts/downvote/${postId}`,[] , {headers});
         setVotes(votes - 2);
         setVoted('down');
       }
       if (voted === null) {
-        const res = await axios.put(`http://localhost:3000/posts/downvote/${postId}`,[] , {headers});
+        await axios.put(`http://localhost:3000/posts/downvote/${postId}`,[] , {headers});
         setVotes(votes - 1);
         setVoted('down');
       }

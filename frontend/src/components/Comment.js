@@ -36,7 +36,8 @@ function Comment(props) {
       };
     
         fetchCommentData();
-      }, []);
+      }, [commentId]);
+      
     return (
         <div className="comment-container">
             <p className="comment-text">{comment.commentText}</p>
