@@ -61,15 +61,15 @@ const MoviePage = () => {
     <div className="container mt-5">
       <div className="row">
         <div className="col-md-4">
-          {/* Display IMDb image for the movie in the thumbnail space */}
+        
           <img
             src={imdbInfo.i.imageUrl}
             alt={imdbInfo.l}
             className="img-fluid rounded"
             style={{ marginBottom: '10px' }} 
           />
-          <p><strong>Cast:</strong> {imdbInfo.s}</p> {/* Display the movie's cast below the thumbnail */}
-          <p><strong>Synopsis:</strong> {imdbInfo.l}</p> {/* Assuming 'l' contains the movie's title */}
+          <p><strong>Cast:</strong> {imdbInfo.s}</p>
+          <p><strong>Synopsis:</strong> {imdbInfo.l}</p> 
         </div>
         <div className="col-md-8">
           <h2>{movieInfo.title}</h2>
