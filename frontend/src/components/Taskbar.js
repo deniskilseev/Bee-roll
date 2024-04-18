@@ -19,7 +19,6 @@ const Taskbar = () => {
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userSearchResults, setUserSearchResults] = useState([]);
-  const u = user.userData;
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
