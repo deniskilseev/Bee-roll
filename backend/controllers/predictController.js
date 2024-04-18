@@ -1,9 +1,7 @@
 const Review = require('../model/Review.js')
 const User = require('../model/User.js')
 const Movie = require('../model/Movie')
-const Request = require('request')
-
-const http = require('http');
+const axios = require('axios');
 
 const url = 'http://localhost:8000'
 
@@ -27,12 +25,13 @@ const predictController = {
                 }
             };
 
-            const movie_recommendation = await http.request(uri, options).then(response => {
-                return response.json();
-              }).catch(err => {console.log(err);});
-
+            const movie_recommendation = await axios.post(uri, {}, options)
+                .then(function (response) {
+                    return response;
+                });
+            
             if (movie_recommendation.status == 200) {
-                const data = await movie_recommendation.json();
+                const data = movie_recommendation.data;
                 return res.status(200).json(data);
             }
 
@@ -72,14 +71,13 @@ const predictController = {
                 }
             }
 
-            const movie_recommendation = await http.request(uri, options).then(response => {
-                return response.json();
-              }).catch(err => {console.log(err);});
-
-            console.log(movie_recommendation);
+            const movie_recommendation = await axios.post(uri, options.body, options)
+                .then(function (response) {
+                    return response;
+                });
 
             if (movie_recommendation.status == 200) {
-                data = await movie_recommendation.json();
+                data = movie_recommendation.data;
                 if (data.status_code == 412) {
                     return res.status(412).json( {error: "User needs more reviews to be recommended movies"} );
                 }
@@ -117,12 +115,14 @@ const predictController = {
                 }
             }
 
-            const similar_users = await http.request(uri, options).then(response => {
-                return response.json();
-              }).catch(err => {console.log(err);});
+            const similar_users = await axios.post(uri, {}, options)
+                .then(function (response) {
+                    return response;
+                });
+
 
             if (similar_users.status == 200) {
-                data = await similar_users.json()
+                data = similar_users.data;
                 return res.status(200).json(data);
             }
 
@@ -150,8 +150,6 @@ const predictController = {
                 needed_user_history.reviews.push({movieId: review.movieId, rating: review.review});
             }
 
-            console.log("test: ", needed_user_history);
-
             const uri = url + '/updateUser'
             const options = {
                 method: "POST",
@@ -161,8 +159,12 @@ const predictController = {
                 }
             }
 
-            console.log("test2: ", options);
-            await http.request(uri, options);
+            
+            const response = await axios.post(uri, options.body, options)
+                .then(function (response) {
+                    return response;
+                });
+
 
             return ;
 
