@@ -31,6 +31,10 @@ const postSchema = new Schema({
     commentIds: {
         type: [Number],
         required: false
+    },
+    rating: {
+        type: Number,
+        default: 0
     }
 });
 

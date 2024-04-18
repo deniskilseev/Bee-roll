@@ -22,6 +22,8 @@ const userSchema = new Schema({
   },
   commentIds: [Number],
   followedWatchListsIds: [Number],
+  upvotedPosts: [Number],
+  downvotedPosts: [Number]
 });
 
 const User = model('User', userSchema);
