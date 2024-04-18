@@ -1,0 +1,15 @@
+button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+  }
+  
+  .upvoted {
+    color: #00b894; /* Change to your preferred color */
+  }
+  
+  .downvoted {
+    color: #d63031; /* Change to your preferred color */
+  }
+  

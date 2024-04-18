@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Comment.css';
 
-
 function Comment(props) {
     const [comment, setComment] = useState([]);
     const [date, setDate] = useState([]);

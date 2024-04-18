@@ -221,6 +221,123 @@ const postController = {
 
     },
 
+    async upvotePost(req, res) {
+        try {
+            const postId = req.params.post_id;
+
+            const user_upvoting = await User.findOne({login: req.user.login});
+    
+            if (!user_upvoting) {
+                return res.status(404).json({error: "User wasn't found"});
+            }
+    
+            const post = await Post.findOne({postId: postId});
+    
+            if (!post) {
+                return res.status(404).json({error: "Post wasn't found"});
+            }
+    
+            if (user_upvoting.upvotedPosts.includes(postId)) {
+                return res.status(400).json({error: "Can't upvote twice"});
+            }
+    
+            post.rating += 1;
+    
+            if (user_upvoting.downvotedPosts.includes(postId)) {
+                post.rating += 1;
+                user_upvoting.downvotedPosts.pull(postId);
+            }
+
+            user_upvoting.upvotedPosts.push(postId);
+            
+            await post.save();
+            await user_upvoting.save();
+
+            return res.status(200).json({message: "Post upvoted succesfully"});
+        } catch (error) {
+            console.error("Error in deletePost:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
+    async downvotePost(req, res) {
+        try {
+            const postId = req.params.post_id;
+
+            const user_downvoting = await User.findOne({login: req.user.login});
+    
+            if (!user_downvoting) {
+                return res.status(404).json({error: "User wasn't found"});
+            }
+    
+            const post = await Post.findOne({postId: postId});
+    
+            if (!post) {
+                return res.status(404).json({error: "Post wasn't found"});
+            }
+    
+            if (user_downvoting.downvotedPosts.includes(postId)) {
+                return res.status(400).json({error: "Can't downvote twice"});
+            }
+    
+            post.rating -= 1;
+    
+            if (user_downvoting.upvotedPosts.includes(postId)) {
+                post.rating -= 1;
+                user_downvoting.upvotedPosts.pull(postId);
+            }
+
+            user_downvoting.downvotedPosts.push(postId);
+
+            await post.save();
+            await user_downvoting.save();
+
+            return res.status(200).json({message: "Post upvoted succesfully"});
+        } catch (error) {
+            console.error("Error in deletePost:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+ 
+    async revokeVote(req, res) {
+        try {
+            const postId = req.params.post_id;
+
+            const user = await User.findOne({login: req.user.login});
+    
+            if (!user) {
+                return res.status(404).json({error: "User wasn't found"});
+            }
+    
+            const post = await Post.findOne({postId: postId});
+    
+            if (!post) {
+                return res.status(404).json({error: "Post wasn't found"});
+            }
+
+            if (!user.downvotedPosts.includes(postId) && !user.upvotedPosts.includes(postId)) {
+                return res.status(400).json({error: "cant revoke a vote without a vote"});
+            }
+
+            if (user.downvotedPosts.includes(postId)) {
+                user.downvotedPosts.pull(postId);
+                post.rating += 1;
+            }
+            else if (user.upvotedPosts.includes(postId)) {
+                user.upvotedPosts.pull(postId);
+                post.rating -= 1;
+            }
+
+            await post.save();
+            await user.save();
+
+            return res.status(200).json({message: "Post vote revoked succesfully"});
+        } catch (error) {
+            console.error("Error in deletePost:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
     async toggleViolate(req, res) {
         try {
             const {postId} = req.body;
