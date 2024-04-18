@@ -213,7 +213,27 @@ describe('deletePost', () => {
  
     });
 });
+describe('upvote/downvote', () => {
+    test('Valid request returns 200', async() => {
+        const res = await request(app)
+            .put('/posts/upvote/2')
+            .set({Authorization: token});
 
+        expect(res.status).toEqual(200);
+        const post = await Post.findOne({postId: 2});
+        expect(post.rating).toEqual(1);
+    });
+
+    test('Valid request returns 200', async() => {
+        const res = await request(app)
+            .put('/posts/downvote/2')
+            .set({Authorization: token});
+
+        expect(res.status).toEqual(200);
+        const post = await Post.findOne({postId: 2});
+        expect(post.rating).toEqual(-1);
+    });
+});
 describe('Violating TOS', () => {
     test('Valid request returns 200', async () => {
         const req = { body :{
@@ -254,5 +274,4 @@ describe('Violating TOS', () => {
 
         expect(res.status).toBe(403);
     });
-
 });

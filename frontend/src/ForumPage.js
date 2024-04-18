@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useUser } from './UserContext';
 import CommentSection from './components/CommentSection'
+import UpvoteDownvoteButton from './components/UpvoteDownvoteButton'
 
 
 const ForumPage = () => {
@@ -208,6 +209,7 @@ const ForumPage = () => {
         <div key={post.post_info.postId} className="card mb-3">
           <div className="card-body">
             <h5 className="card-title"><strong>{post.post_info.postTitle}</strong></h5>
+            <UpvoteDownvoteButton postId = {post.post_info.postId}/>
             {showSpoilersMap[post.post_info.postId] || !post.post_info.containsSpoilers ? (
               <p className="card-text">{post.post_info.postText}</p>
             ) : (
