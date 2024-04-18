@@ -145,13 +145,15 @@ const OtherUserProfile = () => {
     return <div>Loading...</div>;
   }
 
+  console.log(otherUser);
+
   return (
     <div className="container mt-4">
       <div className="row">
         <div className="col-md-8 mx-auto">
           <div className="card">
             <div className="card-header text-center">
-              <img src={otherUser.profilePicture || profileIcon} alt="User Avatar" className="avatar img-fluid" />
+            <img src={otherUser.profilePicture?.data.length > 0 ? `data:${otherUser.profilePicture.type};base64,${Buffer.from(otherUser.profilePicture.data).toString('base64')}` : profileIcon} alt="User Avatar" className="avatar img-fluid" />
               <h2 className="username mt-3">{otherUser.login}</h2>
               <p className="bio text-center">{otherUser.bio || 'No bio available'}</p>
               <div className="text-center mt-3">
