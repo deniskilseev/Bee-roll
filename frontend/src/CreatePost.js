@@ -17,7 +17,6 @@ const CreatePost = () => {
   const [rating, setRating] = useState(null);
   const [hover, setHover] = useState(null);
   const { user } = useUser();
-  const userId = user.userData.data_by_username.uid;
   const token = user.token;
 
   const handleCreatePost = async () => {
@@ -33,7 +32,7 @@ const CreatePost = () => {
       if (postId) {
         newPost.repostId = postId;
       }
-      
+
       console.log('New post:', newPost);
 
       const headers = {
