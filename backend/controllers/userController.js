@@ -278,7 +278,8 @@ const userController = {
 
     async warnUser(req, res) {
         try {
-            const { userId } = req.params;
+            console.log("testinggggg");
+            const { user_id } = req.params;
 
             // Find the user based on the UID
             const user_info = await User.findOne({ uid: user_id });
@@ -286,11 +287,11 @@ const userController = {
             if (!user_info) {
                 return res.status(404).json({ error: "User not found" });
             }
-
-            user.warnings++;
+            console.log("usr info warning? ", user_info.warnings);
+            user_info.warnings++;
 
             // Save the updated user document
-            await user.save();
+            await user_info.save();
 
 
             res.status(200).json({ message: "User warned successfully" });
@@ -299,6 +300,17 @@ const userController = {
             res.status(500).json({ error: "Internal server error" });
         }
     },
+
+    async getWarnedUsers(req, res) {
+        try {
+            const warnedUsers = await User.find({ warnings: { $gt: 0 } }, { login: 1, warnings: 1 });
+
+            res.status(200).json({ warnedUsers });
+        } catch (error) {
+            console.error("Error in getWarnedUsers:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
 }
 
 module.exports = userController;

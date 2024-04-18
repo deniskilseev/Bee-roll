@@ -64,7 +64,7 @@ const App = () => {
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage />} />
           <Route path="/forums/:forumName/settings" element={<ForumSettingsPage />} />
           <Route path="/forumlist" element={<ForumList />}/>
-          <Route path="/admin/warned-users" component={<WarnedUsersPage />} />
+          <Route path="/warnedusers" element={<WarnedUsersPage />} />
 
         </Routes>
       </div>

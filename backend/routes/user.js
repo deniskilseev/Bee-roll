@@ -19,7 +19,8 @@ router.get('/search/:query', userController.searchUsers);
 router.post('/uploadProfilePicture', verifyToken, upload.single('profile-picture'), userController.uploadProfilePicture);
 router.get('/getProfilePicture/:userLogin', userController.downloadProfilePicture);
 router.get('/getSelf', verifyToken, userController.getUserByToken);
-
+router.get('/getWarnedUsers', userController.getWarnedUsers);
+router.post('/warn/:user_id', userController.warnUser);
 
 // Export the router
 module.exports = router;

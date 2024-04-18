@@ -19,6 +19,7 @@ const Taskbar = () => {
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userSearchResults, setUserSearchResults] = useState([]);
+  const u = user.userData;
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
@@ -108,9 +109,8 @@ const Taskbar = () => {
 
   const handleWarnUser = async (userId) => {
     try {
-      // Send a request to your backend to warn the user
-      await axios.post(`http://localhost:3000/users/warn/${userId}`);
-      //fetchWarnedUsers();
+      // Navigate to the warned users page
+      navigate('/warnedusers');
     } catch (error) {
       console.error('Error warning user:', error);
     }
@@ -124,11 +124,6 @@ const Taskbar = () => {
         <div className="btn-group mr-2">
           {user.userData ? (
             <div>
-              {user.isAdmin && (
-                <button onClick={() => handleWarnUser(user.uid)} className="btn btn-outline-light">
-                  Warn User
-                </button>
-              )}
               <button className="btn btn-outline-light ml-2" onClick={toggleSearchBar}>
                 <span className="d-inline-block text-center">{showSearchBar ? 'Hide Search' : 'Search'}</span>
               </button>
@@ -147,6 +142,11 @@ const Taskbar = () => {
               <Link to="/forumlist" className="btn btn-outline-light mr-2">
                 <span className="d-inline-block text-center">Forum List</span>
               </Link>
+              {user.userData.data_by_username.isAdmin && (
+                <button className="btn btn-outline-light mr-2" onClick={handleWarnUser}>
+                  <span className="d-inline-block text-center">Warned Users</span>
+                </button>
+              )}
               <button className="btn btn-outline-light" onClick={handleLogoutClick}>
                 <span className="d-inline-block text-center">Logout</span>
               </button>

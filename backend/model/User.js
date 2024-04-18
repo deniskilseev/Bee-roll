@@ -20,7 +20,7 @@ const userSchema = new Schema({
     data: { type: Buffer, default: Buffer.from([]) },
     type: { type: String, default: '' }
   },
-  isAdmin: [Boolean],
+  isAdmin: Boolean,
   commentIds: [Number],
   followedWatchListsIds: [Number],
   upvotedPosts: [Number],

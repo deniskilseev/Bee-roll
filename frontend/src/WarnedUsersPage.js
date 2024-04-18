@@ -1,33 +1,45 @@
 // WarnedUsersPage.js
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './styles/WarnedUsersPage.css'; 
+
 
 const WarnedUsersPage = () => {
-  const [users, setUsers] = useState([]);
+  const [warnedUsers, setWarnedUsers] = useState([]);
 
   useEffect(() => {
-    const fetchWarnedUsers = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/users/getWarnedUsers');
-        setUsers(response.data); // Assuming the response is an array of user objects
-      } catch (error) {
-        console.error('Error fetching warned users:', error);
-      }
-    };
-
     fetchWarnedUsers();
   }, []);
 
+  const fetchWarnedUsers = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/users/getWarnedUsers');
+      setWarnedUsers(response.data.warnedUsers);
+    } catch (error) {
+      console.error('Error fetching warned users:', error);
+    }
+  };
+
   return (
-    <div>
-      <h2>Warned Users</h2>
-      <ul>
-        {users.map((user) => (
-          <li key={user.uid}>
-            {user.username} - Warning Level: {user.warnings}
-          </li>
-        ))}
-      </ul>
+    <div className="warned-users-container">
+      <h1 className="warned-users-title">Warned Users</h1>
+      <table className="warned-users-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Warning Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          {warnedUsers.map((user, index) => (
+            <tr key={index}>
+              <td>{user.login}</td>
+              <td>{user.warnings}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
