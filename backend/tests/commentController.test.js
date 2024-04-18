@@ -174,3 +174,68 @@ describe('getComment', () => {
         expect(res.body.comment).toBeTruthy();
     });
 });
+
+describe('upvote/downvote/revoke', () => {
+    test('return 200 on existing comment then 400', async () => {
+        const commentId = 1;
+
+        const res1 = await request(app)
+            .put('/comments/upvote/' + commentId)
+            .set({Authorization: token});
+        expect(res1.status).toEqual(200);
+
+        const comment = await Comment.findOne({commentId: commentId});
+
+        expect(comment.rating).toEqual(1);
+
+        const res2 = await request(app)
+            .put('/comments/upvote/' + commentId)
+            .set({Authorization: token});
+
+        expect(res2.status).toEqual(400);
+    });
+    test('return 200 on existing comment then 400', async () => {
+        const commentId = 1;
+
+        const res1 = await request(app)
+            .put('/comments/downvote/' + commentId)
+            .set({Authorization: token});
+
+        expect(res1.status).toEqual(200);
+
+        const comment = await Comment.findOne({commentId: commentId});
+
+        expect(comment.rating).toEqual(-1);
+
+        const res2 = await request(app)
+            .put('/comments/downvote/' + commentId)
+            .set({Authorization: token});
+
+        expect(res2.status).toEqual(400);
+    });
+    test('return 200 on existing comment', async () => {
+        const commentId = 1;
+
+        const res1 = await request(app)
+            .put('/comments/upvote/' + commentId)
+            .set({Authorization: token});
+
+        console.log(res1);
+
+        expect(res1.status).toEqual(200);
+
+        const comment = await Comment.findOne({commentId: commentId});
+
+        expect(comment.rating).toEqual(1);
+
+        const res2 = await request(app)
+            .put('/comments/revoke/' + commentId)
+            .set({Authorization: token});
+
+        expect(res2.status).toEqual(200);
+
+        const comment1 = await Comment.findOne({commentId: commentId});
+
+        expect(comment1.rating).toEqual(0);
+    });
+});
