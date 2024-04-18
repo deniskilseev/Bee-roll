@@ -324,7 +324,9 @@ const postController = {
         } catch (error) {
             console.error("Error in deletePost:", error);
             return res.status(500).json( {error: "Internal server error"} );
-      },
+        }
+    },
+
     async toggleViolate(req, res) {
         try {
             const {postId} = req.body;
