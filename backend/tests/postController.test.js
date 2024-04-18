@@ -58,13 +58,14 @@ describe('createPost', () => {
         const req = { body: {
             forumId: 3,
             postTitle: "Pineapples.",
-            postText: "Love Pineapples."
+            postText: "Love Pineapples.",
+            containsSpoilers: false
         }};
         
         const res = await request(app)
-        .post('/posts/createPost')
-        .send(req.body)
-        .set({Authorization: token});
+            .post('/posts/createPost')
+            .send(req.body)
+            .set({Authorization: token});
         
 
         expect(res.status).toBe(201);
@@ -88,16 +89,34 @@ describe('createPost', () => {
         const req = { body: {
             forumId: 1000000,
             postTitle: "Dogs.",
-            postText: "I love dogs!"
+            postText: "I love dogs!",
+            containsSpoilers: false
         }};
 
         const res = await request(app)
-        .post('/posts/createPost')
-        .send(req.body)
-        .set({Authorization: token});
+            .post('/posts/createPost')
+            .send(req.body)
+            .set({Authorization: token});
 
         expect(res.status).toBe(400);
-    }); 
+    });
+
+    test('Invalid spoilers value returns 400', async() => {
+        const req = { body: {
+            forumId: 3,
+            postTitle: "stuff, lol",
+            postText: "more stuff",
+            containsSpoilers: "Banana"
+        }};
+
+        const res = await request(app)
+            .post('/posts/createPost')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(400);
+
+    });
 });
 
 describe('pinPost', () => {
@@ -192,5 +211,67 @@ describe('deletePost', () => {
 
         expect(res.status).toBe(403);
  
+    });
+});
+describe('upvote/downvote', () => {
+    test('Valid request returns 200', async() => {
+        const res = await request(app)
+            .put('/posts/upvote/2')
+            .set({Authorization: token});
+
+        expect(res.status).toEqual(200);
+        const post = await Post.findOne({postId: 2});
+        expect(post.rating).toEqual(1);
+    });
+
+    test('Valid request returns 200', async() => {
+        const res = await request(app)
+            .put('/posts/downvote/2')
+            .set({Authorization: token});
+
+        expect(res.status).toEqual(200);
+        const post = await Post.findOne({postId: 2});
+        expect(post.rating).toEqual(-1);
+    });
+});
+describe('Violating TOS', () => {
+    test('Valid request returns 200', async () => {
+        const req = { body :{
+            postId: 8
+        }};
+        const res = await request(app)
+            .post('/posts/toggleViolate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const post_info = await Post.findOne( {postId: req.body.postId} );
+
+        expect(post_info.isViolating).toBe(true);
+    });
+
+    test('Inexistent post id returns 400', async () => {
+        const req = { body :{
+            postId: 1000000
+        }};
+        const res = await request(app)
+            .post('/posts/toggleViolate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(400);
+    });
+
+    test('Not a mod returns 403', async () => {
+        const req = { body :{
+            postId: 4
+        }};
+        const res = await request(app)
+            .post('/posts/toggleViolate')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(403);
     });
 });

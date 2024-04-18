@@ -4,13 +4,14 @@ const Counter = require('../model/Counter.js')
 const Movie = require('../model/Movie.js')
 const User = require('../model/User.js')
 const Review = require('../model/Review.js')
+const Post = require('../model/Post.js')
 const predictController = require('./predictController')
 
 
 const reviewController = {
     async createReview(req, res) {
         try {
-            const {movie_id, review} = req.body;
+            const {movie_id, post_id, review} = req.body;
 
             const user_data = await User.findOne( {login: req.user.login } );
 
@@ -30,9 +31,19 @@ const reviewController = {
                 return res.status(400).json( {error: "Review should be between 0 and 5"} );
             }
 
-            const review_data = Review.findOne( {userId: user_id, movieId: movie_id});
+            const review_data = await Review.findOne( {userId: user_id, movieId: movie_id});
             if(review_data) {
                 return res.status(400).json( {error: "Review already exists"} );
+            }
+
+            const post_info = await Post.findOne( {postId: post_id} );
+
+            if (!post_info) {
+                return res.status(400).json( {error: "Invalid post ID"} );
+            }
+
+            if (post_info.userId !== user_id) {
+                return res.status(400).json( {error: "Post is from a different user"} );
             }
 
             const data_request = await Counter.findOne( {_id: "Review"} );
@@ -41,6 +52,7 @@ const reviewController = {
             const newReview = new Review({
                 reviewId: counter_value + 1,
                 userId: user_id,
+                postId: post_id,
                 movieId: movie_id,
                 review: review,
             });
@@ -88,6 +100,8 @@ const reviewController = {
     async updateReview(req, res) {
         try {
             const {review_id, review} = req.body;
+
+            console.log(req.user.login);
 
             const user_data = await User.findOne( {login: req.user.login} );
             
@@ -186,6 +200,25 @@ const reviewController = {
             return res.status(500).json( {error: "Internal server error"} );
         }
     },
+
+    async getReviewByPostId(req, res) {
+        try {
+            const {postId} = req.params;
+
+            const post_info = await Post.findOne( {postId: postId} );
+
+            if(!post_info) {
+                return res.status(400).json( {error: "No such post ID"} );
+            }
+
+            const review_list = await Review.find( {postId: postId} );
+
+            return res.status(200).json( {review_list} );
+        } catch (error) {
+            console.log("Error in getReviewByPostId:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    }
 }
 
 module.exports = reviewController;

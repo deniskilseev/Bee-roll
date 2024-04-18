@@ -13,9 +13,29 @@ const OtherUserWatchlist = ({ watchlist }) => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleFollow = () => {
-    // Logic for handling follow action
-    console.log('Follow button clicked');
+  const handleFollow = async () => {
+    try {
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const response = await axios.post(
+        'http://localhost:3000/watchlists/followWatchlist',
+        {
+          watchlistId: watchlist.watchListId
+        },
+        { headers }
+      );
+      
+      if (response.status === 200) {
+        console.log('Successfully followed the watchlist');
+      } else {
+        console.error('Failed to follow the watchlist');
+      }
+    } catch (error) {
+      console.error('Error following the watchlist', error);
+    }
   };
 
   useEffect(() => {

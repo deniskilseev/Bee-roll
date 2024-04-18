@@ -16,6 +16,7 @@ const OtherUserProfile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState('posts');
+  const [showSpoilersMap, setShowSpoilersMap] = useState({});
   const token = user.token;
 
   const handleTabChange = (tab) => {
@@ -133,6 +134,13 @@ const OtherUserProfile = () => {
     }
   };
 
+  const handleShowSpoilers = (postId) => {
+    setShowSpoilersMap(prevState => ({
+      ...prevState,
+      [postId]: true
+    }));
+  };
+
   if (!otherUser) {
     return <div>Loading...</div>;
   }
@@ -187,7 +195,11 @@ const OtherUserProfile = () => {
                       <div key={post.postId} className="card mb-3">
                         <div className="card-body">
                           <h5 className="card-title">{post.postTitle}</h5>
-                          <p className="card-text">{post.postText}</p>
+                          {showSpoilersMap[post.postId] || !post.containsSpoilers ? (
+                            <p className="card-text">{post.postText}</p>
+                          ) : (
+                            <button className="btn btn-primary mb-2" onClick={() => handleShowSpoilers(post.postId)}>Show spoilers</button>
+                          )}
                           <p className="card-text">Posted By: {otherUser.login}</p>
                         </div>
                       </div>

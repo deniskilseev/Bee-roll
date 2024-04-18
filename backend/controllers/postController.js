@@ -8,7 +8,7 @@ const Post = require('../model/Post.js')
 const postController = {
     async createPost(req, res) {
         try {
-            const {forumId, postTitle, postText} = req.body;
+            const {forumId, postTitle, postText, containsSpoilers} = req.body;
 
             const creator_info = await User.findOne( {login: req.user.login} );
 
@@ -20,6 +20,10 @@ const postController = {
                 return res.status(400).json( {error: "Forum with such ID does not exist"} );
             }
 
+            if (typeof containsSpoilers !== "boolean") {
+                return res.status(400).json( {error: "containsSpoilers should be boolean"} );
+            }
+
             const counter_fetch = await Counter.findOne({_id: "Post"});
             const post_counter_value = counter_fetch.collectionCounter
             const post_number = post_counter_value + 1
@@ -28,7 +32,8 @@ const postController = {
                 userId: creatorId,
                 forumId: forumId,
                 postTitle: postTitle,
-                postText: postText
+                postText: postText,
+                containsSpoilers: containsSpoilers
             });
 
             await newPost.save()
@@ -47,7 +52,7 @@ const postController = {
             );
 
             console.log("Post created successfully: ", postTitle)
-            return res.status(201).json({message: "Post created successfully"})
+            return res.status(201).json({message: "Post created successfully", postId: post_number});
         } catch (error) {
             console.error("Error in createPost:", error);
             res.status(500).json({ error: "Internal server error" });
@@ -65,6 +70,10 @@ const postController = {
             }
     
             const forum = await Forum.findOne( {forumId: forumId} );
+
+            if (post.isViolating) {
+                return res.status(400).json( {error: "The post violated ToS"} );
+            }
     
             if (!forum) {
                 return res.status(400).json( {error: "Forum does not exists"} )
@@ -199,6 +208,154 @@ const postController = {
 
         await res.status(200).json({ posts: posts_to_return });
 
+    },
+
+    async upvotePost(req, res) {
+        try {
+            const postId = req.params.post_id;
+
+            const user_upvoting = await User.findOne({login: req.user.login});
+    
+            if (!user_upvoting) {
+                return res.status(404).json({error: "User wasn't found"});
+            }
+    
+            const post = await Post.findOne({postId: postId});
+    
+            if (!post) {
+                return res.status(404).json({error: "Post wasn't found"});
+            }
+    
+            if (user_upvoting.upvotedPosts.includes(postId)) {
+                return res.status(400).json({error: "Can't upvote twice"});
+            }
+    
+            post.rating += 1;
+    
+            if (user_upvoting.downvotedPosts.includes(postId)) {
+                post.rating += 1;
+                user_upvoting.downvotedPosts.pull(postId);
+            }
+
+            user_upvoting.upvotedPosts.push(postId);
+            
+            await post.save();
+            await user_upvoting.save();
+
+            return res.status(200).json({message: "Post upvoted succesfully"});
+        } catch (error) {
+            console.error("Error in deletePost:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
+    async downvotePost(req, res) {
+        try {
+            const postId = req.params.post_id;
+
+            const user_downvoting = await User.findOne({login: req.user.login});
+    
+            if (!user_downvoting) {
+                return res.status(404).json({error: "User wasn't found"});
+            }
+    
+            const post = await Post.findOne({postId: postId});
+    
+            if (!post) {
+                return res.status(404).json({error: "Post wasn't found"});
+            }
+    
+            if (user_downvoting.downvotedPosts.includes(postId)) {
+                return res.status(400).json({error: "Can't downvote twice"});
+            }
+    
+            post.rating -= 1;
+    
+            if (user_downvoting.upvotedPosts.includes(postId)) {
+                post.rating -= 1;
+                user_downvoting.upvotedPosts.pull(postId);
+            }
+
+            user_downvoting.downvotedPosts.push(postId);
+
+            await post.save();
+            await user_downvoting.save();
+
+            return res.status(200).json({message: "Post upvoted succesfully"});
+        } catch (error) {
+            console.error("Error in deletePost:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+ 
+    async revokeVote(req, res) {
+        try {
+            const postId = req.params.post_id;
+
+            const user = await User.findOne({login: req.user.login});
+    
+            if (!user) {
+                return res.status(404).json({error: "User wasn't found"});
+            }
+    
+            const post = await Post.findOne({postId: postId});
+    
+            if (!post) {
+                return res.status(404).json({error: "Post wasn't found"});
+            }
+
+            if (!user.downvotedPosts.includes(postId) && !user.upvotedPosts.includes(postId)) {
+                return res.status(400).json({error: "cant revoke a vote without a vote"});
+            }
+
+            if (user.downvotedPosts.includes(postId)) {
+                user.downvotedPosts.pull(postId);
+                post.rating += 1;
+            }
+            else if (user.upvotedPosts.includes(postId)) {
+                user.upvotedPosts.pull(postId);
+                post.rating -= 1;
+            }
+
+            await post.save();
+            await user.save();
+
+            return res.status(200).json({message: "Post vote revoked succesfully"});
+        } catch (error) {
+            console.error("Error in deletePost:", error);
+            return res.status(500).json( {error: "Internal server error"} );
+        }
+    },
+
+    async toggleViolate(req, res) {
+        try {
+            const {postId} = req.body;
+
+            const user_info = await User.findOne( {login: req.user.login} );
+
+            const post_info = await Post.findOne( {postId: postId} );
+
+            if (!post_info) {
+                return res.status(400).json( {error: "Invalid post Id"} );
+            }
+
+            const forum_info = await Forum.findOne( {forumId: post_info.forumId} );
+
+            if (!forum_info) {
+                return res.status(400).json( {error: "Invalid post Id"} );
+            }
+
+            if (forum_info.moderatorIds.includes(user_info.uid) || forum_info.creatorId === user_info.uid) {
+                const newViolate = !post_info.isViolating;
+                await Post.findOneAndUpdate( {postId: postId}, {isViolating: newViolate} ); // Update the violated post
+                return res.status(200).json( {message: "OK"} );
+            }
+
+            return res.status(403).json( {error: "Unauthorized"} );
+        } catch (error) {
+            console.error("Error in setViolate:", error);
+            res.status(500).json( {error: "Internal server error"} );
+        }
     }
 }
 

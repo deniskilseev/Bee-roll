@@ -15,6 +15,11 @@ const postSchema = new Schema({
         type: String,
         required: true
     },
+    containsSpoilers: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     forumId: {
         type: Number,
         required: true
@@ -26,6 +31,15 @@ const postSchema = new Schema({
     commentIds: {
         type: [Number],
         required: false
+    },
+    rating: {
+        type: Number,
+        default: 0
+    },
+    isViolating: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 });
 

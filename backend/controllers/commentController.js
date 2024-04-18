@@ -94,6 +94,24 @@ const commentController = {
             console.error("Error in createComment:", error);
             res.status(500).json({ error: "Internal server error" });
         }
+    },
+
+    async getComment(req, res) {
+        try {
+            const commentId = req.params.commentId;
+
+            const comment = await Comment.findOne({commentId: commentId});
+
+            if (!comment) {
+                return res.status(404).json({error: "No comment found"});
+            }
+    
+            return res.status(200).json({comment});
+        }
+        catch (error) {
+            console.error("Error in getComment:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     }
 }
 

@@ -5,6 +5,8 @@ const verifyToken = require('../middleware/auth');
 
 router.post('/createComment', verifyToken, commentController.createComment);
 router.delete('/deleteComment', verifyToken, commentController.deleteComment);
+router.get('/:commentId', commentController.getComment);
+
 
 // Export the router
 module.exports = router;
