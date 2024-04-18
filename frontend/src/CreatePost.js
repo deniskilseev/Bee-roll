@@ -6,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const CreatePost = () => {
   const navigate = useNavigate();
-  const { forumName } = useParams()
+  const { forumName, postId } = useParams()
   const [postTitle, setPostTitle] = useState('');
   const [postText, setPostText] = useState('');
   const [containsSpoilers, setContainsSpoilers] = useState(false);
@@ -17,18 +17,21 @@ const CreatePost = () => {
   const [rating, setRating] = useState(null);
   const [hover, setHover] = useState(null);
   const { user } = useUser();
-  const userId = user.id;
   const token = user.token;
 
   const handleCreatePost = async () => {
     try {
+      console.log('repostId:', postId); // Check the value of repostId
       const newPost = {
-        creatorId: userId,
         forumId: forumName,
         postTitle: postTitle,
         postText: postText,
-        containsSpoilers: containsSpoilers
+        containsSpoilers: containsSpoilers,
       };
+
+      if (postId) {
+        newPost.repostId = postId;
+      }
 
       console.log('New post:', newPost);
 

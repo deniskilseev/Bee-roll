@@ -85,6 +85,27 @@ describe('createPost', () => {
         expect(post_info).not.toBeUndefined();
     });
 
+    test('Creating a repost should also return 200', async () => {
+        const req = { body: {
+            forumId: 3,
+            postTitle: "lel.",
+            postText: "Really Funny",
+            containsSpoilers: false,
+            repostId: 7, 
+        }};
+
+        const res = await request(app)
+            .post('/posts/createPost')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(201);
+
+        const post_info = await Post.findOne( {postTitle: "lel."} );
+
+        expect(post_info.repostId).toBe(7);
+    });
+
     test('Creating a post on non-existent forum returns 400', async() => {
         const req = { body: {
             forumId: 1000000,
