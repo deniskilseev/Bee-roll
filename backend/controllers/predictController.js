@@ -3,6 +3,8 @@ const User = require('../model/User.js')
 const Movie = require('../model/Movie')
 const Request = require('request')
 
+const http = require('http');
+
 const url = 'http://localhost:8000'
 
 const predictController = {
@@ -25,7 +27,9 @@ const predictController = {
                 }
             };
 
-            const movie_recommendation = await fetch(uri, options);
+            const movie_recommendation = await http.request(uri, options).then(response => {
+                return response.json();
+              }).catch(err => {console.log(err);});
 
             if (movie_recommendation.status == 200) {
                 const data = await movie_recommendation.json();
@@ -68,7 +72,11 @@ const predictController = {
                 }
             }
 
-            const movie_recommendation = await fetch(uri, options);
+            const movie_recommendation = await http.request(uri, options).then(response => {
+                return response.json();
+              }).catch(err => {console.log(err);});
+
+            console.log(movie_recommendation);
 
             if (movie_recommendation.status == 200) {
                 data = await movie_recommendation.json();
@@ -109,7 +117,9 @@ const predictController = {
                 }
             }
 
-            const similar_users = await fetch(uri, options);
+            const similar_users = await http.request(uri, options).then(response => {
+                return response.json();
+              }).catch(err => {console.log(err);});
 
             if (similar_users.status == 200) {
                 data = await similar_users.json()
@@ -140,6 +150,8 @@ const predictController = {
                 needed_user_history.reviews.push({movieId: review.movieId, rating: review.review});
             }
 
+            console.log("test: ", needed_user_history);
+
             const uri = url + '/updateUser'
             const options = {
                 method: "POST",
@@ -149,7 +161,8 @@ const predictController = {
                 }
             }
 
-            await fetch(uri, options);
+            console.log("test2: ", options);
+            await http.request(uri, options);
 
             return ;
 
