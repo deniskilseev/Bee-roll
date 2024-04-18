@@ -15,7 +15,7 @@ module.exports = async () => {
         const counters = [
             {_id: "User", collectionCounter: 4},
             {_id: "Forum", collectionCounter: 5},
-            {_id: "Post", collectionCounter: 7},
+            {_id: "Post", collectionCounter: 8},
             {_id: "Comment", collectionCounter: 2},
             {_id: "WatchList", collectionCounter: 7},
             {_id: "Review", collectionCounter: 3},
@@ -29,7 +29,7 @@ module.exports = async () => {
                 postsIds: [3, 4], forumIds: [1, 2], wathcListsIds: [1, 4, 5], followedWatchListsIds: [2, 3], },
 
             {uid: 3, login: 'aarna', password: 'qwerty', email: 'aarna@gmail.com', followsIds: [1, 2], 
-                postsIds: [5], forumIds:[3], watchListsIds: [3], followedWatchListsIds: [1, 2], },
+                postsIds: [5, 8], forumIds:[3], watchListsIds: [3], followedWatchListsIds: [1, 2], },
 
             {uid: 4, login: 'sreekar', password: 'ytrewq', email: 'sreekar@gmail.com', followsIds: [],
                 postIds: [6, 7], forumIds:[4, 5], watchListsIds: [4, 5], followedWatchListsIds: [], }
@@ -43,12 +43,13 @@ module.exports = async () => {
             {postId: 5, userId: 3, postTitle: "PINEAPPLES", forumId: 3, postText: "Pineapples >> apples", containsSpoilers: false},
             {postId: 6, userId: 4, postTitle: "Welcome", forumId: 4, postText: "Welcome to forum", containsSpoilers: false},
             {postId: 7, userId: 4, postTitle: "lol", forumId:5, postText: "funny, haha", containsSpoilers: false},
+            {postId: 8, userId: 3, postTitle: "Something", forumId: 3, postText: "More of Something", containsSpoilers: false},
         ];
 
         const forums = [
             {forumId: 1, forumTitle: 'apples', creatorId: 1, userIds: [1, 2], postIds: [3, 4], isPrivate: false},
             {forumId: 2, forumTitle: 'cars', creatorId: 2, userIds: [2], postIds: [1, 2], isPrivate: true},
-            {forumId: 3, forumTitle: 'pineapples', creatorId: 3, userIds: [3], postIds: [5], isPrivate: false},
+            {forumId: 3, forumTitle: 'pineapples', creatorId: 3, userIds: [3], postIds: [5, 8], isPrivate: false},
             {forumId: 4, forumTitle: 'highboys', creatorId: 4, userIds: [4, 1], postIds: [6], isPrivate: true},
             {forumId: 5, forumTitle: "bruh", creatorId: 4, userIds: [4], postIds: [7], isPrivate: true},
         ];

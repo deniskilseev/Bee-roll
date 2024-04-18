@@ -35,6 +35,11 @@ const postSchema = new Schema({
     rating: {
         type: Number,
         default: 0
+    },
+    isViolating: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 });
 

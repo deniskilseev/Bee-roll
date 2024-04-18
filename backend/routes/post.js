@@ -11,6 +11,7 @@ router.post('/getRecentPosts', verifyToken, postController.getRecentPosts);
 router.put('/upvote/:post_id', verifyToken, postController.upvotePost);
 router.put('/downvote/:post_id', verifyToken, postController.downvotePost);
 router.put('/revoke/:post_id', verifyToken, postController.revokeVote);
+router.post('/toggleViolate', verifyToken, postController.toggleViolate);
 
 // Export the router
 module.exports = router;

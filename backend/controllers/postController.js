@@ -70,6 +70,10 @@ const postController = {
             }
     
             const forum = await Forum.findOne( {forumId: forumId} );
+
+            if (post.isViolating) {
+                return res.status(400).json( {error: "The post violated ToS"} );
+            }
     
             if (!forum) {
                 return res.status(400).json( {error: "Forum does not exists"} )
@@ -283,6 +287,7 @@ const postController = {
             return res.status(500).json( {error: "Internal server error"} );
         }
     },
+ 
     async revokeVote(req, res) {
         try {
             const postId = req.params.post_id;
@@ -319,6 +324,35 @@ const postController = {
         } catch (error) {
             console.error("Error in deletePost:", error);
             return res.status(500).json( {error: "Internal server error"} );
+      },
+    async toggleViolate(req, res) {
+        try {
+            const {postId} = req.body;
+
+            const user_info = await User.findOne( {login: req.user.login} );
+
+            const post_info = await Post.findOne( {postId: postId} );
+
+            if (!post_info) {
+                return res.status(400).json( {error: "Invalid post Id"} );
+            }
+
+            const forum_info = await Forum.findOne( {forumId: post_info.forumId} );
+
+            if (!forum_info) {
+                return res.status(400).json( {error: "Invalid post Id"} );
+            }
+
+            if (forum_info.moderatorIds.includes(user_info.uid) || forum_info.creatorId === user_info.uid) {
+                const newViolate = !post_info.isViolating;
+                await Post.findOneAndUpdate( {postId: postId}, {isViolating: newViolate} ); // Update the violated post
+                return res.status(200).json( {message: "OK"} );
+            }
+
+            return res.status(403).json( {error: "Unauthorized"} );
+        } catch (error) {
+            console.error("Error in setViolate:", error);
+            res.status(500).json( {error: "Internal server error"} );
         }
     }
 }
