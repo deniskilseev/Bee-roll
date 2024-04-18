@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import HomePage from './Homepage';
@@ -62,6 +62,7 @@ const App = () => {
           <Route path="/movies/:movieId" element={<MoviePage />} />
           <Route path="/movies" element={<ReccommendationPage />} />
           <Route path="/forums/:forumName/createpost" element={<CreatePostPage />} />
+          <Route path="/forums/:forumName/createpost/:postId" element={<CreatePostPage />} />
           <Route path="/forums/:forumName/settings" element={<ForumSettingsPage />} />
           <Route path="/forumlist" element={<ForumList />}/>
           <Route path="/warnedusers" element={<WarnedUsersPage />} />
