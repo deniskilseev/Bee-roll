@@ -1,7 +1,7 @@
 const Review = require('../model/Review.js')
 const User = require('../model/User.js')
 const Movie = require('../model/Movie')
-const Request = require('request')
+const axios = require('axios');
 
 const url = 'http://localhost:8000'
 
@@ -25,10 +25,13 @@ const predictController = {
                 }
             };
 
-            const movie_recommendation = await fetch(uri, options);
-
+            const movie_recommendation = await axios.post(uri, {}, options)
+                .then(function (response) {
+                    return response;
+                });
+            
             if (movie_recommendation.status == 200) {
-                const data = await movie_recommendation.json();
+                const data = movie_recommendation.data;
                 return res.status(200).json(data);
             }
 
@@ -68,10 +71,13 @@ const predictController = {
                 }
             }
 
-            const movie_recommendation = await fetch(uri, options);
+            const movie_recommendation = await axios.post(uri, options.body, options)
+                .then(function (response) {
+                    return response;
+                });
 
             if (movie_recommendation.status == 200) {
-                data = await movie_recommendation.json();
+                data = movie_recommendation.data;
                 if (data.status_code == 412) {
                     return res.status(412).json( {error: "User needs more reviews to be recommended movies"} );
                 }
@@ -109,10 +115,14 @@ const predictController = {
                 }
             }
 
-            const similar_users = await fetch(uri, options);
+            const similar_users = await axios.post(uri, {}, options)
+                .then(function (response) {
+                    return response;
+                });
+
 
             if (similar_users.status == 200) {
-                data = await similar_users.json()
+                data = similar_users.data;
                 return res.status(200).json(data);
             }
 
@@ -149,7 +159,12 @@ const predictController = {
                 }
             }
 
-            await fetch(uri, options);
+            
+            const response = await axios.post(uri, options.body, options)
+                .then(function (response) {
+                    return response;
+                });
+
 
             return ;
 
