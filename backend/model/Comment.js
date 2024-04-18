@@ -22,6 +22,10 @@ const commentSchema = new Schema({
     postingDate: {
         type: Date,
         required: true
+    },
+    rating: {
+        type: Number,
+        default: 0
     }
 });
 

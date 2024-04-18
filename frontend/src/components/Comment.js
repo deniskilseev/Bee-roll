@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Comment.css';
+import UpvoteDownvoteButtonComment from './UpvoteDownvoteButtonComment'
 
 function Comment(props) {
     const [comment, setComment] = useState([]);
@@ -39,6 +40,7 @@ function Comment(props) {
       }, []);
     return (
         <div className="comment-container">
+            <UpvoteDownvoteButtonComment commentId = {commentId}/>
             <p className="comment-text">{comment.commentText}</p>
             <div className="comment-details">
                 <span className="comment-user">{user}</span>
