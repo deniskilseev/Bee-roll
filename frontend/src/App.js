@@ -21,31 +21,6 @@ import { useUser } from './UserContext';
 const App = () => {
   const { user } = useUser();
 
-
-  const dummyUser = user.userData
-  ? {
-      id: user.userData.data_by_username.uid,
-      username: user.userData.data_by_username.login,
-      bio: 'Example bio',
-      email: user.userData.data_by_username.email,
-      profilePicture: 'blank profile pic.jpg',
-      followers: user.userData.data_by_username.followersIds,
-      following: user.userData.data_by_username.followsIds,
-      posts: user.userData.data_by_username.postsIds,
-      watchlists: user.userData.data_by_username.watchListsIds,
-    }
-  : 
-  {
-    id: 1,
-    username: 'john_doe',
-    bio: 'Example bio',
-    email: 'john.doe@example.com',
-    profilePicture: 'blank profile pic.jpg',
-    followers: [1, 2, 3, 4],
-    following: [1, 2, 3],
-    watchlists: []
-  };
-
   return (
     <Router>
       <div className="app">
@@ -56,7 +31,7 @@ const App = () => {
           <Route path="/user/profile/:username" element={<OtherUserProfile />} />
           <Route path="/createforum" element={<CreateForumPage />}/>
           <Route path="/watchlists" element={<WatchlistPage />} />
-          <Route path="/forums/:forumName" element={<ForumPage currentUser={dummyUser} />}/>
+          <Route path="/forums/:forumName" element={<ForumPage />}/>
           <Route path="/followers/:username" element={<FollowersPage />} />
           <Route path="/following/:username" element={<FollowingPage />} />
           <Route path="/movies/:movieId" element={<MoviePage />} />

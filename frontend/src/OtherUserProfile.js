@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import profileIcon from './assets/blank profile pic.jpg';
+import blankProfilePic from './assets/blank profile pic.jpg';
 import axios from 'axios';
 import OtherUserWatchlist from './components/OtherUserWatchlist';
 import { useUser } from './UserContext';
@@ -10,7 +10,7 @@ import { useIsRTL } from 'react-bootstrap/esm/ThemeProvider';
 
 
 const OtherUserProfile = () => {
-  const { username } = useParams(); // Extract uid parameter from URL
+  const { username } = useParams();
   const [otherUser, setOtherUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [watchlists, setWatchlists] = useState([]);
@@ -20,6 +20,9 @@ const OtherUserProfile = () => {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState('posts');
   const [showSpoilersMap, setShowSpoilersMap] = useState({});
+  const [profilePictureSrc, setProfilePictureSrc] = useState(null);
+
+
   const token = user.token;
 
   const handleTabChange = (tab) => {
@@ -62,7 +65,6 @@ const OtherUserProfile = () => {
         try {
           const watchlistData = await fetchWatchlist(watchListId);
           if (watchlistData && watchlistData.isPublic) {
-            // Only add the watchlist to the array if it's public
             setWatchlists((prevWatchlists) => {
               if (!prevWatchlists.some((watchlist) => watchlist.watchListId === watchListId)) {
                 return [...prevWatchlists, watchlistData];
@@ -96,6 +98,15 @@ const OtherUserProfile = () => {
 
     fetchUserProfile();
   }, [username]);
+
+  useEffect(() => {
+    if (otherUser && otherUser.profilePicture) {
+      const profilePictureData = otherUser.profilePicture.data;
+      const byteArray = new Uint8Array(profilePictureData.data);
+      const profilePictureSrc = `data:${otherUser.profilePicture.type};base64,${btoa(String.fromCharCode.apply(null, byteArray))}`;
+      setProfilePictureSrc(profilePictureSrc);
+    }
+  }, [otherUser]);
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -181,7 +192,11 @@ const OtherUserProfile = () => {
         <div className="col-md-8 mx-auto">
           <div className="card">
             <div className="card-header text-center">
-              <img src={otherUser.profilePicture || profileIcon} alt="User Avatar" className="avatar img-fluid" />
+              <img
+                src={(profilePictureSrc && profilePictureSrc.length !== 13) ? profilePictureSrc : blankProfilePic}
+                alt="User Avatar"
+                className="avatar img-fluid"
+              />
               <h2 className="username mt-3">{otherUser.login}</h2>
               <p className="bio text-center">{otherUser.bio || 'No bio available'}</p>
               <div className="text-center mt-3">

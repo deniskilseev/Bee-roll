@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import plusIcon from './assets/edit.png';
+import blankProfilePic from './assets/blank profile pic.jpg';
 import axios from 'axios';
 import { useUser } from './UserContext';
 
 const Profile = () => {
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const token = user.token;
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
@@ -15,7 +16,10 @@ const Profile = () => {
   const navigate = useNavigate();
   const { updateUser } = useUser();
   const { loading } = useUser();
-  
+  const profilePictureData = editedUser.userData.data_by_username.profilePicture.data;
+  const byteArray = new Uint8Array(profilePictureData.data);
+  const profilePictureSrc = `data:${editedUser.userData.data_by_username.profilePicture.type};base64,${btoa(String.fromCharCode.apply(null, byteArray))}`;
+
   const handleEditClick = () => {
     setEditing(true);
   };
@@ -24,11 +28,16 @@ const Profile = () => {
     try {
       const { username, password, email } = editedUser;
       // Dummy date of birth constant
-      const dummyDateOfBirth = "1990-01-01"; // Modify as needed
-  
+      const dummyDateOfBirth = "1990-01-01";
+      const oldUsername = user.userData.data_by_username.login;
+      console.log('username:', username);
+
+// Determine the username to use
+      const updatedUsername = username === undefined ? oldUsername : username;
+      console.log('updatedUsername:', updatedUsername);
+
       const updatedUser = {
-        oldUser: user.username,
-        username,
+        username: updatedUsername,
         email: user.email, // Keep the original email
         date_of_birth: dummyDateOfBirth // Use the dummy date of birth
       };
@@ -37,26 +46,29 @@ const Profile = () => {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
-  
+
+      if (profilePicture && isEditing) {
+        const formData = new FormData();
+        formData.append('profile-picture', profilePicture);
+        const headers = {
+          'Authorization': `Bee-roll ${token}`,
+        };
+        await axios.post('http://localhost:3000/users/uploadProfilePicture', formData, { headers });
+      }
+
       const response = await axios.put('http://localhost:3000/users/putuser', updatedUser, { headers });
-  
+
       if (response.status !== 200) {
         throw new Error('Failed to save changes');
       }
 
-      updateUser({ ...editedUser});
-
-      if (profilePicture && isEditing) {
-        const formData = new FormData();
-        formData.append('profilePicture', profilePicture);
-        const headers = {
-          'Authorization': `Bee-roll ${token}`,
-          'Content-Type': 'multipart/form-data'
-        };
-        await axios.post('http://localhost:3000/users/uploadprofilepicture', formData, { headers });
-      }
-  
       setEditing(false);
+
+      alert('Saved changes successfully. Please log in again to see the changes.');
+      logout();
+      navigate('/');
+
+      console.log('Saved changes successfully', user, editedUser);
     } catch (error) {
       console.error(error);
     }
@@ -87,7 +99,7 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchPostData = async () => {
-      if (user.userData && user.userData.data_by_username.postsIds) { // Check if user and user.postsIds are not null
+      if (user.userData && user.userData.data_by_username.postsIds) {
         try {
           const postsData = await Promise.all(
             user.userData.data_by_username.postsIds.map(async (postId) => {
@@ -97,28 +109,26 @@ const Profile = () => {
               };
               const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
               const postData = postResponse.data.post_info;
-    
-              // Fetch user data for the post
+
               const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
               const userData = userResponse.data.user_info;
-    
-              // Combine post data with user data
+
               return { ...postData, user: userData.login };
             })
           );
-          
+
           setPosts(postsData);
         } catch (error) {
           console.error('Error fetching posts:', error);
         }
       }
     };
-    
+
     fetchPostData();
   }, [user, token]);
 
-  console.log('edited:', editedUser);
-  console.log('user:', user);
+  console.log(editedUser.userData.data_by_username.profilePicture);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -133,7 +143,7 @@ const Profile = () => {
                 <label htmlFor="profile-picture" className="edit-profile-picture">
                   <div className="d-flex justify-content-center align-items-center">
                     <img
-                      src={editedUser.userData.data_by_username.profilePicture || plusIcon}
+                      src={(profilePictureSrc && profilePictureSrc.length !== 13) ? profilePictureSrc : blankProfilePic}
                       alt="User Avatar"
                       className="avatar img-fluid"
                     />
@@ -141,7 +151,7 @@ const Profile = () => {
                       src={plusIcon}
                       alt="Edit Icon"
                       className="edit-icon ml-2"
-                      style={{ width: '20px', height: '20px'}}
+                      style={{ width: '20px', height: '20px' }}
                     />
                   </div>
                   <input
@@ -153,8 +163,13 @@ const Profile = () => {
                   />
                 </label>
               )}
-              {!isEditing && editedUser.userData?.data_by_username?.profilePicture && (
-                <img src={editedUser.userData.data_by_username.profilePicture} alt="User Avatar" className="avatar img-fluid" />
+
+              {!isEditing && (
+                <img
+                  src={(profilePictureSrc && profilePictureSrc.length !== 13) ? profilePictureSrc : blankProfilePic}
+                  alt="User Avatar"
+                  className="avatar img-fluid"
+                />
               )}
               <h2 className="username mt-3">
                 {isEditing ? (
@@ -212,25 +227,25 @@ const Profile = () => {
               <div className="row">
                 <div className="col-md-6 text-center">
                   <Link
-                      to={`/followers/${editedUser.userData?.data_by_username?.username}`}
-                      style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
-                    >
-                      <div className='bio-follow-header'>
-                        <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
-                        <p className='bio-follows'>{editedUser.userData?.data_by_username?.followersIds.length}</p>
-                      </div>
+                    to={`/followers/${editedUser.userData?.data_by_username?.username}`}
+                    style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
+                  >
+                    <div className='bio-follow-header'>
+                      <h3 style={{ fontSize: 'inherit' }}>Followers</h3>
+                      <p className='bio-follows'>{editedUser.userData?.data_by_username?.followersIds.length}</p>
+                    </div>
                   </Link>
                 </div>
                 <div className="col-md-6 text-center">
-                    <Link
-                        to={`/following/${editedUser.userData?.data_by_username?.username}`}
-                        style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
-                      >
-                        <div className='bio-follow-header'>
-                          <h3 style={{ fontSize: 'inherit' }}>Following</h3>
-                          <p className='bio-follows'>{editedUser.userData?.data_by_username?.followsIds.length}</p>
-                        </div>
-                    </Link>
+                  <Link
+                    to={`/following/${editedUser.userData?.data_by_username?.username}`}
+                    style={{ cursor: 'pointer', textDecoration: 'none', fontSize: 'inherit' }}
+                  >
+                    <div className='bio-follow-header'>
+                      <h3 style={{ fontSize: 'inherit' }}>Following</h3>
+                      <p className='bio-follows'>{editedUser.userData?.data_by_username?.followsIds.length}</p>
+                    </div>
+                  </Link>
                 </div>
               </div>
             </div>
