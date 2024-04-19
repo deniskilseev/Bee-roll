@@ -112,7 +112,6 @@ const WatchlistsPage = () => {
   }, [user.watchlists, fetchWatchlist, user.userData.data_by_username.watchListsIds]);
 
   useEffect(() => {
-    // Fetch followed watchlists when user switches to the "Followed Watchlists" tab
     if (activeTab === 'followedWatchlists') {
       fetchFollowedWatchlists();
     }
