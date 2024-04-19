@@ -115,15 +115,10 @@ describe('deleteComment', () => {
             .delete('/comments/deleteComment')
             .send(req.body)
             .set({Authorization: token});
-<<<<<<< HEAD
-
-=======
         
         const comments = await Comment.find();
         console.log(comments);
-
-            
->>>>>>> fix-cookies
+        
         expect(res.status).toEqual(200);
 
         const post = await Post.findOne({postId: comment.postId});
