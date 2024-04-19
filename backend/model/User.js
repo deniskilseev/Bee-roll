@@ -20,10 +20,13 @@ const userSchema = new Schema({
     data: { type: Buffer, default: Buffer.from([]) },
     type: { type: String, default: '' }
   },
+  isAdmin: Boolean,
   commentIds: [Number],
   followedWatchListsIds: [Number],
   upvotedPosts: [Number],
-  downvotedPosts: [Number]
+  downvotedPosts: [Number],
+  warnings: { type: Number, default: 0 },
+  warningDescription: String
 });
 
 const User = model('User', userSchema);
