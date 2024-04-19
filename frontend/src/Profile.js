@@ -16,6 +16,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const { updateUser } = useUser();
   const { loading } = useUser();
+  const profilePictureData = editedUser.userData.data_by_username.profilePicture.data;
+  const byteArray = new Uint8Array(profilePictureData.data);
+  const profilePictureSrc = `data:${editedUser.userData.data_by_username.profilePicture.type};base64,${btoa(String.fromCharCode.apply(null, byteArray))}`;
 
   const handleEditClick = () => {
     setEditing(true);
@@ -28,7 +31,6 @@ const Profile = () => {
       const dummyDateOfBirth = "1990-01-01";
 
       const updatedUser = {
-        oldUser: user.username,
         username,
         email: user.email, // Keep the original email
         date_of_birth: dummyDateOfBirth // Use the dummy date of birth
@@ -39,25 +41,37 @@ const Profile = () => {
         'Content-Type': 'application/json'
       };
 
+      if (profilePicture && isEditing) {
+        const formData = new FormData();
+        formData.append('profile-picture', profilePicture);
+        const headers = {
+          'Authorization': `Bee-roll ${token}`,
+        };
+        await axios.post('http://localhost:3000/users/uploadProfilePicture', formData, { headers });
+      }
+
       const response = await axios.put('http://localhost:3000/users/putuser', updatedUser, { headers });
 
       if (response.status !== 200) {
         throw new Error('Failed to save changes');
       }
 
-      updateUser({ ...editedUser });
+      setEditing(false);
 
-      if (profilePicture && isEditing) {
-        const formData = new FormData();
-        formData.append('profilePicture', profilePicture);
-        const headers = {
+      const userResponse = await axios.get('http://localhost:3000/users/getSelf', {
+        headers: {
           'Authorization': `Bee-roll ${token}`,
-          'Content-Type': 'multipart/form-data'
-        };
-        await axios.post('http://localhost:3000/users/uploadprofilepicture', formData, { headers });
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (userResponse.status === 200) {
+        updateUser(userResponse.data, userResponse.data.token);
       }
 
-      setEditing(false);
+      setEditedUser(user);
+
+      console.log('Saved changes successfully', user, editedUser);
     } catch (error) {
       console.error(error);
     }
@@ -88,7 +102,7 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchPostData = async () => {
-      if (user.userData && user.userData.data_by_username.postsIds) { // Check if user and user.postsIds are not null
+      if (user.userData && user.userData.data_by_username.postsIds) {
         try {
           const postsData = await Promise.all(
             user.userData.data_by_username.postsIds.map(async (postId) => {
@@ -99,11 +113,9 @@ const Profile = () => {
               const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
               const postData = postResponse.data.post_info;
 
-              // Fetch user data for the post
               const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
               const userData = userResponse.data.user_info;
 
-              // Combine post data with user data
               return { ...postData, user: userData.login };
             })
           );
@@ -134,7 +146,7 @@ const Profile = () => {
                 <label htmlFor="profile-picture" className="edit-profile-picture">
                   <div className="d-flex justify-content-center align-items-center">
                     <img
-                      src={(editedUser.userData.data_by_username.profilePicture && editedUser.userData.data_by_username.profilePicture.data && editedUser.userData.data_by_username.profilePicture.data.length > 0) ? plusIcon : blankProfilePic}
+                      src={(profilePictureSrc && profilePictureSrc.length !== 13) ? profilePictureSrc : blankProfilePic}
                       alt="User Avatar"
                       className="avatar img-fluid"
                     />
@@ -157,7 +169,7 @@ const Profile = () => {
 
               {!isEditing && (
                 <img
-                  src={(editedUser.userData.data_by_username.profilePicture && editedUser.userData.data_by_username.profilePicture.data && editedUser.userData.data_by_username.profilePicture.data.length > 0) ? editedUser.userData.data_by_username.profilePicture : blankProfilePic}
+                  src={(profilePictureSrc && profilePictureSrc.length !== 13) ? profilePictureSrc : blankProfilePic}
                   alt="User Avatar"
                   className="avatar img-fluid"
                 />
