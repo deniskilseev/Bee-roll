@@ -417,3 +417,60 @@ describe('uploadUserImage', () => {
         expect(res.headers['content-type']).toEqual('image/jpeg');
     }, 10 * 1000);
   }, 30 * 1000);
+
+
+  describe('warnUser', () => {
+    test('return 200 if warning user is successful', async () => {
+        const user = await User.findOne({ login: 'denis' });
+        const userId = user.uid;
+        const warningDescription = "Inappropriate behavior";
+
+        const res = await request(app)
+            .post(`/users/warnUser/${userId}`)
+            .send({ warningDescription });
+
+        expect(res.status).toEqual(200);
+
+        const updatedUser = await User.findOne({ uid: userId });
+        expect(updatedUser.warnings).toBeGreaterThan(0);
+        expect(updatedUser.warningDescription).toEqual(warningDescription);
+    });
+
+    test('return 404 if user does not exist', async () => {
+        const userId = 0;
+        const warningDescription = "Inappropriate behavior";
+
+        const res = await request(app)
+            .post(`/users/warnUser/${userId}`)
+            .send({ warningDescription });
+
+        expect(res.status).toEqual(404);
+    });
+});
+
+describe('getWarnedUsers', () => {
+    test('return 200 with list of warned users', async () => {
+        const res = await request(app)
+            .get('/users/getWarnedUsers');
+
+        expect(res.status).toEqual(200);
+        expect(res.body.warnedUsers).toBeTruthy();
+        expect(Array.isArray(res.body.warnedUsers)).toBe(true);
+        expect(res.body.warnedUsers.length).toBe(0);
+    });
+
+    test('return 200 with empty list if no warned users exist', async () => {
+        // Assuming there are no users with warnings
+        // Clear warnings for all users
+        await User.updateMany({}, { warnings: 0 });
+
+        const res = await request(app)
+            .get('/users/getWarnedUsers');
+
+        expect(res.status).toEqual(200);
+        expect(res.body.warnedUsers).toBeTruthy();
+        expect(Array.isArray(res.body.warnedUsers)).toBe(true);
+        expect(res.body.warnedUsers.length).toBe(0);
+    });
+});
+

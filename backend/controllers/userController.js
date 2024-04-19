@@ -205,8 +205,6 @@ const userController = {
 
             const users = await User.find( {login: regex} );
 
-          // Assuming User model has a field called 'username' for searching
-          //const users = await User.find({ username: { $regex: query, $options: 'i' } }).limit(1);
           res.json({ users });
         } catch (error) {
           console.error('Error searching users:', error);
