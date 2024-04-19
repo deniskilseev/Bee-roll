@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useUser } from './UserContext';
 
 const Profile = () => {
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const token = user.token;
   const [isEditing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
@@ -29,9 +29,15 @@ const Profile = () => {
       const { username, password, email } = editedUser;
       // Dummy date of birth constant
       const dummyDateOfBirth = "1990-01-01";
+      const oldUsername = user.userData.data_by_username.login;
+      console.log('username:', username);
+
+// Determine the username to use
+      const updatedUsername = username === undefined ? oldUsername : username;
+      console.log('updatedUsername:', updatedUsername);
 
       const updatedUser = {
-        username,
+        username: updatedUsername,
         email: user.email, // Keep the original email
         date_of_birth: dummyDateOfBirth // Use the dummy date of birth
       };
@@ -58,18 +64,9 @@ const Profile = () => {
 
       setEditing(false);
 
-      const userResponse = await axios.get('http://localhost:3000/users/getSelf', {
-        headers: {
-          'Authorization': `Bee-roll ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (userResponse.status === 200) {
-        updateUser(userResponse.data, userResponse.data.token);
-      }
-
-      setEditedUser(user);
+      alert('Saved changes successfully. Please log in again to see the changes.');
+      logout();
+      navigate('/');
 
       console.log('Saved changes successfully', user, editedUser);
     } catch (error) {
