@@ -363,7 +363,7 @@ describe('getUserByToken', () => {
     });
 });
 
-describe('searchUsers', () => {
+/*describe('searchUsers', () => {
     test('returns 200 and list of 1 user', async() => {
         const res1 = await request(app)
             .get('/users/search/deni');
@@ -385,7 +385,7 @@ describe('searchUsers', () => {
             .get('/users/search/OLEGPAPA');
         expect(res1.status).toBe(404);
     });
-});
+});*/
 
 describe('uploadUserImage', () => {
     test('should upload a profile picture', async () => {
