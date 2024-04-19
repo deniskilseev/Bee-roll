@@ -25,6 +25,8 @@ const userSchema = new Schema({
   followedWatchListsIds: [Number],
   upvotedPosts: [Number],
   downvotedPosts: [Number],
+  upvotedComments: [Number],
+  downvotedComments: [Number],
   warnings: { type: Number, default: 0 },
   warningDescription: String
 });
