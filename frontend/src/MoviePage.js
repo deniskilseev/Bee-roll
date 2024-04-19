@@ -85,6 +85,9 @@ const MoviePage = () => {
   useEffect(() => {
     const fetchStreamingServices = async () => {
       try {
+        if (!movieInfo || !movieInfo.imdbId) {
+          return; // Exit early if movieInfo is not available
+        }
         const options = {
           method: 'GET',
           url: 'https://streaming-availability.p.rapidapi.com/get',
@@ -100,11 +103,20 @@ const MoviePage = () => {
   
         const response = await axios.request(options);
         console.log('Response:', response.data);
+        const streamingInfo = response.data.result.streamingInfo;
+        console.log('Streaming info:', streamingInfo);
+        const usStreamingServices = streamingInfo?.us;
+        console.log('US Streaming services:', usStreamingServices);
+
+        if (!usStreamingServices) {
+          throw new Error('No streaming info available for US');
+        }
         setStreamingServices(response.data.result.streamingInfo.us);
         setCast(response.data.result.cast);
         setDirectors(response.data.result.directors);
       } catch (error) {
         console.error('Error fetching streaming services:', error);
+        setStreamingServices([]);
       }
     };
 
@@ -138,7 +150,7 @@ const MoviePage = () => {
     }
   }, [movieInfo]);
 
-  if (!movieInfo) {
+  if (!movieInfo || !streamingServices) {
     return <div className="container mt-5">Loading...</div>;
   }  
 

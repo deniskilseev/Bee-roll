@@ -6,6 +6,7 @@ import profileIcon from './assets/blank profile pic.jpg';
 import axios from 'axios';
 import OtherUserWatchlist from './components/OtherUserWatchlist';
 import { useUser } from './UserContext';
+import { useIsRTL } from 'react-bootstrap/esm/ThemeProvider';
 
 
 const OtherUserProfile = () => {
@@ -15,6 +16,7 @@ const OtherUserProfile = () => {
   const [watchlists, setWatchlists] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [warningDescription, setWarningDescription] = useState('');
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState('posts');
   const [showSpoilersMap, setShowSpoilersMap] = useState({});
@@ -148,10 +150,12 @@ const OtherUserProfile = () => {
       console.log("here 2");
       console.log("other user id: ", otherUser.uid);
 
-      await axios.post(`http://localhost:3000/users/warn/${otherUser.uid}`, { headers });
+      const description = prompt('Enter warning description:');
+      if (!description) return;
+
+      await axios.post(`http://localhost:3000/users/warn/${otherUser.uid}`, { warningDescription: description }, { headers });
       
       console.log("here 3");
-      // Assume the warning count is updated in the response
       const updatedUser = { ...otherUser, warningCount: otherUser.warningCount + 1 };
       setOtherUser(updatedUser);
 
@@ -180,17 +184,17 @@ const OtherUserProfile = () => {
               <img src={otherUser.profilePicture || profileIcon} alt="User Avatar" className="avatar img-fluid" />
               <h2 className="username mt-3">{otherUser.login}</h2>
               <p className="bio text-center">{otherUser.bio || 'No bio available'}</p>
-              {otherUser.warnings > 0 && (
-                <div className="warning-level">
-                  <p>Warning Level: {otherUser.warnings}</p>
-                </div>
-              )}
               <div className="text-center mt-3">
               {console.log("isAdmin: ", isAdmin)}
               {isAdmin && (
                   <button className="btn btn-warning mr-2" onClick={handleWarnUser}>
                     Warn
                   </button>
+                )}
+                {otherUser.warnings > 0 && (
+                  <div className="warning-level">
+                    <p>Warning Level: {otherUser.warnings} ({otherUser.warningDescription})</p>
+                  </div>
                 )}
                 <button className="btn btn-primary" onClick={handleFollow}>
                   {isFollowing ? 'Unfollow' : 'Follow'}

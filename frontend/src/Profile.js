@@ -182,7 +182,7 @@ const Profile = () => {
                   editedUser.userData?.data_by_username?.bio || 'No bio available'
                 )}
               </p>
-              {editedUser.userData.data_by_username.warnings > 0 && (
+              {editedUser.userData?.data_by_username?.warnings > 0 && (
                 <div className="warning-level">
                   <p>Warning Level: {editedUser.userData.data_by_username.warnings}</p>
                 </div>

@@ -108,7 +108,6 @@ const Taskbar = () => {
 
   const handleWarnUser = async (userId) => {
     try {
-      // Navigate to the warned users page
       navigate('/warnedusers');
     } catch (error) {
       console.error('Error warning user:', error);
@@ -132,7 +131,7 @@ const Taskbar = () => {
               <Link to="/createforum" className="btn btn-outline-light mr-2">
                   <span className="d-inline-block text-center">Create Forum</span>
               </Link>
-              <Link to="/movies" className="btn btn-outline-light mr-2"> {/* Add Link for Movies button */}
+              <Link to="/movies" className="btn btn-outline-light mr-2">
                 <span className="d-inline-block text-center">Movies</span>
               </Link>
               <Link to="/profile" className="btn btn-outline-light mr-2">

@@ -278,8 +278,8 @@ const userController = {
 
     async warnUser(req, res) {
         try {
-            console.log("testinggggg");
             const { user_id } = req.params;
+            const { warningDescription } = req.body;
 
             // Find the user based on the UID
             const user_info = await User.findOne({ uid: user_id });
@@ -287,8 +287,8 @@ const userController = {
             if (!user_info) {
                 return res.status(404).json({ error: "User not found" });
             }
-            console.log("usr info warning? ", user_info.warnings);
             user_info.warnings++;
+            user_info.warningDescription = warningDescription;
 
             // Save the updated user document
             await user_info.save();

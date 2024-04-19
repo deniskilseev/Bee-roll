@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Loader, Message } from 'semantic-ui-react';
-import MovieCard from './MovieCard';
+import MoviePage from './MoviePage'; // Import MoviePage component
 import { useUser } from './UserContext';
+import MovieCard from './MovieCard';
+import { Link, useNavigate } from 'react-router-dom';
+
 
 const ReccommendationPage = () => {
   const [movies, setMovies] = useState([]);
@@ -17,12 +20,13 @@ const ReccommendationPage = () => {
           'Authorization': `Bee-roll ${token}`,
           'Content-Type': `application/json`
         };
-        const response = await fetch('http://localhost:3000/predict/predictUser', { headers }); // Assuming '/api/movies' is the endpoint to fetch all movies
+        const response = await fetch('http://localhost:3000/predict/predictUser', { headers });
         if (!response.ok) {
           throw new Error('Failed to fetch movies');
         }
         const data = await response.json();
-        setMovies(data.movies);
+        setMovies(data.movie_ids);
+        console.log("testing data: ", data);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -31,18 +35,20 @@ const ReccommendationPage = () => {
     };
 
     fetchMovies();
-  }, []);
+  }, [token]);
 
   return (
     <div className="movie-page">
       <h1>Movie Page</h1>
       {loading && <Loader active>Loading...</Loader>}
       {error && <Message negative>{error}</Message>}
-      <Card.Group>
-        {movies.map(movie => (
-          <MovieCard key={movie._id} title={movie.title} thumbnailUrl={movie.thumbnailUrl} />
+      <ul>
+        {movies.map(movieId => (
+          <li key={movieId}>
+            <Link to={`/movies/${movieId}`}>Movie ID: {movieId}</Link>
+          </li>
         ))}
-      </Card.Group>
+      </ul>
     </div>
   );
 };
