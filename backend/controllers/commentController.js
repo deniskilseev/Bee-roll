@@ -74,7 +74,7 @@ const commentController = {
             const post = await Post.findOne({postId: comment.postId});
             const forum = await Forum.findOne({forumId: post.forumId});
             console.log("USER CREATING: ", post.userId)
-            const isAllowed = user_deleting_uid == post.userId 
+            const isAllowed = user_deleting_uid == comment.userId 
                 || user_deleting_uid == forum.creatorId 
                 || forum.moderatorIds.includes(user_deleting_uid);
             if (!isAllowed) {
