@@ -415,3 +415,24 @@ describe('unfollowWatchlist', () => {
 
     });
 });
+
+describe('Change Title', () => {
+    test('200 when everythin is correct', async () => {
+        req = { body: {
+            watchlistId: 1,
+            newTitle: "sick movies, lol"
+        }};
+
+         const res = await request(app)
+            .put('/watchlists/changeTitle')
+            .send(req.body)
+            .set({Authorization: token});
+
+        expect(res.status).toBe(200);
+
+        const watchlist_data = await WatchList.findOne({watchListId: 1});
+
+        expect(watchlist_data.watchListTitle).toBe(req.body.newTitle);
+
+    }); 
+});

@@ -23,7 +23,7 @@ const WatchlistsPage = () => {
   
       const response = await axios.post('http://localhost:3000/watchlists/createWatchlist', {
         isPublic: false,
-        watchlistTitle: 'New Watchlist 8',
+        watchlistTitle: 'New Watchlist',
       }, { headers });
 
       if (response.status === 201) {
@@ -112,7 +112,6 @@ const WatchlistsPage = () => {
   }, [user.watchlists, fetchWatchlist, user.userData.data_by_username.watchListsIds]);
 
   useEffect(() => {
-    // Fetch followed watchlists when user switches to the "Followed Watchlists" tab
     if (activeTab === 'followedWatchlists') {
       fetchFollowedWatchlists();
     }
