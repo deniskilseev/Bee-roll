@@ -37,7 +37,8 @@ function Comment(props) {
       };
     
         fetchCommentData();
-      }, []);
+      }, [commentId]);
+      
     return (
         <div className="comment-container">
             <UpvoteDownvoteButtonComment commentId = {commentId}/>

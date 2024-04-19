@@ -5,6 +5,9 @@ const User = require('../model/User.js')
 const JWT_SECRET = require('../secrets/jwt')
 const jwt = require('jsonwebtoken')
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
 const userController = {
     async createUser(req, res) {
         try {
@@ -46,6 +49,7 @@ const userController = {
     async loginUser(req, res) {
         try {
             const {username, password} = req.body;
+            console.log("body: ", req.body);
 
             data_by_username = await User.findOne({login: username});
             const verified_password = data_by_username.password == password;
@@ -178,7 +182,6 @@ const userController = {
         try {
             const { username } = req.params;
     
-            // Find the user based on the UID
             const user_info = await User.findOne({ login: username });
     
             if (!user_info) {
@@ -196,18 +199,15 @@ const userController = {
 
     async searchUsers (req, res) {
         try {
-          const query = req.params.query;
+            const {query} = req.params;
 
-          const users = await User.find({ login: { $regex: query, $options: 'i' } }).limit(10);
-          if (users.length === 0) {
-            return res.status(404).json({error: 'No users found!'})
-          }
+            const regex = new RegExp(escapeRegExp(query), "gi");
 
-          const users_uids = [];
-          for (const user of users) {
-            users_uids.push(user.uid);
-          }
-          res.status(200).json({ users_uids });
+            const users = await User.find( {login: regex} );
+
+          // Assuming User model has a field called 'username' for searching
+          //const users = await User.find({ username: { $regex: query, $options: 'i' } }).limit(1);
+          res.json({ users });
         } catch (error) {
           console.error('Error searching users:', error);
           res.status(500).json({ error: 'Internal server error' });
@@ -275,6 +275,42 @@ const userController = {
             res.status(500).json( {error: "Internal Server Error"} );
         }
     },
+
+    async warnUser(req, res) {
+        try {
+            const { user_id } = req.params;
+            const { warningDescription } = req.body;
+
+            // Find the user based on the UID
+            const user_info = await User.findOne({ uid: user_id });
+
+            if (!user_info) {
+                return res.status(404).json({ error: "User not found" });
+            }
+            user_info.warnings++;
+            user_info.warningDescription = warningDescription;
+
+            // Save the updated user document
+            await user_info.save();
+
+
+            res.status(200).json({ message: "User warned successfully" });
+        } catch (error) {
+            console.error("Error in warnUser:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    },
+
+    async getWarnedUsers(req, res) {
+        try {
+            const warnedUsers = await User.find({ warnings: { $gt: 0 } }, { login: 1, warnings: 1 });
+
+            res.status(200).json({ warnedUsers });
+        } catch (error) {
+            console.error("Error in getWarnedUsers:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
 }
 
 module.exports = userController;

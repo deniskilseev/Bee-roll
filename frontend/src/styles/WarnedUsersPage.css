@@ -1,0 +1,35 @@
+/* WarnedUsersPage.css */
+
+.warned-users-container {
+    margin: 20px;
+  }
+  
+  .warned-users-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .warned-users-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .warned-users-table th,
+  .warned-users-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .warned-users-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .warned-users-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .warned-users-table tr:hover {
+    background-color: #ddd;
+  }
+  

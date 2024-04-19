@@ -118,8 +118,7 @@ describe('deleteComment', () => {
         
         const comments = await Comment.find();
         console.log(comments);
-
-            
+        
         expect(res.status).toEqual(200);
 
         const post = await Post.findOne({postId: comment.postId});
