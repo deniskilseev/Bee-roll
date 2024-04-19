@@ -12,18 +12,21 @@ const CreatePost = () => {
   const [containsSpoilers, setContainsSpoilers] = useState(false);
   const [createReview, setCreateReview] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [forumSearchQuery, setForumSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [movieId, setMovieId] = useState(null);
   const [rating, setRating] = useState(null);
   const [hover, setHover] = useState(null);
+  const [forumId, setForumId] = useState(forumName);
   const { user } = useUser();
+  const [forumSearchResults, setForumSearchResults] = useState([]);
   const token = user.token;
 
   const handleCreatePost = async () => {
     try {
-      console.log('repostId:', postId); // Check the value of repostId
+      console.log('repostId:', postId);
       const newPost = {
-        forumId: forumName,
+        forumId: forumId,
         postTitle: postTitle,
         postText: postText,
         containsSpoilers: containsSpoilers,
@@ -57,7 +60,7 @@ const CreatePost = () => {
           console.error('Error creating review:', error);
         }
       }
-      
+
 
       setPostTitle('');
       setPostText('');
@@ -69,6 +72,12 @@ const CreatePost = () => {
     } catch (error) {
       console.error('Error creating post:', error);
     }
+  };
+
+  const handleForumClick = (forumId, forumTitle) => {
+    setForumSearchQuery(forumTitle);
+    setForumSearchResults([]);
+    setForumId(forumId);
   };
 
   const handleSearchChange = async (event) => {
@@ -104,9 +113,27 @@ const CreatePost = () => {
     setRating(selectedRating);
   };
 
+  const handleForumSearchChange = async (event) => {
+    const query = event.target.value;
+    setForumSearchQuery(query);
+    fetchForumSearchResults(query);
+  };
+
+  const fetchForumSearchResults = async (query) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/forums/`);
+      console.log('Forum search results:', response.data);
+      setForumSearchResults(response.data.publicForums);
+    } catch (error) {
+      console.error('Error fetching forum search results:', error);
+    }
+  };
+
   const handleCancel = () => {
     navigate(-1);
   };
+
+  console.log('Forum search results:', forumSearchResults);
 
   return (
     <div className="container mt-5">
@@ -128,9 +155,21 @@ const CreatePost = () => {
           <input type="checkbox" className="form-check-input" id="createReview" checked={createReview} onChange={(e) => setCreateReview(e.target.checked)} />
           <label className="form-check-label" htmlFor="createReview">Create Review</label>
         </div>
+        {postId && (
+          <div className="mb-3">
+            <label htmlFor="forumSearch" className="form-label">Search Forum:</label>
+            <input type="text" className="form-control" id="forumSearch" value={forumSearchQuery} onChange={handleForumSearchChange} placeholder="Search for a forum..." />
+            <ul className="list-group">
+              {forumSearchResults.map((forum) => (
+                <li key={forum.forumId} className="list-group-item" onClick={() => handleForumClick(forum.forumId, forum.forumTitle)}>
+                  {forum.forumTitle}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {createReview && (
           <div>
-            {/* Search bar with suggestions */}
             <div className="input-group mb-3">
               <input
                 type="text"
@@ -140,7 +179,6 @@ const CreatePost = () => {
                 onChange={handleSearchChange}
               />
             </div>
-            {/* Display search results */}
             <ul className="list-group">
               {searchResults.map((result, index) => (
                 <li key={index} className="list-group-item" onClick={() => handleSearchResultClick(result.movieId, result.title)}>
