@@ -261,7 +261,6 @@ const ForumPage = () => {
                 </div>
               )}
               <div className="mb-3">
-                <UpvoteDownvoteButton postId={post.post_info.postId} />
                 <button className="btn btn-outline-primary mr-2" onClick={() => handleRepost(post.post_info.postId)}>Repost</button>
               </div>
               {(isOwner || isModerator) && (
