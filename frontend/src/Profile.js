@@ -16,7 +16,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { updateUser } = useUser();
   const { loading } = useUser();
-  const profilePictureData = editedUser.userData.data_by_username.profilePicture.data;
+  const profilePictureData = editedUser.userData.data_by_username?.profilePicture.data;
   const byteArray = new Uint8Array(profilePictureData.data);
   const profilePictureSrc = `data:${editedUser.userData.data_by_username.profilePicture.type};base64,${btoa(String.fromCharCode.apply(null, byteArray))}`;
 
@@ -199,7 +199,7 @@ const Profile = () => {
               </p>
               {editedUser.userData?.data_by_username?.warnings > 0 && (
                 <div className="warning-level">
-                  <p>Warning Level: {editedUser.userData.data_by_username.warnings}</p>
+                  <p>Warning Level: {editedUser.userData.data_by_username.warnings} ({editedUser.userData.data_by_username.warningDescription})</p>
                 </div>
               )}
               {isEditing && (
