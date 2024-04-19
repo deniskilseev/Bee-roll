@@ -416,7 +416,4 @@ describe('uploadUserImage', () => {
         expect(res.status).toEqual(200);
         expect(res.headers['content-type']).toEqual('image/jpeg');
     }, 10 * 1000);
-<<<<<<< HEAD
   }, 30 * 1000);
-=======
-  }, 20 * 1000);

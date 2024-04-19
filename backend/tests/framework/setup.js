@@ -20,7 +20,6 @@ module.exports = async () => {
             {_id: "WatchList", collectionCounter: 7},
             {_id: "Review", collectionCounter: 3},
         ];
->>>>>>> fix-cookies
 
         const users = [
             {uid: 1, login: 'denis', password: '123', email: 'denis@gmail.com', followersIds: [3], 
@@ -48,12 +47,6 @@ module.exports = async () => {
         ];
 
         const forums = [
-<<<<<<< HEAD
-            {forumId: 1, forumTitle: 'Apples', creatorId: 1, userIds: [1, 2], postIds: [3, 4], isPrivate: false},
-            {forumId: 2, forumTitle: 'Cars', creatorId: 2, userIds: [2], postIds: [1, 2], isPrivate: true},
-            {forumId: 3, forumTitle: 'Pineapples', creatorId: 3, userIds: [3], postIds: [5], isPrivate: false},
-            {forumId: 4, forumTitle: 'highboys', creatorId: 4, userIds: [4, 1], postIds: [6], isPrivate: true}
-=======
             {forumId: 1, forumTitle: 'apples', creatorId: 1, userIds: [1, 2], postIds: [3, 4], isPrivate: false},
             {forumId: 2, forumTitle: 'cars', creatorId: 2, userIds: [2], postIds: [1, 2], isPrivate: true},
             {forumId: 3, forumTitle: 'pineapples', creatorId: 3, userIds: [3], postIds: [5, 8], isPrivate: false},
