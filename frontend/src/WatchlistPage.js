@@ -23,7 +23,7 @@ const WatchlistsPage = () => {
   
       const response = await axios.post('http://localhost:3000/watchlists/createWatchlist', {
         isPublic: false,
-        watchlistTitle: 'New Watchlist 8',
+        watchlistTitle: 'New Watchlist',
       }, { headers });
 
       if (response.status === 201) {

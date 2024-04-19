@@ -39,7 +39,7 @@ const Watchlist = ({ watchlist }) => {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
-  
+
       const response = await axios.post(`http://localhost:3000/watchlists/togglePublic`, {
         watchlistId: watchlist.watchListId
       }, {
@@ -55,8 +55,29 @@ const Watchlist = ({ watchlist }) => {
   };
 
   const handleTitleChange = (event) => {
-    // implement logic to handle title change
-    // setEditedTitle(event.target.value);
+    setEditedTitle(event.target.value);
+  };
+
+  const handleSaveTitle = async () => {
+    try {
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const response = await axios.put('http://localhost:3000/watchlists/changeTitle', {
+        watchlistId: watchlist.watchListId,
+        newTitle: editedTitle
+      }, { headers });
+
+      if (response.status === 200) {
+        console.log('Watchlist title changed successfully');
+      } else {
+        console.error('Failed to change watchlist title');
+      }
+    } catch (error) {
+      console.error('Error changing watchlist title:', error);
+    }
   };
 
   const handleSearchChange = (event) => {
@@ -105,7 +126,7 @@ const Watchlist = ({ watchlist }) => {
     }
   };
 
-  const deleteFromWatchlist = async (movieId) => { 
+  const deleteFromWatchlist = async (movieId) => {
     try {
       const headers = {
         'Authorization': `Bee-roll ${token}`,
@@ -145,7 +166,7 @@ const Watchlist = ({ watchlist }) => {
         const promises = watchlist.movieIds.map(async (movieId) => {
           try {
             const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
-    
+
             if (response.ok) {
               const movieInfo = await response.json();
               return movieInfo;
@@ -158,7 +179,7 @@ const Watchlist = ({ watchlist }) => {
             return null;
           }
         });
-    
+
         const movieInfoArray = await Promise.all(promises);
         setMoviesInfo(prevMoviesInfo => [
           ...prevMoviesInfo,
@@ -166,7 +187,7 @@ const Watchlist = ({ watchlist }) => {
         ]);
       }
     };
-    
+
     fetchMovieInfo();
   }, [isExpanded, watchlist.movieIds]);
 
@@ -174,18 +195,23 @@ const Watchlist = ({ watchlist }) => {
     <div className="card mt-3">
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center">
-          <h5 className="card-title" onClick={toggleExpand}>
             {isEditMode ? (
-              <input
-                type="text"
-                className="form-control"
-                value={editedTitle}
-                onChange={handleTitleChange}
-              />
+              <div className="d-flex">
+                <input
+                  type="text"
+                  className="form-control me-2"
+                  value={editedTitle}
+                  onChange={handleTitleChange}
+                />
+                <button className="btn btn-sm btn-primary" onClick={handleSaveTitle}>
+                  Save
+                </button>
+              </div>
             ) : (
-              watchlist.watchListTitle
+              <h5 className="card-title" onClick={toggleExpand}>
+                {watchlist.watchListTitle}
+              </h5>
             )}
-          </h5>
           <div className="d-flex align-items-center">
             <div className="privacy-section me-3">
               <label className="privacy-label">
