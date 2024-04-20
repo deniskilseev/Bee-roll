@@ -5,6 +5,7 @@ import plusIcon from './assets/edit.png';
 import blankProfilePic from './assets/blank profile pic.jpg';
 import axios from 'axios';
 import { useUser } from './UserContext';
+import config from './config';
 
 const Profile = () => {
   const { user, logout } = useUser();
@@ -53,10 +54,10 @@ const Profile = () => {
         const headers = {
           'Authorization': `Bee-roll ${token}`,
         };
-        await axios.post('http://localhost:3000/users/uploadProfilePicture', formData, { headers });
+        await axios.post(`${config.apiBaseUrl}/users/uploadProfilePicture`, formData, { headers });
       }
 
-      const response = await axios.put('http://localhost:3000/users/putuser', updatedUser, { headers });
+      const response = await axios.put(`${config.apiBaseUrl}/users/putuser`, updatedUser, { headers });
 
       if (response.status !== 200) {
         throw new Error('Failed to save changes');
@@ -107,10 +108,10 @@ const Profile = () => {
                 'Authorization': `Bee-roll ${token}`,
                 'Content-Type': 'application/json'
               };
-              const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+              const postResponse = await axios.get(`${config.apiBaseUrl}/posts/getPost/${postId}`, { headers });
               const postData = postResponse.data.post_info;
 
-              const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
+              const userResponse = await axios.get(`${config.apiBaseUrl}/users/getUser/${postData.userId}`);
               const userData = userResponse.data.user_info;
 
               return { ...postData, user: userData.login };

@@ -5,6 +5,7 @@ import OtherUserWatchlist from './components/OtherUserWatchlist';
 import { useUser } from './UserContext';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import config from './config';
 
 const WatchlistsPage = () => {
   const [activeTab, setActiveTab] = useState('watchlists');
@@ -21,13 +22,13 @@ const WatchlistsPage = () => {
         'Content-Type': 'application/json',
       };
   
-      const response = await axios.post('http://localhost:3000/watchlists/createWatchlist', {
+      const response = await axios.post(`${config.apiBaseUrl}/watchlists/createWatchlist`, {
         isPublic: false,
         watchlistTitle: 'New Watchlist',
       }, { headers });
 
       if (response.status === 201) {
-        const userResponse = await axios.get('http://localhost:3000/users/getSelf', {
+        const userResponse = await axios.get(`${config.apiBaseUrl}/users/getSelf`, {
           headers: {
             'Authorization': `Bee-roll ${token}`,
             'Content-Type': 'application/json',
@@ -54,7 +55,7 @@ const WatchlistsPage = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
+      const response = await axios.get(`${config.apiBaseUrl}/watchlists/getWatchlist/${watchListId}`, {
         headers: {
           'Authorization': `Bee-roll ${token}`,
           'Content-Type': 'application/json',
@@ -83,7 +84,7 @@ const WatchlistsPage = () => {
     try {
       const followedWatchlistsData = [];
       for (const watchListId of user.userData.data_by_username.followedWatchListsIds) {
-        const response = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
+        const response = await axios.get(`${config.apiBaseUrl}/watchlists/getWatchlist/${watchListId}`, {
           headers: {
             'Authorization': `Bee-roll ${token}`,
             'Content-Type': 'application/json',

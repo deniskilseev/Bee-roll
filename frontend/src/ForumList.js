@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Forum from './components/Forum';
+import config from './config';
 
 const ForumList = () => {
    const [forumList, setForumList] = useState([]);
@@ -8,7 +9,7 @@ const ForumList = () => {
     useEffect(() => {
         const fetchForumList = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/forums/');
+                const response = await axios.get(`${config.apiBaseUrl}/forums/`);
                 const fetchedForums = response.data.publicForums;
                 console.log(fetchedForums);
                 setForumList(fetchedForums);

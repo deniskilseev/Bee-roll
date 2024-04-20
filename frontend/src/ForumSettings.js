@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './styles/forumSettings.css';
 import { useUser } from './UserContext';
+import config from './config';
 
 function checkAlias(string) {
     const regexp = new RegExp("^[a-z0-9]+$");
@@ -23,7 +24,7 @@ const ForumSettings = () => {
     const handleAddModerator = async () => {
         if (newModerator && !moderators.includes(newModerator)) {
             try {
-                const userResponse = await axios.get(`http://localhost:3000/users/getUserByUsername/${newModerator}`);
+                const userResponse = await axios.get(`${config.apiBaseUrl}/users/getUserByUsername/${newModerator}`);
                 const userToAdd = userResponse.data.user_info;
 
                 if (userToAdd) {
@@ -37,7 +38,7 @@ const ForumSettings = () => {
                         'Content-Type': 'application/json'
                     };
 
-                    await axios.post('http://localhost:3000/forums/addModerator', moderatorData, { headers });
+                    await axios.post(`${config.apiBaseUrl}/forums/addModerator`, moderatorData, { headers });
                     setModerators([...moderators, newModerator]);
                     setNewModerator('');
                 } else {
@@ -63,7 +64,7 @@ const ForumSettings = () => {
                         'Content-Type': 'application/json'
                     };
 
-                    const serverResponse = await axios.put('http://localhost:3000/forums/changeTitle', aliasData, { headers });
+                    const serverResponse = await axios.put(`${config.apiBaseUrl}/forums/changeTitle`, aliasData, { headers });
 
                     if (serverResponse.status === 200) {
                         //forumName = newAlias;
@@ -94,7 +95,7 @@ const ForumSettings = () => {
             'Content-Type': 'application/json'
         };
 
-        axios.post('http://localhost:3000/forums/togglePrivate', {
+        axios.post(`${config.apiBaseUrl}/forums/togglePrivate`, {
             forumId: forum.forumId,
         }, { headers })
         .then(response => {
@@ -108,13 +109,13 @@ const ForumSettings = () => {
     useEffect(() => {
         const fetchForumData = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
+                const response = await axios.get(`${config.apiBaseUrl}/forums/${forumName}`);
                 const fetchedForum = response.data;
                 setForum(fetchedForum);
                 setIsPublic(!fetchedForum.isPrivate);
 
                 const moderatorPromises = fetchedForum.moderatorIds.map(async moderatorId => {
-                    const userResponse = await axios.get(`http://localhost:3000/users/getuser/${moderatorId}`);
+                    const userResponse = await axios.get(`${config.apiBaseUrl}/users/getuser/${moderatorId}`);
                     return userResponse.data;
                 });
 
@@ -131,7 +132,7 @@ const ForumSettings = () => {
 
     const handleDeleteModerator = async (moderator) => {
         // Implement moderator deletion logic here
-        const userResponse = await axios.get(`http://localhost:3000/users/getUserByUsername/${moderator}`);
+        const userResponse = await axios.get(`${config.apiBaseUrl}/users/getUserByUsername/${moderator}`);
 
         console.log('Forum:', forum.forumId);
 
@@ -140,7 +141,7 @@ const ForumSettings = () => {
             'Content-Type': 'application/json'
         };
 
-        axios.post('http://localhost:3000/forums/removeModerator', {
+        axios.post(`${config.apiBaseUrl}/forums/removeModerator`, {
             userId: userResponse.data.user_info.uid,
             forumId: forum.forumId,
         }, { headers })

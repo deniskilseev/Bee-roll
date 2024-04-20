@@ -7,6 +7,7 @@ import axios from 'axios';
 import OtherUserWatchlist from './components/OtherUserWatchlist';
 import { useUser } from './UserContext';
 import { useIsRTL } from 'react-bootstrap/esm/ThemeProvider';
+import config from './config';
 
 
 const OtherUserProfile = () => {
@@ -34,7 +35,7 @@ const OtherUserProfile = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchListId}`, {
+      const response = await axios.get(`${config.apiBaseUrl}/watchlists/getWatchlist/${watchListId}`, {
         headers: {
           'Authorization': `Bee-roll ${token}`,
           'Content-Type': 'application/json',
@@ -87,7 +88,7 @@ const OtherUserProfile = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/users/getUserByUsername/${username}`);
+        const response = await axios.get(`${config.apiBaseUrl}/users/getUserByUsername/${username}`);
         setOtherUser(response.data.user_info);
         console.log("user info: ", user.userData.data_by_username.isAdmin);
         setIsAdmin(user.userData.data_by_username.isAdmin);
@@ -118,7 +119,7 @@ const OtherUserProfile = () => {
                 'Authorization': `Bee-roll ${token}`,
                 'Content-Type': 'application/json'
               };
-              const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+              const response = await axios.get(`${config.apiBaseUrl}/posts/getPost/${postId}`, { headers });
               return response.data.post_info;
             })
           );
@@ -140,7 +141,7 @@ const OtherUserProfile = () => {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
-      await axios.post(`http://localhost:3000${endpoint}`, {
+      await axios.post(`${config.apiBaseUrl}${endpoint}`, {
         user_follower: user.username,
         user_followed: otherUser.login
       }, { headers });
@@ -164,7 +165,7 @@ const OtherUserProfile = () => {
       const description = prompt('Enter warning description:');
       if (!description) return;
 
-      await axios.post(`http://localhost:3000/users/warn/${otherUser.uid}`, { warningDescription: description }, { headers });
+      await axios.post(`${config.apiBaseUrl}/users/warn/${otherUser.uid}`, { warningDescription: description }, { headers });
       
       console.log("here 3");
       const updatedUser = { ...otherUser, warningCount: otherUser.warningCount + 1 };

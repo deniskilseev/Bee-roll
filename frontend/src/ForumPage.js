@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useUser } from './UserContext';
 import CommentSection from './components/CommentSection'
 import UpvoteDownvoteButtonPost from './components/UpvoteDownvoteButtonPost'
+import config from './config';
 
 
 const ForumPage = () => {
@@ -27,7 +28,7 @@ const ForumPage = () => {
   useEffect(() => {
     const fetchForumData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/forums/${forumName}`);
+        const response = await axios.get(`${config.apiBaseUrl}/forums/${forumName}`);
         const fetchedForum = response.data;
         setForum(fetchedForum);
         setIsOwner(user.userData.data_by_username.uid === fetchedForum.creatorId);
@@ -50,11 +51,10 @@ const ForumPage = () => {
           'Authorization': `Bee-roll ${token}`,
           'Content-Type': 'application/json'
         };
-        const response = await axios.get(`http://localhost:3000/posts/getPost/${repostId}`, { headers });
+        const response = await axios.get(`${config.apiBaseUrl}/posts/getPost/${repostId}`, { headers });
         const originalPostData = response.data;
     
-        // Fetch user data for the original post
-        const userResponse = await axios.get(`http://localhost:3000/users/getuser/${originalPostData.post_info.userId}`);
+        const userResponse = await axios.get(`${config.apiBaseUrl}/users/getuser/${originalPostData.post_info.userId}`);
         const userData = userResponse.data;
     
         return { ...originalPostData, user: userData };
@@ -73,15 +73,15 @@ const ForumPage = () => {
               'Content-Type': 'application/json'
             };
 
-            const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+            const response = await axios.get(`${config.apiBaseUrl}/posts/getPost/${postId}`, { headers });
             const postData = response.data;
 
-            const reviewsResponse = await axios.get(`http://localhost:3000/reviews/getPostReviews/${postId}`);
+            const reviewsResponse = await axios.get(`${config.apiBaseUrl}/reviews/getPostReviews/${postId}`);
             const reviewsData = reviewsResponse.data;
 
             const combinedData = { ...postData, reviews: reviewsData.review_list[0] };
 
-            const userResponse = await axios.get(`http://localhost:3000/users/getuser/${postData.post_info.userId}`);
+            const userResponse = await axios.get(`${config.apiBaseUrl}/users/getuser/${postData.post_info.userId}`);
             const userData = userResponse.data;
 
             let repost = null;
@@ -101,7 +101,7 @@ const ForumPage = () => {
         const movieTitlePromises = postsData.map(async (post) => {
           if (post.reviews) {
             try {
-              const response = await axios.get(`http://localhost:3000/movies/getInfo/${post.reviews.movieId}`);
+              const response = await axios.get(`${config.apiBaseUrl}/movies/getInfo/${post.reviews.movieId}`);
               const movieTitle = response.data.movie_data.title;
               return { ...post, movieTitle: movieTitle };
             } catch (error) {
@@ -131,7 +131,7 @@ const ForumPage = () => {
       'Authorization': `Bee-roll ${token}`,
       'Content-Type': 'application/json'
     };
-    axios.post('http://localhost:3000/forums/joinForum', { forumId: forum.forumId }, { headers })
+    axios.post(`${config.apiBaseUrl}/forums/joinForum`, { forumId: forum.forumId }, { headers })
       .then(response => {
         console.log('Forum followed successfully:', response.data);
       })
@@ -151,7 +151,7 @@ const ForumPage = () => {
       'Content-Type': 'application/json'
     };
 
-    axios.post('http://localhost:3000/posts/pinPost', { postId: postId, forumId: forum.forumId }, { headers })
+    axios.post(`${config.apiBaseUrl}/posts/pinPost`, { postId: postId, forumId: forum.forumId }, { headers })
       .then(response => {
         console.log('Post pinned successfully:', response.data);
       })
@@ -168,7 +168,7 @@ const ForumPage = () => {
         'Content-Type': 'application/json'
       };
 
-      axios.delete(`http://localhost:3000/posts/deletePost/${postId}`, { headers })
+      axios.delete(`${config.apiBaseUrl}/posts/deletePost/${postId}`, { headers })
         .then(response => {
           console.log('Post deleted successfully:', response.data);
         })
@@ -205,7 +205,7 @@ const ForumPage = () => {
       'Content-Type': 'application/json'
     };
     
-    axios.post('http://localhost:3000/posts/toggleViolate', { postId: postId }, { headers })
+    axios.post(`${config.apiBaseUrl}/posts/toggleViolate`, { postId: postId }, { headers })
       .then(response => {
         console.log('Post flagged successfully:', response.data);
       })

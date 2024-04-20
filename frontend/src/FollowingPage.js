@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import profileIcon from './assets/blank profile pic.jpg';
+import config from './config';
 
 const FollowingPage = () => {
   const { username } = useParams();
@@ -10,13 +11,13 @@ const FollowingPage = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/users/getUserByUsername/${username}`);
+        const response = await axios.get(`${config.apiBaseUrl}/users/getUserByUsername/${username}`);
 
         const followsIds = response.data.user_info.followsIds;
 
         // Fetch followed users
         const followedUsersData = await Promise.all(followsIds.map(async (userId) => {
-          const userResponse = await axios.get(`http://localhost:3000/users/getUser/${userId}`);
+          const userResponse = await axios.get(`${config.apiBaseUrl}/users/getUser/${userId}`);
           return userResponse.data.user_info;
         }));
 
