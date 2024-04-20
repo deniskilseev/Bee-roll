@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { useUser } from '../UserContext';
 import '../styles/watchlistCard.css';
+import config from '../config';
 
 const Watchlist = ({ watchlist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -40,7 +41,7 @@ const Watchlist = ({ watchlist }) => {
         'Content-Type': 'application/json'
       };
 
-      const response = await axios.post(`http://localhost:3000/watchlists/togglePublic`, {
+      const response = await axios.post(`${config.apiBaseUrl}/watchlists/togglePublic`, {
         watchlistId: watchlist.watchListId
       }, {
         headers
@@ -65,7 +66,7 @@ const Watchlist = ({ watchlist }) => {
         'Content-Type': 'application/json'
       };
 
-      const response = await axios.put('http://localhost:3000/watchlists/changeTitle', {
+      const response = await axios.put(`${config.apiBaseUrl}/watchlists/changeTitle`, {
         watchlistId: watchlist.watchListId,
         newTitle: editedTitle
       }, { headers });
@@ -88,7 +89,7 @@ const Watchlist = ({ watchlist }) => {
 
   const fetchSearchResults = async (query) => {
     try {
-      const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
+      const response = await axios.get(`${config.apiBaseUrl}/movies/find/${query}`);
       setSearchResults(response.data.foundMovies.slice(0, 5)); // Limit results to 5
     } catch (error) {
       console.error('Error fetching search results:', error);
@@ -101,7 +102,7 @@ const Watchlist = ({ watchlist }) => {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
-      const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
+      const response = await axios.post(`${config.apiBaseUrl}/watchlists/addMovie`, {
         watchlistId: watchlist.watchListId,
         movieId: movieId
       }, { headers });
@@ -112,7 +113,7 @@ const Watchlist = ({ watchlist }) => {
         console.error(`Failed to add to watchlist`);
       }
 
-      const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
+      const updatedWatchlistResponse = await axios.get(`${config.apiBaseUrl}/watchlists/getWatchlist/${watchlist.watchListId}`, {
         headers: {
           'Authorization': `Bee-roll ${token}`
         }
@@ -133,7 +134,7 @@ const Watchlist = ({ watchlist }) => {
         'Content-Type': 'application/json'
       };
 
-      const response = await axios.post(`http://localhost:3000/watchlists/removeMovie`, {
+      const response = await axios.post(`${config.apiBaseUrl}/watchlists/removeMovie`, {
         watchlistId: watchlist.watchListId,
         movieId: movieId
       }, { headers });
@@ -144,7 +145,7 @@ const Watchlist = ({ watchlist }) => {
         console.error(`Failed to remove from watchlist`);
       }
 
-      const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
+      const updatedWatchlistResponse = await axios.get(`${config.apiBaseUrl}/watchlists/getWatchlist/${watchlist.watchListId}`, {
         headers: {
           'Authorization': `Bee-roll ${token}`
         }
@@ -165,7 +166,7 @@ const Watchlist = ({ watchlist }) => {
         setMoviesInfo([]);
         const promises = watchlist.movieIds.map(async (movieId) => {
           try {
-            const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
+            const response = await fetch(`${config.apiBaseUrl}/movies/getInfo/${movieId}`);
 
             if (response.ok) {
               const movieInfo = await response.json();

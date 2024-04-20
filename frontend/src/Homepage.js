@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUser } from './UserContext';
 import axios from 'axios';
+import config from './config';
 
 const HomePage = () => {
     const { user } = useUser();
@@ -22,7 +23,7 @@ const HomePage = () => {
                       'Authorization': `Bee-roll ${token}`,
                       'Content-Type': 'application/json'
                   };
-                  const response = await axios.post('http://localhost:3000/posts/getRecentPosts', {
+                  const response = await axios.post(`${config.apiBaseUrl}/posts/getRecentPosts`, {
                       user_login: user.userData.data_by_username.login
                   }, { headers });
                   setPostIds(response.data);
@@ -46,10 +47,10 @@ const HomePage = () => {
                   'Authorization': `Bee-roll ${token}`,
                   'Content-Type': 'application/json'
                 };
-                const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+                const postResponse = await axios.get(`${config.apiBaseUrl}/posts/getPost/${postId}`, { headers });
                 const postData = postResponse.data.post_info;
 
-                const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
+                const userResponse = await axios.get(`${config.apiBaseUrl}/users/getUser/${postData.userId}`);
                 const userData = userResponse.data.user_info;
       
                 return { ...postData, user: userData.login };
@@ -71,7 +72,7 @@ const HomePage = () => {
                 'Authorization': `Bee-roll ${token}`,
                 'Content-Type': 'application/json'
             };
-            const forumsResponse = await axios.get('http://localhost:3000/forums/', { headers });
+            const forumsResponse = await axios.get(`${config.apiBaseUrl}/forums/`, { headers });
             const allForums = forumsResponse.data;
 
             const userForumIds = user.userData.data_by_username.forumIds;
@@ -89,10 +90,10 @@ const HomePage = () => {
                   'Authorization': `Bee-roll ${token}`,
                   'Content-Type': 'application/json'
                 };
-                const postResponse = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, { headers });
+                const postResponse = await axios.get(`${config.apiBaseUrl}/posts/getPost/${postId}`, { headers });
                 const postData = postResponse.data.post_info;
 
-                const userResponse = await axios.get(`http://localhost:3000/users/getUser/${postData.userId}`);
+                const userResponse = await axios.get(`${config.apiBaseUrl}/users/getUser/${postData.userId}`);
                 const userData = userResponse.data.user_info;
       
                 return { ...postData, user: userData.login };

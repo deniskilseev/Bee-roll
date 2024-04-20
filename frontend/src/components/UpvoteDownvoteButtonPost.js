@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../styles/UpvoteDownvoteButton.css'; // Import CSS file for styling
 import { useUser } from '../UserContext';
 import axios from 'axios';
+import config from '../config';
 
 const UpvoteDownvoteButton = (props) => {
   const [votes, setVotes] = useState(0);
@@ -21,7 +22,7 @@ const UpvoteDownvoteButton = (props) => {
   useEffect(() => {
     const fetchPostData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/posts/getPost/${postId}`, [], {headers});
+        const response = await axios.get(`${config.apiBaseUrl}/posts/getPost/${postId}`, [], {headers});
         const fetchedPost = response.data.post_info;
         setVotes(fetchedPost.rating);
         if (user_data.downvotedPosts?.includes(postId)) {
@@ -44,17 +45,17 @@ const UpvoteDownvoteButton = (props) => {
   const handleUpvote = async () => {
     try {
       if (voted === 'up') {
-        await axios.put(`http://localhost:3000/posts/revoke/${postId}`,[] ,{headers});
+        await axios.put(`${config.apiBaseUrl}/posts/revoke/${postId}`,[] ,{headers});
         setVotes(votes - 1);
         setVoted(null);
       }
       else if (voted === 'down') {
-        await axios.put(`http://localhost:3000/posts/upvote/${postId}`,[] ,{headers});
+        await axios.put(`${config.apiBaseUrl}/posts/upvote/${postId}`,[] ,{headers});
         setVotes(votes + 2);
         setVoted('up');
       }
       else if (voted === null) {
-        await axios.put(`http://localhost:3000/posts/upvote/${postId}`,[] ,{headers});
+        await axios.put(`${config.apiBaseUrl}/posts/upvote/${postId}`,[] ,{headers});
         setVotes(votes + 1);
         setVoted('up');
       }
@@ -67,17 +68,17 @@ const UpvoteDownvoteButton = (props) => {
   const handleDownvote = async () => {
     try {
       if (voted === 'down') {
-        await axios.put(`http://localhost:3000/posts/revoke/${postId}`,[] , {headers});
+        await axios.put(`${config.apiBaseUrl}/posts/revoke/${postId}`,[] , {headers});
         setVotes(votes + 1);
         setVoted(null);
       }
       if (voted === 'up') {
-        await axios.put(`http://localhost:3000/posts/downvote/${postId}`,[] , {headers});
+        await axios.put(`${config.apiBaseUrl}/posts/downvote/${postId}`,[] , {headers});
         setVotes(votes - 2);
         setVoted('down');
       }
       if (voted === null) {
-        await axios.put(`http://localhost:3000/posts/downvote/${postId}`,[] , {headers});
+        await axios.put(`${config.apiBaseUrl}/posts/downvote/${postId}`,[] , {headers});
         setVotes(votes - 1);
         setVoted('down');
       }

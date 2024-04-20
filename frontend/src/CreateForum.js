@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useUser } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import config from './config';
 
 const CreateForumPage = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const CreateForumPage = () => {
             'Content-Type': 'application/json'
         };
 
-        await axios.post('http://localhost:3000/forums/createForum', newForum, { headers });
+        await axios.post(`${config.apiBaseUrl}/forums/createForum`, newForum, { headers });
 
         navigate(`/forums/${forumName}`);
     } catch (error) {

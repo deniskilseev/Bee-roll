@@ -3,6 +3,7 @@ import "./styles/CreatePost.css";
 import { useUser } from './UserContext';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import config from './config';
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const CreatePost = () => {
         'Content-Type': 'application/json'
       };
 
-      const response = await axios.post('http://localhost:3000/posts/createPost', newPost, { headers });
+      const response = await axios.post(`${config.apiBaseUrl}/posts/createPost`, newPost, { headers });
       const newPostId = response.data.postId;
 
       if (createReview) {
@@ -54,7 +55,7 @@ const CreatePost = () => {
         };
 
         try {
-          const response = await axios.post('http://localhost:3000/reviews/createReview', review, { headers });
+          const response = await axios.post(`${config.apiBaseUrl}/reviews/createReview`, review, { headers });
           console.log('Review created:', response.data);
         } catch (error) {
           console.error('Error creating review:', error);
@@ -88,7 +89,7 @@ const CreatePost = () => {
 
   const fetchSearchResults = async (query) => {
     try {
-      const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
+      const response = await axios.get(`${config.apiBaseUrl}/movies/find/${query}`);
       console.log('Search results:', response.data);
       setSearchResults(response.data.foundMovies.slice(0, 5));
     } catch (error) {
@@ -98,7 +99,7 @@ const CreatePost = () => {
 
   const handleSearchResultClick = async (movieId, title) => {
     try {
-      const response = await axios.get(`http://localhost:3000/movies/getInfo/${movieId}`);
+      const response = await axios.get(`${config.apiBaseUrl}/movies/getInfo/${movieId}`);
       console.log('Movie info:', response.data);
       setSearchQuery(title);
       setMovieId(movieId);
@@ -121,7 +122,7 @@ const CreatePost = () => {
 
   const fetchForumSearchResults = async (query) => {
     try {
-      const response = await axios.get(`http://localhost:3000/forums/`);
+      const response = await axios.get(`${config.apiBaseUrl}/forums/`);
       console.log('Forum search results:', response.data);
       setForumSearchResults(response.data.publicForums);
     } catch (error) {

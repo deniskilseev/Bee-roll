@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import '@fortawesome/fontawesome-free/js/all.js';
 import './styles/moviePage.css';
+import config from './config';
 
 const MoviePage = () => {
   const { movieId } = useParams();
@@ -67,8 +68,8 @@ const MoviePage = () => {
     const fetchMovieInfo = async () => {
       try {
         const [movieResponse, ratingResponse] = await Promise.all([
-          axios.get(`http://localhost:3000/movies/getInfo/${movieId}`),
-          axios.get(`http://localhost:3000/reviews/getAverage/${movieId}`)
+          axios.get(`${config.apiBaseUrl}/movies/getInfo/${movieId}`),
+          axios.get(`${config.apiBaseUrl}/reviews/getAverage/${movieId}`)
         ]);
         console.log('Movie info:', movieResponse.data);
         setMovieInfo(movieResponse.data.movie_data);

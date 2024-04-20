@@ -6,6 +6,7 @@ import RegisterPageModal from './Modals/RegisterPageModal';
 import { useUser } from '../UserContext';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import config from '../config';
 
 const Taskbar = () => {
   const { user, logout } = useUser();
@@ -64,7 +65,7 @@ const Taskbar = () => {
 
   const fetchSearchResults = async (query) => {
     try {
-      const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
+      const response = await axios.get(`${config.apiBaseUrl}/movies/find/${query}`);
       console.log('Search results:', response.data);
       setSearchResults(response.data.foundMovies.slice(0, 5));
     } catch (error) {
@@ -74,7 +75,7 @@ const Taskbar = () => {
 
   const handleSearchResultClick = async (movieId) => {
     try {
-      const response = await axios.get(`http://localhost:3000/movies/getInfo/${movieId}`);
+      const response = await axios.get(`${config.apiBaseUrl}/movies/getInfo/${movieId}`);
       
       navigate(`/movies/${movieId}`, { state: { movieInfo: response.data } });
     } catch (error) {
@@ -84,9 +85,7 @@ const Taskbar = () => {
 
   const fetchUserSearchResults = async (query) => {
     try {
-      console.log(`Sending request to: http://localhost:3000/users/search/${query}`);
-      const response = await axios.get(`http://localhost:3000/users/search/${query}`);
-      console.log('Search results:', response.data);
+      const response = await axios.get(`${config.apiBaseUrl}/users/search/${query}`);
       setUserSearchResults(response.data.users.slice(0, 2));
     } catch (error) {
       console.error('Error fetching user search results:', error);
@@ -95,7 +94,7 @@ const Taskbar = () => {
 
   const handleUserSearchResultClick = async (uid) => {
     try {
-      const response = await axios.get(`http://localhost:3000/users/getUser/${uid}`);
+      const response = await axios.get(`${config.apiBaseUrl}/users/getUser/${uid}`);
       const userData = response.data;
       const username = response.data.user_info.login;
       console.log("username: ", userData);

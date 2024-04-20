@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import config from './config';
 
 const UserContext = createContext();
 
@@ -16,7 +17,7 @@ export const UserProvider = ({ children }) => {
     const storedToken = Cookies.get('beerollToken');
     if (storedToken) {
       // Check if the stored token is valid by sending a request to the server
-      axios.get('http://localhost:3000/users/getSelf', {
+      axios.get(`${config.apiBaseUrl}/users/getSelf`, {
         headers: {
           'Authorization': `Bee-roll ${storedToken}`,
           'Content-Type': 'application/json',

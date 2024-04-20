@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { useUser } from '../UserContext';
+import config from '../config';
 
 const OtherUserWatchlist = ({ watchlist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -21,7 +22,7 @@ const OtherUserWatchlist = ({ watchlist }) => {
       };
 
       const response = await axios.post(
-        'http://localhost:3000/watchlists/followWatchlist',
+        `${config.apiBaseUrl}/watchlists/followWatchlist`,
         {
           watchlistId: watchlist.watchListId
         },
@@ -42,7 +43,7 @@ const OtherUserWatchlist = ({ watchlist }) => {
     const fetchMovieInfo = async () => {
       const promises = watchlist.movieIds.map(async (movieId) => {
         try {
-          const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
+          const response = await fetch(`${config.apiBaseUrl}/movies/getInfo/${movieId}`);
           
           if (response.ok) {
             const movieInfo = await response.json();

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import RegisterPageModal from './RegisterPageModal';
 import { useUser } from '../../UserContext';
 import Cookies from 'js-cookie';
+import config from '../../config';
 
 const LoginPageModal = ({ showModal, onClose }) => {
   const { updateUser } = useUser();
@@ -56,7 +57,7 @@ const LoginPageModal = ({ showModal, onClose }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3000/users/loginUser', {
+      const response = await fetch(`${config.apiBaseUrl}/users/loginUser`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
