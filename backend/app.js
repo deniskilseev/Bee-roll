@@ -39,16 +39,15 @@ const uri = `mongodb://${username}:${password}@${host}:${portMongo}/${dbName}`;
 // Connect to MongoDB
 mongoose.connect(uri, {
     useUnifiedTopology: true,
-    dbName: 'testDatabase'
+    dbName: process.env.DATABASE
   })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
-
   const corsOptions = {
-  origin: 'http://localhost:3001', // Update this with your frontend URL
-  methods: ['GET', 'POST'], // Specify the methods you want to allow
-  allowedHeaders: ['Content-Type'], // Include other allowed headers
+    origin: 'http://localhost:3001', // Update this with your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify the methods you want to allow
+    allowedHeaders: ['Content-Type'], // Include other allowed headers
 };
 // Routes.
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
