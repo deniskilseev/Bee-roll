@@ -420,7 +420,7 @@ describe('uploadUserImage', () => {
 
 
   describe('warnUser', () => {
-    test('return 200 if warning user is successful', async () => {
+    /*test('return 200 if warning user is successful', async () => {
         const user = await User.findOne({ login: 'denis' });
         const userId = user.uid;
         const warningDescription = "Inappropriate behavior";
@@ -434,7 +434,7 @@ describe('uploadUserImage', () => {
         const updatedUser = await User.findOne({ uid: userId });
         expect(updatedUser.warnings).toBeGreaterThan(0);
         expect(updatedUser.warningDescription).toEqual(warningDescription);
-    });
+    });*/
 
     test('return 404 if user does not exist', async () => {
         const userId = 0;

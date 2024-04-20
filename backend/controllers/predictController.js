@@ -3,7 +3,7 @@ const User = require('../model/User.js')
 const Movie = require('../model/Movie')
 const axios = require('axios');
 
-const url = 'http://localhost:8000'
+const url = 'http://52.90.219.98:8000'
 
 const predictController = {
 
