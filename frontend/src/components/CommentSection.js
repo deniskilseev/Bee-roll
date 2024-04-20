@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Comment from './Comment'
 import { useUser } from '../UserContext';
+import config from '../config';
 
 
 function CommentWindow(props) {
@@ -27,7 +28,7 @@ function CommentWindow(props) {
             commentText: inputValue
         };
 
-        axios.post('http://localhost:3000/comments/createComment', data, { headers })
+        axios.post(`${config.apiBaseUrl}/comments/createComment`, data, { headers })
             .then(response => {
                 console.log('Created comment successfully:', response.data);
                 window.location.reload();

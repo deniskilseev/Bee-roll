@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../styles/UpvoteDownvoteButton.css'; // Import CSS file for styling
 import { useUser } from '../UserContext';
 import axios from 'axios';
+import config from '../config';
 
 const UpvoteDownvoteButtonComment = (props) => {
   const [votes, setVotes] = useState(0);
@@ -21,7 +22,7 @@ const UpvoteDownvoteButtonComment = (props) => {
   useEffect(() => {
     const fetchCommentData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/comments/${commentId}`, [], {headers});
+        const response = await axios.get(`${config.apiBaseUrl}/comments/${commentId}`, [], {headers});
         const fetchedComment = response.data.comment;
         setVotes(fetchedComment.rating);
         if (user_data.downvotedComments?.includes(commentId)) {
@@ -44,17 +45,17 @@ const UpvoteDownvoteButtonComment = (props) => {
   const handleUpvote = async () => {
     try {
       if (voted === 'up') {
-        const res = await axios.put(`http://localhost:3000/comments/revoke/${commentId}`,[] ,{headers});
+        const res = await axios.put(`${config.apiBaseUrl}/comments/revoke/${commentId}`,[] ,{headers});
         setVotes(votes - 1);
         setVoted(null);
       }
       else if (voted === 'down') {
-        const res = await axios.put(`http://localhost:3000/comments/upvote/${commentId}`,[] ,{headers});
+        const res = await axios.put(`${config.apiBaseUrl}/comments/upvote/${commentId}`,[] ,{headers});
         setVotes(votes + 2);
         setVoted('up');
       }
       else if (voted === null) {
-        const res = await axios.put(`http://localhost:3000/comments/upvote/${commentId}`,[] ,{headers});
+        const res = await axios.put(`${config.apiBaseUrl}/comments/upvote/${commentId}`,[] ,{headers});
         setVotes(votes + 1);
         setVoted('up');
       }
@@ -67,17 +68,17 @@ const UpvoteDownvoteButtonComment = (props) => {
   const handleDownvote = async () => {
     try {
       if (voted === 'down') {
-        const res = await axios.put(`http://localhost:3000/comments/revoke/${commentId}`,[] , {headers});
+        const res = await axios.put(`${config.apiBaseUrl}/comments/revoke/${commentId}`,[] , {headers});
         setVotes(votes + 1);
         setVoted(null);
       }
       if (voted === 'up') {
-        const res = await axios.put(`http://localhost:3000/comments/downvote/${commentId}`,[] , {headers});
+        const res = await axios.put(`${config.apiBaseUrl}/comments/downvote/${commentId}`,[] , {headers});
         setVotes(votes - 2);
         setVoted('down');
       }
       if (voted === null) {
-        const res = await axios.put(`http://localhost:3000/comments/downvote/${commentId}`,[] , {headers});
+        const res = await axios.put(`${config.apiBaseUrl}/comments/downvote/${commentId}`,[] , {headers});
         setVotes(votes - 1);
         setVoted('down');
       }

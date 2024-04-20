@@ -342,6 +342,36 @@ const watchListController = {
             return res.status(500).json( {error: "Internal server error"} );
         }
     },
+
+    async changeWatchListName(req, res) {
+        try {
+            const {watchlistId, newTitle} = req.body;
+            const login = req.user.login;
+
+            const user_data = await User.findOne( {login: login} );
+
+            const watchlist_data = await WatchList.findOne( {watchListId: watchlistId} );
+
+            if (!watchlist_data) {
+                return res.status(400).json( {error: "Invalid watchlistId"} );
+            }
+            
+            if (!newTitle || typeof newTitle !== "string") {
+                return res.status(400).json( {error: "Invalid title"} );
+            }
+           
+            if (user_data.uid === watchlist_data.userId) {
+                await WatchList.findOneAndUpdate({watchListId: watchlistId}, {watchListTitle: newTitle});
+                return res.status(200).json( {message: "OK"} );
+            }
+
+            return res.status(403).json( {error: "Unauthorized"} );
+        
+        } catch (error) {
+            console.error("Error in changeWatchListName:", error);
+            res.status(500).json( {error: "Internal error" });
+        }
+    }
 }
 
 module.exports = watchListController;

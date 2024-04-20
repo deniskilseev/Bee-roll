@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { useUser } from '../UserContext';
 import '../styles/watchlistCard.css';
+import config from '../config';
 
 const Watchlist = ({ watchlist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -39,8 +40,8 @@ const Watchlist = ({ watchlist }) => {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
-  
-      const response = await axios.post(`http://localhost:3000/watchlists/togglePublic`, {
+
+      const response = await axios.post(`${config.apiBaseUrl}/watchlists/togglePublic`, {
         watchlistId: watchlist.watchListId
       }, {
         headers
@@ -55,8 +56,29 @@ const Watchlist = ({ watchlist }) => {
   };
 
   const handleTitleChange = (event) => {
-    // implement logic to handle title change
-    // setEditedTitle(event.target.value);
+    setEditedTitle(event.target.value);
+  };
+
+  const handleSaveTitle = async () => {
+    try {
+      const headers = {
+        'Authorization': `Bee-roll ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const response = await axios.put(`${config.apiBaseUrl}/watchlists/changeTitle`, {
+        watchlistId: watchlist.watchListId,
+        newTitle: editedTitle
+      }, { headers });
+
+      if (response.status === 200) {
+        console.log('Watchlist title changed successfully');
+      } else {
+        console.error('Failed to change watchlist title');
+      }
+    } catch (error) {
+      console.error('Error changing watchlist title:', error);
+    }
   };
 
   const handleSearchChange = (event) => {
@@ -67,7 +89,7 @@ const Watchlist = ({ watchlist }) => {
 
   const fetchSearchResults = async (query) => {
     try {
-      const response = await axios.get(`http://localhost:3000/movies/find/${query}`);
+      const response = await axios.get(`${config.apiBaseUrl}/movies/find/${query}`);
       setSearchResults(response.data.foundMovies.slice(0, 5)); // Limit results to 5
     } catch (error) {
       console.error('Error fetching search results:', error);
@@ -80,7 +102,7 @@ const Watchlist = ({ watchlist }) => {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
-      const response = await axios.post('http://localhost:3000/watchlists/addMovie', {
+      const response = await axios.post(`${config.apiBaseUrl}/watchlists/addMovie`, {
         watchlistId: watchlist.watchListId,
         movieId: movieId
       }, { headers });
@@ -91,7 +113,7 @@ const Watchlist = ({ watchlist }) => {
         console.error(`Failed to add to watchlist`);
       }
 
-      const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
+      const updatedWatchlistResponse = await axios.get(`${config.apiBaseUrl}/watchlists/getWatchlist/${watchlist.watchListId}`, {
         headers: {
           'Authorization': `Bee-roll ${token}`
         }
@@ -105,14 +127,14 @@ const Watchlist = ({ watchlist }) => {
     }
   };
 
-  const deleteFromWatchlist = async (movieId) => { 
+  const deleteFromWatchlist = async (movieId) => {
     try {
       const headers = {
         'Authorization': `Bee-roll ${token}`,
         'Content-Type': 'application/json'
       };
 
-      const response = await axios.post(`http://localhost:3000/watchlists/removeMovie`, {
+      const response = await axios.post(`${config.apiBaseUrl}/watchlists/removeMovie`, {
         watchlistId: watchlist.watchListId,
         movieId: movieId
       }, { headers });
@@ -123,7 +145,7 @@ const Watchlist = ({ watchlist }) => {
         console.error(`Failed to remove from watchlist`);
       }
 
-      const updatedWatchlistResponse = await axios.get(`http://localhost:3000/watchlists/getWatchlist/${watchlist.watchListId}`, {
+      const updatedWatchlistResponse = await axios.get(`${config.apiBaseUrl}/watchlists/getWatchlist/${watchlist.watchListId}`, {
         headers: {
           'Authorization': `Bee-roll ${token}`
         }
@@ -144,8 +166,8 @@ const Watchlist = ({ watchlist }) => {
         setMoviesInfo([]);
         const promises = watchlist.movieIds.map(async (movieId) => {
           try {
-            const response = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`);
-    
+            const response = await fetch(`${config.apiBaseUrl}/movies/getInfo/${movieId}`);
+
             if (response.ok) {
               const movieInfo = await response.json();
               return movieInfo;
@@ -158,7 +180,7 @@ const Watchlist = ({ watchlist }) => {
             return null;
           }
         });
-    
+
         const movieInfoArray = await Promise.all(promises);
         setMoviesInfo(prevMoviesInfo => [
           ...prevMoviesInfo,
@@ -166,7 +188,7 @@ const Watchlist = ({ watchlist }) => {
         ]);
       }
     };
-    
+
     fetchMovieInfo();
   }, [isExpanded, watchlist.movieIds]);
 
@@ -174,18 +196,23 @@ const Watchlist = ({ watchlist }) => {
     <div className="card mt-3">
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center">
-          <h5 className="card-title" onClick={toggleExpand}>
             {isEditMode ? (
-              <input
-                type="text"
-                className="form-control"
-                value={editedTitle}
-                onChange={handleTitleChange}
-              />
+              <div className="d-flex">
+                <input
+                  type="text"
+                  className="form-control me-2"
+                  value={editedTitle}
+                  onChange={handleTitleChange}
+                />
+                <button className="btn btn-sm btn-primary" onClick={handleSaveTitle}>
+                  Save
+                </button>
+              </div>
             ) : (
-              watchlist.watchListTitle
+              <h5 className="card-title" onClick={toggleExpand}>
+                {watchlist.watchListTitle}
+              </h5>
             )}
-          </h5>
           <div className="d-flex align-items-center">
             <div className="privacy-section me-3">
               <label className="privacy-label">

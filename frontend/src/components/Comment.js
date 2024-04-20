@@ -3,6 +3,7 @@ import axios from 'axios';
 import '../styles/Comment.css';
 import UpvoteDownvoteButtonComment from './UpvoteDownvoteButtonComment'
 import { useUser } from '../UserContext';
+import config from '../config';
 
 function Comment(props) {
     const [comment, setComment] = useState([]);
@@ -16,7 +17,7 @@ function Comment(props) {
     useEffect(() => {
         const fetchCommentData = async () => {
           try {
-            const response = await axios.get(`http://localhost:3000/comments/${commentId}`);
+            const response = await axios.get(`${config.apiBaseUrl}/comments/${commentId}`);
             const fetchedComment = response.data.comment;
             setComment(fetchedComment);
             const commentDate = new Date(fetchedComment.postingDate);
@@ -34,7 +35,7 @@ function Comment(props) {
             const formattedDateTime = `${formattedDate} at ${formattedTime}`;
             setDate(formattedDateTime);
 
-            const userResponse = await axios.get(`http://localhost:3000/users/getUser/${fetchedComment.userId}`);
+            const userResponse = await axios.get(`${config.apiBaseUrl}/users/getUser/${fetchedComment.userId}`);
             setUserComment(userResponse.data.user_info.login);
           } catch (error) {
             console.error('Error fetching comment data:', error);
@@ -52,7 +53,7 @@ function Comment(props) {
           'Content-Type': 'application/json'
         };
   
-        axios.delete(`http://localhost:3000/comments/deleteComment/`, { headers, data: {commentId: commentId} })
+        axios.delete(`${config.apiBaseUrl}/comments/deleteComment/`, { headers, data: {commentId: commentId} })
           .then(response => {
             console.log('Comment deleted successfully:', response.data);
           })

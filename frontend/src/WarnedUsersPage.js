@@ -1,8 +1,7 @@
-// WarnedUsersPage.js
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './styles/WarnedUsersPage.css'; 
+import config from './config';
 
 
 const WarnedUsersPage = () => {
@@ -14,7 +13,7 @@ const WarnedUsersPage = () => {
 
   const fetchWarnedUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/users/getWarnedUsers');
+      const response = await axios.get(`${config.apiBaseUrl}/users/getWarnedUsers`);
       setWarnedUsers(response.data.warnedUsers);
     } catch (error) {
       console.error('Error fetching warned users:', error);

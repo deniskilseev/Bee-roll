@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import LoginPageModal from './LoginPageModal';
+import config from '../../config';
 
 const RegisterPageModal = ({ showModal, onClose }) => {
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ const RegisterPageModal = ({ showModal, onClose }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3000/users/createUser', {
+      const response = await fetch(`${config.apiBaseUrl}/users/createUser`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

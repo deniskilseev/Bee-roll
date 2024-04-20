@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Loader, Message } from 'semantic-ui-react';
 import { useUser } from './UserContext';
 import { Link } from 'react-router-dom';
+import config from './config';
 
 const RecommendationPage = () => {
   const [movies, setMovies] = useState([]);
@@ -17,7 +18,7 @@ const RecommendationPage = () => {
           'Authorization': `Bee-roll ${token}`,
           'Content-Type': 'application/json'
         };
-        const response = await fetch('http://localhost:3000/predict/predictUser', { headers });
+        const response = await fetch(`${config.apiBaseUrl}/predict/predictUser`, { headers });
         if (!response.ok) {
           throw new Error('Failed to fetch movies');
         }
@@ -26,7 +27,7 @@ const RecommendationPage = () => {
 
         const moviesInfoPromises = movieIds.map(async (movieId) => {
           try {
-            const movieResponse = await fetch(`http://localhost:3000/movies/getInfo/${movieId}`, { headers });
+            const movieResponse = await fetch(`${config.apiBaseUrl}/movies/getInfo/${movieId}`, { headers });
             if (!movieResponse.ok) {
               throw new Error(`Failed to fetch movie info for movie ID ${movieId}`);
             }

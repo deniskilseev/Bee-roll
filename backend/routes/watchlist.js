@@ -10,6 +10,7 @@ router.get('/getWatchlist/:watchlistId', verifyToken, watchListController.getWat
 router.post('/togglePublic', verifyToken, watchListController.togglePublic);
 router.post('/followWatchlist', verifyToken, watchListController.followWatchlist);
 router.post('/unfollowWatchlist', verifyToken, watchListController.unfollowWatchlist);
+router.put('/changeTitle', verifyToken, watchListController.changeWatchListName);
 router.delete('/deleteWatchlist/:watchlistId', verifyToken, watchListController.deleteWatchList);
 
 // Export the router
