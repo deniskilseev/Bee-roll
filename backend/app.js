@@ -20,7 +20,7 @@ const commentRoute = require('./routes/comment');
 // Create Express application
 const app = express();
 app.use(bodyParser.json());
-
+app.use(cors());
 
 // Middleware
 app.use(express.json()); // Parse JSON bodies
@@ -43,6 +43,11 @@ mongoose.connect(uri, {
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
+const corsOptions = {
+  origin: 'http://deniskilseev.com', // Update this with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify the methods you want to allow
+  allowedHeaders: ['Content-Type'], // Include other allowed headers
+};
 
 // Routes.
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
