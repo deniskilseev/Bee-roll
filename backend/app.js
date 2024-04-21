@@ -20,7 +20,6 @@ const commentRoute = require('./routes/comment');
 // Create Express application
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
 
 
 // Middleware
@@ -39,17 +38,12 @@ const uri = `mongodb://${username}:${password}@${host}:${portMongo}/${dbName}`;
 // Connect to MongoDB
 mongoose.connect(uri, {
     useUnifiedTopology: true,
-    dbName: 'prodDatabase'
+    dbName: 'testDatabase'
   })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
 
-  const corsOptions = {
-  origin: 'http://localhost:3001', // Update this with your frontend URL
-  methods: ['GET', 'POST'], // Specify the methods you want to allow
-  allowedHeaders: ['Content-Type'], // Include other allowed headers
-};
 // Routes.
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/users', userRoute);
